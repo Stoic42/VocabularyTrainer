@@ -100,10 +100,7 @@ def import_words_from_csv():
                     # 打印处理后的数据，用于调试
                     if i < 3:  # 只打印前3行的处理结果
                         print(f"处理结果: list_id={list_id}, spelling={spelling}, pos={pos}, meaning_cn={meaning_cn}")
-                except Exception as e:
-                    print(f"处理行 {i+1} 时出错: {e}, 行内容: {row}")
-                    continue
-                
+                    
                     # 准备SQL插入语句
                     # 现在我们插入拼写、中文意思、词性和列表ID
                     sql = """
@@ -113,6 +110,9 @@ def import_words_from_csv():
                     # 执行SQL语句 (使用CSV中的list_id)
                     cursor.execute(sql, (spelling, meaning_cn, pos, list_id))
                     count += 1
+                except Exception as e:
+                    print(f"处理行 {i+1} 时出错: {e}, 行内容: {row}")
+                    continue
             
             # 提交所有更改到数据库
             conn.commit()

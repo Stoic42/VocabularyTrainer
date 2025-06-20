@@ -15,9 +15,11 @@
 
     <div id="quiz-area" style="display: none;">
         <h2 id="question-meaning"></h2>
+        <button id="play-audio" style="margin-right: 10px;">播放发音</button>
         <p>第 <span id="current-q-num">1</span> / <span id="total-q-num"></span> 题</p>
         <input type="text" id="answer-input" placeholder="输入单词拼写...">
         <button id="next-btn">下一题</button>
+        <audio id="word-audio" style="display: none;"></audio>
     </div>
 
     <div id="results-area">
@@ -76,25 +78,42 @@
             }
         });
 
-        // 显示问题
+        // 在displayQuestion函数中添加音频处理
         function displayQuestion() {
-            // Remove duplicate declaration since 'q' is declared again below
-            // --- 新的、更智能的显示逻辑 ---
             const q = questions[currentQuestionIndex];
             let displayText = q.meaning_cn;
 
-            // 检查API返回的数据里有没有'pos'字段，以及它是不是空的
             if (q.pos && q.pos.trim() !== '') {
-                // 如果有词性，就把它和中文意思拼接起来
                 displayText = `${q.meaning_cn} (${q.pos})`;
             }
             questionMeaningEl.textContent = displayText;
             currentQNumEl.textContent = currentQuestionIndex + 1;
+
+            // 如果没有保存的音频URL，生成剑桥词典的URL
+            if (!q.audio_url) {
+                const word = q.spelling.toLowerCase().trim();
+                // 使用剑桥词典的音频URL格式
+                q.audio_url = `https://dictionary.cambridge.org/media/english/uk_pron/${word[0]}/${word}.mp3`;
+            }
+
+            // 设置音频元素
+            const audioEl = document.getElementById('word-audio');
+            audioEl.src = q.audio_url;
+
             answerInput.focus();
             if (currentQuestionIndex === questions.length - 1) {
                 nextBtn.textContent = '完成并提交';
             }
         }
+
+        // 添加播放按钮事件监听
+        document.getElementById('play-audio').addEventListener('click', () => {
+            const audioEl = document.getElementById('word-audio');
+            audioEl.play().catch(error => {
+                console.error('播放音频失败:', error);
+                alert('抱歉，无法播放音频。可能是网络问题或该单词暂无发音。');
+            });
+        });
 
         // 提交测试
         async function submitTest() {
@@ -120,6 +139,18 @@
                 errorListEl.appendChild(li);
             });
         }
+
+        // 监听输入框的键盘按下事件
+        answerInput.addEventListener('keydown', function(event) {
+            // 检查按下的键是不是回车键 (Enter键的keyCode是13)
+            if (event.keyCode === 13) {
+                // 阻止回车键的默认行为 (比如提交整个页面的表单)
+                event.preventDefault();
+                
+                // 手动触发“下一题”/“完成”按钮的点击事件
+                nextBtn.click();
+            }
+        });
     </script>
 </body>
 </html>

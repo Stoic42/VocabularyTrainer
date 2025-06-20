@@ -15,7 +15,8 @@ def get_db_connection():
 def get_questions():
     conn = get_db_connection()
     # 随机抽取10个单词
-    words = conn.execute('SELECT word_id, spelling, meaning_cn, pos FROM Words ORDER BY RANDOM() LIMIT 10').fetchall()
+    # 修改SQL查询，添加 audio_url 字段
+    words = conn.execute('SELECT word_id, spelling, meaning_cn, pos, audio_url FROM Words ORDER BY RANDOM() LIMIT 10').fetchall()
     conn.close()
     # 将查询结果转换为字典列表
     return jsonify([dict(word) for word in words])
