@@ -21,3 +21,10 @@ config.py
 # 这些文件只跟您自己的编辑习惯有关
 .idea/
 .vscode/
+
+# 忽略词库CSV文件
+# 词库文件可能很大，且包含特定内容，不适合放入版本控制
+*.csv
+wordlists/*.csv
+# 但保留README.md文件
+!wordlists/README.md
