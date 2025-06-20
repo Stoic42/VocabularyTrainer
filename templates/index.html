@@ -78,8 +78,17 @@
 
         // 显示问题
         function displayQuestion() {
+            // Remove duplicate declaration since 'q' is declared again below
+            // --- 新的、更智能的显示逻辑 ---
             const q = questions[currentQuestionIndex];
-            questionMeaningEl.textContent = q.meaning_cn;
+            let displayText = q.meaning_cn;
+
+            // 检查API返回的数据里有没有'pos'字段，以及它是不是空的
+            if (q.pos && q.pos.trim() !== '') {
+                // 如果有词性，就把它和中文意思拼接起来
+                displayText = `${q.meaning_cn} (${q.pos})`;
+            }
+            questionMeaningEl.textContent = displayText;
             currentQNumEl.textContent = currentQuestionIndex + 1;
             answerInput.focus();
             if (currentQuestionIndex === questions.length - 1) {

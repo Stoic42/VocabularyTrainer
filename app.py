@@ -15,7 +15,7 @@ def get_db_connection():
 def get_questions():
     conn = get_db_connection()
     # 随机抽取10个单词
-    words = conn.execute('SELECT word_id, spelling, meaning_cn FROM Words ORDER BY RANDOM() LIMIT 10').fetchall()
+    words = conn.execute('SELECT word_id, spelling, meaning_cn, pos FROM Words ORDER BY RANDOM() LIMIT 10').fetchall()
     conn.close()
     # 将查询结果转换为字典列表
     return jsonify([dict(word) for word in words])
@@ -40,7 +40,14 @@ def submit_answers():
         correct_word = cursor.execute('SELECT spelling FROM Words WHERE word_id = ?', (word_id,)).fetchone()
         correct_spelling = correct_word['spelling']
 
-        if student_answer.strip().lower() != correct_spelling.lower():
+        # --- 原来的逻辑 ---
+        # if student_answer.strip().lower() != correct_spelling.lower():
+        #     # ... 答错了 ...
+
+        # --- 请修改为下面的新逻辑 ---
+        valid_spellings = [s.strip().lower() for s in correct_spelling.split('/')]
+        if student_answer.strip().lower() not in valid_spellings:
+            # ... 答错了 ...
             error_count += 1
             error_details.append({
                 'word_id': word_id,
