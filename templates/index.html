@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MVP Vocabulary Trainer</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        #quiz-area, #results-area { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
+        #results-area { display: none; } /* 默认隐藏结果区 */
+    </style>
+</head>
+<body>
+    <h1>快速单词测试 (MVP)</h1>
+    <button id="start-btn">开始测试</button>
+
+    <div id="quiz-area" style="display: none;">
+        <h2 id="question-meaning"></h2>
+        <p>第 <span id="current-q-num">1</span> / <span id="total-q-num"></span> 题</p>
+        <input type="text" id="answer-input" placeholder="输入单词拼写...">
+        <button id="next-btn">下一题</button>
+    </div>
+
+    <div id="results-area">
+        <h2>测试结果</h2>
+        <p>你错了 <strong id="error-count"></strong> 个单词。</p>
+        <ul id="error-list"></ul>
+    </div>
+
+    <script>
+        // 全局变量
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        // 获取DOM元素
+        const startBtn = document.getElementById('start-btn');
+        const quizArea = document.getElementById('quiz-area');
+        const resultsArea = document.getElementById('results-area');
+        const questionMeaningEl = document.getElementById('question-meaning');
+        const currentQNumEl = document.getElementById('current-q-num');
+        const totalQNumEl = document.getElementById('total-q-num');
+        const answerInput = document.getElementById('answer-input');
+        const nextBtn = document.getElementById('next-btn');
+
+        // 开始按钮点击事件
+        startBtn.addEventListener('click', async () => {
+            const response = await fetch('/api/questions');
+            questions = await response.json();
+            if (questions.length > 0) {
+                startBtn.style.display = 'none';
+                quizArea.style.display = 'block';
+                totalQNumEl.textContent = questions.length;
+                displayQuestion();
+            } else {
+                alert('无法加载题目！');
+            }
+        });
+
+        // 下一题/提交按钮点击事件
+        nextBtn.addEventListener('click', () => {
+            // 保存当前答案
+            userAnswers.push({
+                word_id: questions[currentQuestionIndex].word_id,
+                answer: answerInput.value
+            });
+
+            // 移动到下一题
+            currentQuestionIndex++;
+            answerInput.value = '';
+
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+            } else {
+                // 测试结束
+                submitTest();
+            }
+        });
+
+        // 显示问题
+        function displayQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionMeaningEl.textContent = q.meaning_cn;
+            currentQNumEl.textContent = currentQuestionIndex + 1;
+            answerInput.focus();
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = '完成并提交';
+            }
+        }
+
+        // 提交测试
+        async function submitTest() {
+            quizArea.style.display = 'none';
+            const response = await fetch('/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers: userAnswers })
+            });
+            const results = await response.json();
+            displayResults(results);
+        }
+
+        // 显示结果
+        function displayResults(results) {
+            resultsArea.style.display = 'block';
+            document.getElementById('error-count').textContent = results.error_count;
+            const errorListEl = document.getElementById('error-list');
+            errorListEl.innerHTML = '';
+            results.error_details.forEach(err => {
+                const li = document.createElement('li');
+                li.textContent = `正确: ${err.correct_spelling} / 你的答案: ${err.your_answer}`;
+                errorListEl.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
