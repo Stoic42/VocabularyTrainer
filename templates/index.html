@@ -29,12 +29,24 @@
     </div>
 
     <script>
-        // 全局变量
         let questions = [];
         let currentQuestionIndex = 0;
         let userAnswers = [];
+        let voices = [];
 
-        // 获取DOM元素
+        // 初始化语音列表
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+        }
+
+        // 监听语音列表加载完成事件
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // 初始加载语音列表
+        loadVoices();
+
         const startBtn = document.getElementById('start-btn');
         const quizArea = document.getElementById('quiz-area');
         const resultsArea = document.getElementById('results-area');
@@ -78,7 +90,7 @@
             }
         });
 
-        // 在displayQuestion函数中添加音频处理
+        // 修改 displayQuestion 函数中的音频处理部分
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
             let displayText = q.meaning_cn;
@@ -89,16 +101,13 @@
             questionMeaningEl.textContent = displayText;
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
-            // 如果没有保存的音频URL，生成剑桥词典的URL
-            if (!q.audio_url) {
-                const word = q.spelling.toLowerCase().trim();
-                // 使用剑桥词典的音频URL格式
-                q.audio_url = `https://dictionary.cambridge.org/media/english/uk_pron/${word[0]}/${word}.mp3`;
-            }
+            // 使用 Google Text-to-Speech API 的 URL
+            const word = q.spelling.toLowerCase().trim();
+            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=en&client=tw-ob`;
 
             // 设置音频元素
             const audioEl = document.getElementById('word-audio');
-            audioEl.src = q.audio_url;
+            audioEl.src = ttsUrl;
 
             answerInput.focus();
             if (currentQuestionIndex === questions.length - 1) {
@@ -106,13 +115,21 @@
             }
         }
 
-        // 添加播放按钮事件监听
+        // 播放音频按钮点击事件
         document.getElementById('play-audio').addEventListener('click', () => {
-            const audioEl = document.getElementById('word-audio');
-            audioEl.play().catch(error => {
-                console.error('播放音频失败:', error);
-                alert('抱歉，无法播放音频。可能是网络问题或该单词暂无发音。');
-            });
+            window.speechSynthesis.cancel(); // 停止当前正在播放的语音
+            const q = questions[currentQuestionIndex];
+            const word = q.spelling.toLowerCase().trim();
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            // 获取可用的语音列表
+            const voices = window.speechSynthesis.getVoices();
+            // 选择英语语音
+            const englishVoice = voices.find(voice => voice.lang.startsWith('en-'));
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            }
+            window.speechSynthesis.speak(utterance);
         });
 
         // 提交测试
