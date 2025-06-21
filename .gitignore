@@ -28,3 +28,19 @@ config.py
 wordlists/*.csv
 # 但保留README.md文件
 !wordlists/README.md
+
+# 忽略assets目录下的特定文件
+# 忽略所有图片文件，除了SVG
+assets/img/*.png
+assets/img/*.jpg
+assets/img/*.jpeg
+assets/img/*.gif
+assets/img/*.bmp
+# 保留SVG文件，因为它们是矢量图，体积小且易于版本控制
+!assets/img/*.svg
+# 忽略生成的HTML文件
+assets/img/*.html
+# 忽略其他可能的二进制资源文件
+assets/audio/*
+assets/video/*
+assets/fonts/*

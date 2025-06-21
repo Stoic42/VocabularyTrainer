@@ -4,20 +4,195 @@
     <meta charset="UTF-8">
     <title>MVP Vocabulary Trainer</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        #quiz-area, #results-area { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
+        :root {
+            --primary-color: #4CAF50;
+            --hover-color: #45a049;
+            --error-color: #dc3545;
+            --warning-color: #ffc107;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #quiz-area, #results-area {
+            margin-top: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
         #results-area { display: none; }
-        .audio-loading { opacity: 0.6; cursor: not-allowed; }
-        .audio-loading::after { content: '加载中...'; margin-left: 5px; font-size: 0.8em; }
-        #audio-error { display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .loading-indicator { display: none; margin-left: 10px; color: #666; }
-        #preload-status { font-size: 0.8em; color: #666; margin-top: 5px; }
-        .audio-controls { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
-        .volume-control { display: flex; align-items: center; gap: 5px; }
-        .progress-container { width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .progress-bar { width: 0; height: 100%; background: #4CAF50; transition: width 0.1s linear; }
-        .keyboard-shortcuts { font-size: 0.8em; color: #666; margin-top: 5px; }
-        .loop-control { display: flex; align-items: center; gap: 5px; }
+
+        .audio-loading {
+            opacity: 0.6;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .audio-loading::after {
+            content: '加载中...';
+            margin-left: 5px;
+            font-size: 0.8em;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        #audio-error {
+            display: none;
+            color: var(--error-color);
+            background-color: #fff5f5;
+            border: 1px solid #ffebeb;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: var(--border-radius);
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 4px rgba(220,53,69,0.1);
+        }
+
+        .loading-indicator {
+            display: none;
+            margin-left: 10px;
+            color: var(--text-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        #preload-status {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid #e9ecef;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--hover-color));
+            transition: width 0.1s linear;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .keyboard-shortcuts {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid #e9ecef;
+        }
+
+        .loop-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #answer-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        #answer-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+        }
+
+        .playing {
+            animation: playing 2s infinite;
+        }
+
+        @keyframes playing {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -70,6 +245,8 @@
         let isPlaying = false;
         let currentAudio = null;
         let loopEnabled = false;
+        let preloadQueue = [];
+        let maxCacheSize = 10; // 最大缓存数量
 
         // 初始化语音列表
         function loadVoices() {
@@ -129,6 +306,8 @@
 
         // 修改 displayQuestion 函数中的音频处理部分
         async function displayQuestion() {
+            // 清空预加载队列
+            preloadQueue = [];
             const q = questions[currentQuestionIndex];
             let displayText = q.meaning_cn;
 
@@ -151,15 +330,22 @@
                 nextBtn.textContent = '完成并提交';
             }
 
-            // 预加载当前单词的音频
+            // 预加载当前单词的音频（高优先级）
             if (q.audio_path_uk) await preloadAudio(q.audio_path_uk);
             if (q.audio_path_us) await preloadAudio(q.audio_path_us);
             
-            // 预加载下一个单词的音频
-            if (currentQuestionIndex < questions.length - 1) {
-                const nextQ = questions[currentQuestionIndex + 1];
-                if (nextQ.audio_path_uk) await preloadAudio(nextQ.audio_path_uk);
-                if (nextQ.audio_path_us) await preloadAudio(nextQ.audio_path_us);
+            // 将后续单词的音频添加到预加载队列（低优先级）
+            for (let i = 1; i <= 2; i++) {
+                if (currentQuestionIndex + i < questions.length) {
+                    const futureQ = questions[currentQuestionIndex + i];
+                    if (futureQ.audio_path_uk) preloadQueue.push(futureQ.audio_path_uk);
+                    if (futureQ.audio_path_us) preloadQueue.push(futureQ.audio_path_us);
+                }
+            }
+            
+            // 开始预加载队列中的第一个音频
+            if (preloadQueue.length > 0) {
+                preloadAudio(preloadQueue.shift());
             }
         }
 
@@ -168,13 +354,27 @@
             if (!audioPath || audioCache.has(audioPath)) return;
             
             try {
+                // 如果缓存已满，移除最早的缓存
+                if (audioCache.size >= maxCacheSize) {
+                    const oldestKey = audioCache.keys().next().value;
+                    URL.revokeObjectURL(audioCache.get(oldestKey));
+                    audioCache.delete(oldestKey);
+                }
+
                 const response = await fetch(`/static/audio/${audioPath}`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const blob = await response.blob();
                 audioCache.set(audioPath, URL.createObjectURL(blob));
-                document.getElementById('preload-status').textContent = `已预加载: ${audioPath}`;
+                document.getElementById('preload-status').textContent = `已预加载: ${audioPath} (缓存: ${audioCache.size}/${maxCacheSize})`;
+
+                // 预加载队列中的下一个音频
+                const nextInQueue = preloadQueue.shift();
+                if (nextInQueue) {
+                    preloadAudio(nextInQueue);
+                }
             } catch (error) {
                 console.error('预加载音频失败:', error);
+                document.getElementById('preload-status').textContent = `预加载失败: ${audioPath}`;
             }
         }
 
@@ -207,15 +407,29 @@
                 
                 audioEl.loop = document.getElementById('loop-audio').checked;
                 
-                // 更新进度条
+                // 更新进度条和播放动画
                 audioEl.addEventListener('timeupdate', () => {
                     const progress = (audioEl.currentTime / audioEl.duration) * 100;
                     document.getElementById('audio-progress').style.width = `${progress}%`;
                 });
                 
-                // 重置进度条
+                // 播放开始时添加动画效果
+                audioEl.addEventListener('play', () => {
+                    button.classList.add('playing');
+                });
+                
+                // 播放结束时的处理
                 audioEl.addEventListener('ended', () => {
                     document.getElementById('audio-progress').style.width = '0%';
+                    button.classList.remove('playing');
+                    if (!audioEl.loop) {
+                        isPlaying = false;
+                    }
+                });
+                
+                // 播放暂停时的处理
+                audioEl.addEventListener('pause', () => {
+                    button.classList.remove('playing');
                     isPlaying = false;
                 });
                 
@@ -227,10 +441,13 @@
                 console.error('播放音频失败:', error);
                 audioError.textContent = '音频播放失败，已自动切换到TTS发音';
                 audioError.style.display = 'block';
+                audioError.style.animation = 'none';
+                audioError.offsetHeight; // 触发重排
+                audioError.style.animation = 'slideIn 0.3s ease-out';
                 
                 if (fallbackToTTS) {
                     const q = questions[currentQuestionIndex];
-                    playTTS(q.spelling.toLowerCase().trim());
+                    setTimeout(() => playTTS(q.spelling.toLowerCase().trim()), 1000); // 延迟1秒后播放TTS
                 }
             } finally {
                 isAudioLoading = false;
