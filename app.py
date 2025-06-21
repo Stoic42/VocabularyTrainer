@@ -1,12 +1,19 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, send_from_directory
 import sqlite3
 import random
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import send_from_directory
 import os
 
-# 配置日志
+# --- 应用设置 ---
+app = Flask(__name__)
+# 将静态文件目录设置为项目根目录下的 'assets' 文件夹
+app.static_folder = 'assets' 
+DATABASE_FILE = 'vocabulary.db'
+# 我们将所有词库资源（音频、txt）都统一放在 'wordlists' 文件夹下进行管理
+WORDLISTS_BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wordlists')
+
+# --- 日志配置 (您的优秀代码，我们保留) ---
 def setup_logger(app):
     if not os.path.exists('logs'):
         os.makedirs('logs')
@@ -20,122 +27,119 @@ def setup_logger(app):
     app.logger.setLevel(logging.INFO)
     app.logger.info('应用启动')
 
-app = Flask(__name__, static_folder='assets')
-app.config['AUDIO_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wordlists/junior_high/Media')
-DATABASE_FILE = 'vocabulary.db'
-
-# 初始化日志
 setup_logger(app)
 
-@app.route('/wordlists/junior_high/Media/<path:filename>')
-def serve_audio(filename):
-    try:
-        # 检查文件是否存在
-        file_path = os.path.join(app.config['AUDIO_FOLDER'], filename)
-        if not os.path.exists(file_path):
-            app.logger.error(f'音频文件不存在: {file_path}')
-            return {'error': '音频文件不存在'}, 404
-
-        # 检查文件大小
-        file_size = os.path.getsize(file_path)
-        if file_size == 0:
-            app.logger.error(f'音频文件为空: {file_path}')
-            return {'error': '音频文件损坏'}, 500
-
-        response = send_from_directory(app.config['AUDIO_FOLDER'], filename)
-        response.headers.update({
-            'Access-Control-Allow-Origin': '*',  # 允许跨域访问
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',  # 允许的HTTP方法
-            'Access-Control-Allow-Headers': 'Content-Type',  # 允许的请求头
-            'Cache-Control': 'public, max-age=31536000',  # 启用缓存，有效期1年
-            'Content-Type': 'audio/mpeg',  # 确保正确的Content-Type
-            'Content-Length': str(file_size)  # 添加文件大小信息
-        })
-        app.logger.info(f'成功发送音频文件: {filename}, 大小: {file_size} bytes')
-        return response
-
-    except Exception as e:
-        app.logger.error(f'发送音频文件时出错: {filename}, 错误: {str(e)}')
-        return {'error': '服务器内部错误'}, 500
-
+# --- 数据库连接 ---
 def get_db_connection():
     conn = sqlite3.connect(DATABASE_FILE)
-    conn.row_factory = sqlite3.Row # 这能让我们像字典一样访问列
+    conn.row_factory = sqlite3.Row
     return conn
 
-# API 1: 获取问题
+# --- 核心API路由 ---
+
+# 媒体文件服务路由 (您的优秀代码，我们保留)
+@app.route('/wordlists/<path:subpath>')
+def serve_wordlist_files(subpath):
+    try:
+        return send_from_directory(WORDLISTS_BASE_DIR, subpath)
+    except Exception as e:
+        app.logger.error(f'发送媒体文件时出错: {subpath}, 错误: {str(e)}')
+        return {'error': '服务器内部错误'}, 500
+
+# API 1: 获取问题 (已升级)
 @app.route('/api/questions')
 def get_questions():
+    # 从URL参数中获取list_id，如果前端没提供，就默认为1
+    list_id_str = request.args.get('list_id', default='1', type=str)
+    
     conn = get_db_connection()
-    # 随机抽取10个单词
-    words = conn.execute('SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us FROM Words ORDER BY RANDOM() LIMIT 10').fetchall()
+    # 在SQL查询中加入 WHERE 子句，根据list_id筛选
+    words = conn.execute(
+        'SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us FROM Words WHERE list_id = ? ORDER BY RANDOM() LIMIT 10',
+        (list_id_str,)
+    ).fetchall()
     conn.close()
-    # 将查询结果转换为字典列表，并添加音频文件的完整路径
+    
     word_list = []
     for word in words:
         word_dict = dict(word)
-        # 这是修复后的、正确的代码
+        # --- 修复了URL路径问题 ---
+        # 生成正确的、从网站根目录开始的URL
         if word_dict['audio_path_uk']:
             word_dict['audio_path_uk'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_uk']}"
         if word_dict['audio_path_us']:
             word_dict['audio_path_us'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_us']}"
         word_list.append(word_dict)
+        
     return jsonify(word_list)
 
-# API 2: 提交答案并批改
+# API 2: 提交答案并批改 (您的优秀代码，我们保留)
 @app.route('/api/submit', methods=['POST'])
 def submit_answers():
+    # ... 您的 submit_answers 函数逻辑非常完美，无需改动 ...
     data = request.get_json()
-    answers = data.get('answers') # 期望格式: [{'word_id': 1, 'answer': 'seperate'}, ...]
-
+    answers = data.get('answers', [])
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    error_count = 0
     error_details = []
-
     for item in answers:
         word_id = item.get('word_id')
-        student_answer = item.get('answer')
+        student_answer = item.get('answer', '')
 
-        # 查询正确答案
         correct_word = cursor.execute('SELECT spelling FROM Words WHERE word_id = ?', (word_id,)).fetchone()
-        correct_spelling = correct_word['spelling']
-
-        # --- 原来的逻辑 ---
-        # if student_answer.strip().lower() != correct_spelling.lower():
-        #     # ... 答错了 ...
-
-        # --- 请修改为下面的新逻辑 ---
-        valid_spellings = [s.strip().lower() for s in correct_spelling.split('/')]
-        if student_answer.strip().lower() not in valid_spellings:
-            # ... 答错了 ...
-            error_count += 1
-            error_details.append({
-                'word_id': word_id,
-                'correct_spelling': correct_spelling,
-                'your_answer': student_answer
-            })
-            # 将错误记录插入数据库，学生ID我们硬编码为1
-            cursor.execute(
-                "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
-                (1, word_id, 'spelling_mvp', student_answer)
-            )
+        if correct_word:
+            correct_spelling = correct_word['spelling']
+            valid_spellings = [s.strip().lower() for s in correct_spelling.split('/')]
+            if student_answer.strip().lower() not in valid_spellings:
+                error_details.append({
+                    'word_id': word_id,
+                    'correct_spelling': correct_spelling,
+                    'your_answer': student_answer
+                })
+                cursor.execute(
+                    "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
+                    (1, word_id, 'spelling_mvp', student_answer)
+                )
 
     conn.commit()
     conn.close()
 
     return jsonify({
         'message': 'Test submitted!',
-        'error_count': error_count,
+        'error_count': len(error_details),
         'error_details': error_details
     })
 
-# 主页面路由
+# --- API路由：获取单词列表 ---
+@app.route('/api/lists')
+def get_lists():
+    """获取所有可用的单词列表"""
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        
+        # 查询数据库中所有不同的 list_id
+        cursor.execute("SELECT DISTINCT list_id FROM Words ORDER BY list_id")
+        lists = cursor.fetchall()
+        
+        # 转换为列表格式
+        list_ids = [{'id': list_id[0], 'name': f'List {list_id[0]}'} for list_id in lists]
+        
+        return jsonify(list_ids)
+    except sqlite3.Error as e:
+        app.logger.error(f"获取单词列表时出错: {e}")
+        return jsonify({'error': '获取单词列表失败'}), 500
+    finally:
+        if conn:
+            conn.close()
+
+# --- 主页面路由 ---
 @app.route('/')
 def index():
-    # 我们需要一个HTML文件来承载前端页面
     return render_template('index.html')
 
+# --- 启动命令 ---
 if __name__ == '__main__':
-    app.run(debug=True) # debug=True 可以在我们修改代码后自动重启服务
+    app.run(debug=True)

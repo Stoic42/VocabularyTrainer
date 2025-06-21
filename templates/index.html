@@ -17,7 +17,47 @@
             --accent-color: #FF7B54;  /* 活力珊瑚橙 */
             --border-radius: 8px;
         }
+        /* Lumi 相关样式 */
+        .lumi-reaction {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(40px);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
+        .lumi-reaction.active {
+            opacity: 1;
+            transform: translateY(0);
+            animation: lumiFloat 15s ease-in-out infinite;
+        }
+
+        .lumi-reaction.bounce {
+            animation: lumiJump 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+        }
+
+        @keyframes lumiJump {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        @keyframes lumiFloat {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5px, -3px); }
+            50% { transform: translate(3px, -5px); }
+            75% { transform: translate(-3px, -4px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* 添加到现有的样式表末尾 */
         body, html {
             margin: 0;
             padding: 0;
@@ -106,6 +146,37 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(255,179,71,0.1);
         }
+        
+        /* 美化下拉菜单样式 */
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            background-color: white;
+            color: var(--text-color);
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6"><path d="M0 0h12L6 6z" fill="%23666"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,179,71,0.1);
+        }
+        
+        select:hover {
+            border-color: var(--primary-color);
+        }
 
         #quiz-area, #results-area {
             margin-top: 20px;
@@ -148,12 +219,65 @@
             color: #666;
             margin: 10px 0;
         }
+        
+        /* 美化下拉菜单 */
+        .list-selector {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .list-selector label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        select {
+            width: 200px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            color: var(--text-color);
+            background-color: white;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        select:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.25);
+        }
     </style>
 </head>
 <body>
     <div id="app-container">
         <div class="header">
             <h1>快速单词测试 (MVP)</h1>
+        </div>
+
+        <!-- List 选择器 -->
+        <div class="list-selector">
+            <label for="list-select">选择单词列表:</label>
+            <select id="list-select">
+                <!-- 列表选项将通过 JavaScript 动态加载 -->
+                <option value="">加载中...</option>
+            </select>
         </div>
 
         <button id="start-btn">开始测试</button>
@@ -183,6 +307,39 @@
         let questions = [];
         let currentQuestionIndex = 0;
         let userAnswers = [];
+        
+        // 页面加载时获取可用的单词列表
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const listSelect = document.getElementById('list-select');
+                const response = await fetch('/api/lists');
+                if (!response.ok) throw new Error('获取单词列表失败');
+                const lists = await response.json();
+                
+                // 清空加载中的选项
+                listSelect.innerHTML = '';
+                
+                // 添加所有可用的列表选项
+                if (lists && lists.length > 0) {
+                    lists.forEach(list => {
+                        const option = document.createElement('option');
+                        option.value = list.id;
+                        option.textContent = list.name;
+                        listSelect.appendChild(option);
+                    });
+                } else {
+                    // 如果没有列表，显示默认选项
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = '没有可用的单词列表';
+                    listSelect.appendChild(option);
+                }
+            } catch (error) {
+                console.error('加载单词列表时出错:', error);
+                const listSelect = document.getElementById('list-select');
+                listSelect.innerHTML = '<option value="">加载失败</option>';
+            }
+        });
 
         // DOM 元素
         const startBtn = document.getElementById('start-btn');
@@ -197,28 +354,31 @@
         const ukBtn = document.getElementById('play-uk-btn');
         const usBtn = document.getElementById('play-us-btn');
 
-        // 统一的音频播放函数
-        function playAudio(audioPath) {
-            if (!audioPath) return; // 如果路径不存在，则不执行任何操作
+        // 新的、统一的、更强大的音频播放函数
+        function playAudio(audioPath, fallbackText) {
+            if (audioPath && audioPath.trim() !== "") {
+                // 优先播放本地音频
+                audioEl.src = audioPath;
+                const playPromise = audioEl.play();
 
-            // 直接使用后端提供的完整URL路径
-            audioEl.src = audioPath;
-            const playPromise = audioEl.play();
-
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error("音频播放错误:", error);
-                    // 在这里可以调用TTS作为后备方案
-                    // playTTSFallback(questions[currentQuestionIndex].spelling);
-                });
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.error(`本地音频播放失败: ${audioPath}`, error);
+                        // 播放失败时，自动调用TTS作为后备
+                        playTTS(fallbackText); 
+                    });
+                }
+            } else {
+                // 如果没有本地音频，直接调用TTS
+                playTTS(fallbackText);
             }
         }
 
         // 显示问题的函数
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
-            
-            // 显示题目（中文意思和词性）
+
+            // 正确显示中文意思和词性
             let displayText = q.meaning_cn;
             if (q.pos && q.pos.trim() !== '') {
                 displayText = `${q.meaning_cn} (${q.pos})`;
@@ -226,15 +386,20 @@
             questionMeaningEl.textContent = displayText;
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
+
             // 根据是否有音频路径，决定是否显示按钮并绑定事件
-            ukBtn.style.display = q.audio_path_uk ? 'inline-block' : 'none';
-            usBtn.style.display = q.audio_path_us ? 'inline-block' : 'none';
-            
             if (q.audio_path_uk) {
-                ukBtn.onclick = () => playAudio(q.audio_path_uk);
+                ukBtn.style.display = 'inline-block';
+                ukBtn.onclick = () => playAudio(q.audio_path_uk, q.spelling);
+            } else {
+                ukBtn.style.display = 'none';
             }
+
             if (q.audio_path_us) {
-                usBtn.onclick = () => playAudio(q.audio_path_us);
+                usBtn.style.display = 'inline-block';
+                usBtn.onclick = () => playAudio(q.audio_path_us, q.spelling);
+            } else {
+                usBtn.style.display = 'none';
             }
 
             // 更新按钮文字并聚焦输入框
@@ -287,7 +452,8 @@
         // --- 事件监听器 ---
         startBtn.addEventListener('click', async () => {
             try {
-                const response = await fetch('/api/questions');
+                const selectedListId = document.getElementById('list-select').value;
+                const response = await fetch(`/api/questions?list_id=${selectedListId}`);
                 if (!response.ok) throw new Error('网络请求失败');
                 questions = await response.json();
                 
@@ -296,6 +462,7 @@
                     quizArea.style.display = 'block';
                     totalQNumEl.textContent = questions.length;
                     displayQuestion();
+                    updateLumiReaction('thinking'); 
                 } else {
                     alert('无法加载题目或题目列表为空！');
                 }
@@ -313,7 +480,105 @@
                 handleNextQuestion();
             }
         });
+                // TTS功能
+        function playTTS(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        }
+
+        // Lumi图片路径定义
+        const lumiImages = {
+            'start': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
+            'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
+            'correct': '/assets/img/Lumi/Lumi_Celebrating.png',
+            'wrong': '/assets/img/Lumi/Lumi_Encouraging.png'
+        };
+
+        // 预加载Lumi图片
+        function preloadLumiImages() {
+            const preloadedImages = {};
+            for (const [state, path] of Object.entries(lumiImages)) {
+                preloadedImages[state] = new Image();
+                preloadedImages[state].src = path;
+            }
+            return preloadedImages;
+        }
+
+        // 更新Lumi表情和动画
+        function updateLumiReaction(state) {
+            const lumiImg = document.querySelector('.lumi-reaction');
+            if (!lumiImg) return;
+
+            // 移除所有动画类
+            lumiImg.classList.remove('bounce');
+            
+            // 设置新图片
+            if (lumiImages[state]) {
+                lumiImg.style.backgroundImage = `url(${lumiImages[state]})`;
+                
+                // 确保元素可见
+                if (!lumiImg.classList.contains('active')) {
+                    requestAnimationFrame(() => {
+                        lumiImg.classList.add('active');
+                    });
+                }
+                
+                // 添加弹跳动画
+                if (state === 'correct' || state === 'wrong') {
+                    // 暂停漂浮动画
+                    lumiImg.style.animation = 'none';
+                    
+                    // 触发重排以重置动画
+                    void lumiImg.offsetWidth;
+                    
+                    // 添加弹跳动画
+                    lumiImg.classList.add('bounce');
+                    
+                    // 弹跳结束后恢复漂浮
+                    setTimeout(() => {
+                        lumiImg.classList.remove('bounce');
+                        lumiImg.style.animation = '';
+                    }, 1000);
+                }
+            }
+        }
+
+        // 在页面加载时就开始预加载图片
+        document.addEventListener('DOMContentLoaded', () => {
+            preloadLumiImages();
+        });
+
+        // 修改handleNextQuestion函数，添加Lumi反应
+        function handleNextQuestion() {
+            const currentAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = questions[currentQuestionIndex].spelling.trim().toLowerCase();
+            
+            // 更新Lumi表情
+            updateLumiReaction(currentAnswer === correctAnswer ? 'correct' : 'wrong');
+
+            userAnswers.push({
+                word_id: questions[currentQuestionIndex].word_id,
+                answer: answerInput.value
+            });
+            
+            currentQuestionIndex++;
+            answerInput.value = '';
+
+            if (currentQuestionIndex < questions.length) {
+                setTimeout(() => {
+                    displayQuestion();
+                    updateLumiReaction('thinking');
+                }, 1000);
+            } else {
+                submitTest();
+            }
+        }
 
     </script>
+
+    <!-- 将Lumi元素移到body的最后 -->
+    <div class="lumi-reaction"></div>
 </body>
 </html>
