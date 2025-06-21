@@ -4,10 +4,8 @@ import csv     # 用于读取CSV文件
 
 # --- 请在这里配置您的文件名 ---
 DATABASE_FILE = 'vocabulary.db'  # 您的数据库文件名
-# 使用wordlists文件夹中的CSV文件
-# 您可以将任何词库CSV文件放在wordlists文件夹中，然后修改下面的文件名
-# 示例文件：wordlists/example_wordlist.csv
-CSV_FILE = 'wordlists/junior_high_vocab_random.csv'  # 新东方初中英语词汇文件
+# 使用wordlists文件夹中的词汇列表文件
+WORDLIST_FILE = 'wordlists/junior_high/初中 乱序 绿宝书.txt'  # 词汇列表文件
 # -----------------------------
 
 def create_database_tables():
@@ -53,9 +51,9 @@ def create_database_tables():
         if conn:
             conn.close()
 
-def import_words_from_csv():
+def import_words_from_txt():
     """
-    从CSV文件读取单词并导入到SQLite数据库中。
+    从TXT文件读取单词并导入到SQLite数据库中。
     """
     try:
         # 连接到SQLite数据库
@@ -63,33 +61,32 @@ def import_words_from_csv():
         cursor = conn.cursor()
         print(f"成功连接到数据库: {DATABASE_FILE}")
 
-        # 打开CSV文件进行读取
-        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
-            # 新东方CSV文件使用逗号(,)分隔
-            csv_reader = csv.reader(file, delimiter=',') 
-            
-            # 跳过CSV文件的第一行（表头）
-            next(csv_reader, None)
-
-            print("开始从CSV文件导入单词...")
+        # 打开TXT文件进行读取
+        with open(WORDLIST_FILE, mode='r', encoding='utf-8') as file:
+            print("开始从词汇列表文件导入单词...")
             count = 0
             # 打印前几行数据以便调试
-            print("CSV文件的前几行数据结构:")
-            for i, row in enumerate(csv_reader):
+            print("词汇列表文件的前几行数据结构:")
+            for i, line in enumerate(file):
                 if i < 3:  # 只打印前3行用于调试
-                    print(f"行 {i+1}: {row}")
+                    print(f"行 {i+1}: {line.strip()}")
                 
-                # 检查行是否有足够的列
-                if len(row) < 4:
+                # 使用制表符分割行
+                row = line.strip().split('\t')
+                
+                # 检查行是否有足够的列（至少需要12列：ID、单词、音标、近义词、中文释义、例句等）
+                if len(row) < 12:
                     print(f"警告: 行 {i+1} 列数不足，跳过此行: {row}")
+                    continue
+                
+                # 跳过空行或无效行
+                if not row[1].strip() or row[1].strip() == 'Word':
                     continue
                     
                 try:
-                    # 根据junior_high_vocab_random.csv文件的列顺序
-                    # 第0列是Word List，第1列是Word，第2列是IPA，第3列是Meaning (CN)，第4列是Example
-                    list_id = row[0].replace("List ", "")  # 从"List 1"中提取数字部分
-                    spelling = row[1]      # 第1列是单词拼写
-                    meaning_cn = row[3]    # 第3列是中文意思
+                    spelling = row[1]      # 第2列是单词拼写
+                    ipa = row[2]          # 第3列是音标
+                    meaning_cn = row[4]    # 第5列是中文意思
                     
                     # 从中文意思中提取词性
                     # 格式通常是"n. 牙科医生"这样的形式
@@ -98,19 +95,30 @@ def import_words_from_csv():
                     if len(parts) > 1 and parts[0].endswith("."):
                         pos = parts[0]  # 提取词性部分，如"n."
                         meaning_cn = parts[1]  # 提取剩余的中文意思部分
+                    
+                    # 提取音频文件路径
+                    # 假设音频引用格式为 [sound:cambridge-xxx.mp3]
+                    audio_uk = ""
+                    audio_us = ""
+                    if len(row) >= 12:  # 确保有足够的列
+                        uk_ref = row[10].strip()  # 第11列是英音
+                        us_ref = row[11].strip()  # 第12列是美音
+                        if uk_ref.startswith('[sound:') and uk_ref.endswith(']'):
+                            audio_uk = uk_ref[7:-1]  # 移除 [sound: 和 ]
+                        if us_ref.startswith('[sound:') and us_ref.endswith(']'):
+                            audio_us = us_ref[7:-1]  # 移除 [sound: 和 ]
                         
                     # 打印处理后的数据，用于调试
                     if i < 3:  # 只打印前3行的处理结果
-                        print(f"处理结果: list_id={list_id}, spelling={spelling}, pos={pos}, meaning_cn={meaning_cn}")
+                        print(f"处理结果: spelling={spelling}, ipa={ipa}, pos={pos}, meaning_cn={meaning_cn}, audio_uk={audio_uk}, audio_us={audio_us}")
                     
                     # 准备SQL插入语句
-                    # 执行SQL语句 (使用CSV中的list_id)
                     sql = """
                     INSERT INTO Words (spelling, meaning_cn, pos, audio_path_uk, audio_path_us, list_id) 
                     VALUES (?, ?, ?, ?, ?, ?);
                     """
                     # 执行SQL语句
-                    cursor.execute(sql, (spelling, meaning_cn, pos, audio_path_uk, audio_path_us, list_id))
+                    cursor.execute(sql, (spelling, meaning_cn, pos, audio_uk, audio_us, 1))  # 暂时将所有单词设为list_id=1
                     count += 1
                 except Exception as e:
                     print(f"处理行 {i+1} 时出错: {e}, 行内容: {row}")
@@ -136,4 +144,4 @@ def import_words_from_csv():
 # --- 运行主函数 ---
 if __name__ == '__main__':
     create_database_tables()  # 首先创建数据库表
-    import_words_from_csv()   # 然后导入数据
+    import_words_from_txt()   # 然后导入数据

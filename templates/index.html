@@ -287,11 +287,11 @@ rux
     <div id="main-container">
         <header style="text-align: center; margin-bottom: 30px; position: relative;">
             <div style="position: relative; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: var(--border-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <img src="../assets/img/Logo/logo-original.svg" alt="Logo" style="height: 80px; margin-bottom: 15px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                <img src="../assets/img/Logo/logo-original.svg" alt="Logo" style="height: 60px; margin-bottom: 15px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                 <h1 style="margin: 0; color: var(--text-color); font-size: 2em; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">快速单词测试</h1>
             </div>
-            <div style="position: absolute; top: -10px; left: 0; right: 0; height: 40px; background: url('../assets/img/Logo/logo-original.svg') repeat-x center; opacity: 0.05; transform: scale(0.8);"></div>
-            <div style="position: absolute; bottom: -10px; left: 0; right: 0; height: 40px; background: url('../assets/img/Logo/logo-original.svg') repeat-x center; opacity: 0.05; transform: scale(0.8);"></div>
+            <div style="position: absolute; top: -10px; left: 0; right: 0; height: 30px; background: url('../assets/img/Logo/logo-original.svg') repeat-x center/auto 30px; opacity: 0.05;"></div>
+            <div style="position: absolute; bottom: -10px; left: 0; right: 0; height: 30px; background: url('../assets/img/Logo/logo-original.svg') repeat-x center/auto 30px; opacity: 0.05;"></div>
         </header>
 
     <div style="text-align: center;">
@@ -392,6 +392,45 @@ rux
         // 初始加载语音列表
         loadVoices();
 
+        // 音频播放按钮事件监听
+        document.getElementById('play-audio-uk').addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            if (q.audio_path_uk) {
+                playAudio(q.audio_path_uk, 'play-audio-uk');
+            } else {
+                playTTS(q.spelling);
+            }
+        });
+
+        document.getElementById('play-audio-us').addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            if (q.audio_path_us) {
+                playAudio(q.audio_path_us, 'play-audio-us');
+            } else {
+                playTTS(q.spelling);
+            }
+        });
+
+        document.getElementById('play-tts').addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            playTTS(q.spelling);
+        });
+
+        // 音量控制
+        document.getElementById('volume').addEventListener('input', (e) => {
+            const volume = parseFloat(e.target.value);
+            if (currentAudio) {
+                currentAudio.volume = volume;
+            }
+        });
+
+        // 循环播放控制
+        document.getElementById('loop-audio').addEventListener('change', (e) => {
+            if (currentAudio) {
+                currentAudio.loop = e.target.checked;
+            }
+        });
+
         const startBtn = document.getElementById('start-btn');
         const quizArea = document.getElementById('quiz-area');
         const resultsArea = document.getElementById('results-area');
@@ -451,51 +490,68 @@ rux
 
         // 修改 displayQuestion 函数中的音频处理部分
         async function displayQuestion() {
-            // 清空预加载队列
-            preloadQueue = [];
-            const q = questions[currentQuestionIndex];
-            let displayText = q.meaning_cn;
+            try {
+                // 清空预加载队列
+                preloadQueue = [];
+                const q = questions[currentQuestionIndex];
+                let displayText = q.meaning_cn;
 
-            if (q.pos && q.pos.trim() !== '') {
-                displayText = `${q.meaning_cn} (${q.pos})`;
-            }
-            questionMeaningEl.textContent = displayText;
-            currentQNumEl.textContent = currentQuestionIndex + 1;
-
-            // 使用 Google Text-to-Speech API 的 URL
-            const word = q.spelling.toLowerCase().trim();
-            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=en&client=tw-ob`;
-
-            // 设置音频元素
-            const audioEl = document.getElementById('word-audio');
-            audioEl.src = ttsUrl;
-
-            answerInput.focus();
-            if (currentQuestionIndex === questions.length - 1) {
-                nextBtn.textContent = '完成并提交';
-            }
-
-            // 预加载当前单词的音频（高优先级）
-            if (q.audio_path_uk) await preloadAudio(q.audio_path_uk);
-            if (q.audio_path_us) await preloadAudio(q.audio_path_us);
-            
-            // 将后续单词的音频添加到预加载队列（低优先级）
-            for (let i = 1; i <= 2; i++) {
-                if (currentQuestionIndex + i < questions.length) {
-                    const futureQ = questions[currentQuestionIndex + i];
-                    if (futureQ.audio_path_uk) preloadQueue.push(futureQ.audio_path_uk);
-                    if (futureQ.audio_path_us) preloadQueue.push(futureQ.audio_path_us);
+                if (q.pos && q.pos.trim() !== '') {
+                    displayText = `${q.meaning_cn} (${q.pos})`;
                 }
-            }
-            
-            // 开始预加载队列中的第一个音频
-            if (preloadQueue.length > 0) {
-                preloadAudio(preloadQueue.shift());
+                questionMeaningEl.textContent = displayText;
+                currentQNumEl.textContent = currentQuestionIndex + 1;
+
+                // 设置音频元素
+                const audioEl = document.getElementById('word-audio');
+                audioEl.pause();  // 停止当前播放
+                audioEl.src = '';  // 清空之前的音源
+                audioEl.load();  // 重置音频状态
+
+                // 添加音频事件监听
+                audioEl.onloadstart = () => console.log('开始加载音频...');
+                audioEl.oncanplay = () => console.log('音频可以播放');
+                audioEl.onerror = (e) => console.error('音频加载错误:', e);
+
+                answerInput.focus();
+                if (currentQuestionIndex === questions.length - 1) {
+                    nextBtn.textContent = '完成并提交';
+                }
+
+                // 预加载当前单词的音频（高优先级）
+                if (q.audio_path_uk) {
+                    console.log('预加载英音:', q.audio_path_uk);
+                    await preloadAudio(q.audio_path_uk);
+                }
+                if (q.audio_path_us) {
+                    console.log('预加载美音:', q.audio_path_us);
+                    await preloadAudio(q.audio_path_us);
+                }
+                
+                // 将后续单词的音频添加到预加载队列（低优先级）
+                for (let i = 1; i <= 2; i++) {
+                    if (currentQuestionIndex + i < questions.length) {
+                        const futureQ = questions[currentQuestionIndex + i];
+                        if (futureQ.audio_path_uk) preloadQueue.push(futureQ.audio_path_uk);
+                        if (futureQ.audio_path_us) preloadQueue.push(futureQ.audio_path_us);
+                    }
+                }
+                
+                // 开始预加载队列中的第一个音频
+                if (preloadQueue.length > 0) {
+                    const nextAudio = preloadQueue.shift();
+                    console.log('预加载队列中的下一个音频:', nextAudio);
+                    preloadAudio(nextAudio);
+                }
+            } catch (error) {
+                console.error('显示问题时出错:', error);
+                // 出错时也确保界面正常显示
+                answerInput.focus();
             }
         }
 
         // 预加载音频文件
-        async function preloadAudio(audioPath) {
+        async function preloadAudio(audioPath, retryCount = 0) {
             if (!audioPath || audioCache.has(audioPath)) return;
             
             try {
@@ -504,13 +560,62 @@ rux
                     const oldestKey = audioCache.keys().next().value;
                     URL.revokeObjectURL(audioCache.get(oldestKey));
                     audioCache.delete(oldestKey);
+                    console.log('缓存已满，移除最早的音频:', oldestKey);
                 }
 
-                const response = await fetch(`/static/audio/${audioPath}`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                // 检查URL格式
+                if (!audioPath.startsWith('/')) {
+                    throw new Error('无效的音频路径');
+                }
+
+                const response = await fetch(audioPath, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'audio/*',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.startsWith('audio/')) {
+                    throw new Error(`无效的Content-Type: ${contentType}`);
+                }
+
+                const contentLength = response.headers.get('content-length');
+                if (!contentLength || parseInt(contentLength) === 0) {
+                    throw new Error('音频文件大小异常');
+                }
+
                 const blob = await response.blob();
+                if (blob.size === 0 || blob.size !== parseInt(contentLength)) {
+                    throw new Error('音频文件大小不匹配');
+                }
+                
+                // 验证是否为有效的音频文件
+                const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav'];
+                if (!validTypes.includes(blob.type)) {
+                    console.warn('未知的音频类型:', blob.type);
+                }
+                
+                // 验证音频文件可播放性
+                const audioTest = new Audio();
+                const testUrl = URL.createObjectURL(blob);
+                try {
+                    await new Promise((resolve, reject) => {
+                        audioTest.oncanplaythrough = resolve;
+                        audioTest.onerror = () => reject(new Error('音频文件验证失败'));
+                        audioTest.src = testUrl;
+                    });
+                } finally {
+                    URL.revokeObjectURL(testUrl);
+                }
+                
                 audioCache.set(audioPath, URL.createObjectURL(blob));
                 document.getElementById('preload-status').textContent = `已预加载: ${audioPath} (缓存: ${audioCache.size}/${maxCacheSize})`;
+                console.log('音频预加载成功:', audioPath);
 
                 // 预加载队列中的下一个音频
                 const nextInQueue = preloadQueue.shift();
@@ -519,8 +624,50 @@ rux
                 }
             } catch (error) {
                 console.error('预加载音频失败:', error);
-                document.getElementById('preload-status').textContent = `预加载失败: ${audioPath}`;
+                const maxRetries = 2;
+                if (retryCount < maxRetries) {
+                    console.log(`重试预加载 (${retryCount + 1}/${maxRetries}):`, audioPath);
+                    const retryDelay = Math.pow(2, retryCount) * 1000; // 指数退避策略
+                    setTimeout(() => preloadAudio(audioPath, retryCount + 1), retryDelay);
+                    document.getElementById('preload-status').textContent = `预加载重试中: ${audioPath}`;
+                } else {
+                    console.error(`预加载失败 (已重试${maxRetries}次):`, audioPath);
+                    document.getElementById('preload-status').textContent = `预加载失败: ${audioPath}`;
+                    // 将失败的音频从预加载队列中移除
+                    preloadQueue = preloadQueue.filter(path => path !== audioPath);
+                }
             }
+        }
+
+        // TTS 播放函数
+        function playTTS(word) {
+            if (!window.speechSynthesis) {
+                console.error('浏览器不支持 TTS');
+                return;
+            }
+
+            // 停止当前正在播放的音频
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+                isPlaying = false;
+            }
+
+            // 停止当前正在播放的 TTS
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            utterance.volume = document.getElementById('volume').value;
+
+            // 选择合适的声音
+            const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+            if (englishVoices.length > 0) {
+                utterance.voice = englishVoices[0];
+            }
+
+            window.speechSynthesis.speak(utterance);
         }
 
         // 播放音频的通用函数
@@ -544,10 +691,40 @@ rux
 
                 const audioEl = document.getElementById('word-audio');
                 audioEl.volume = document.getElementById('volume').value;
+                
+                // 添加详细的错误处理
+                audioEl.onerror = (e) => {
+                    console.error('音频加载错误:', e);
+                    let errorMsg = '音频加载失败';
+                    
+                    // 检查具体错误类型
+                    if (audioEl.error) {
+                        switch (audioEl.error.code) {
+                            case 1: errorMsg += ': 加载被中止'; break;
+                            case 2: errorMsg += ': 网络错误'; break;
+                            case 3: errorMsg += ': 解码错误'; break;
+                            case 4: errorMsg += ': 音频格式不支持'; break;
+                        }
+                    }
+                    
+                    throw new Error(`${errorMsg}: ${audioPath}`);
+                };
+
+                // 添加状态监听
+                audioEl.onloadstart = () => console.log('开始加载音频:', audioPath);
+                audioEl.onprogress = () => console.log('音频加载中:', audioPath);
+                audioEl.oncanplay = () => console.log('音频可以播放:', audioPath);
+                
                 if (audioCache.has(audioPath)) {
+                    console.log('使用缓存的音频:', audioPath);
                     audioEl.src = audioCache.get(audioPath);
                 } else {
-                    audioEl.src = `/static/audio/${audioPath}`;
+                    console.log('加载新音频:', audioPath);
+                    // 检查URL是否有效
+                    if (!audioPath.startsWith('/')) {
+                        throw new Error('无效的音频路径');
+                    }
+                    audioEl.src = `/wordlists/junior_high/Media/${audioPath}`;
                 }
                 
                 audioEl.loop = document.getElementById('loop-audio').checked;
@@ -584,15 +761,46 @@ rux
                 await audioEl.play();
             } catch (error) {
                 console.error('播放音频失败:', error);
-                audioError.textContent = '音频播放失败，已自动切换到TTS发音';
+                
+                // 解析错误信息
+                let errorMessage = '音频播放失败';
+                if (error.message.includes('网络错误')) {
+                    errorMessage = '网络连接失败，请检查网络设置';
+                } else if (error.message.includes('解码错误') || error.message.includes('格式不支持')) {
+                    errorMessage = '音频文件格式错误';
+                } else if (error.message.includes('无效的音频路径')) {
+                    errorMessage = '音频文件路径无效';
+                }
+                errorMessage += '，已切换到TTS发音';
+                
+                // 显示错误提示
+                audioError.textContent = errorMessage;
                 audioError.style.display = 'block';
                 audioError.style.animation = 'none';
                 audioError.offsetHeight; // 触发重排
                 audioError.style.animation = 'slideIn 0.3s ease-out';
                 
+                // 设置自动隐藏错误提示
+                setTimeout(() => {
+                    audioError.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        audioError.style.display = 'none';
+                    }, 300);
+                }, 5000);
+                
+                // 从缓存中移除失败的音频
+                if (audioCache.has(audioPath)) {
+                    URL.revokeObjectURL(audioCache.get(audioPath));
+                    audioCache.delete(audioPath);
+                    console.log('从缓存中移除失败的音频:', audioPath);
+                }
+                
+                // 切换到TTS
                 if (fallbackToTTS) {
                     const q = questions[currentQuestionIndex];
-                    setTimeout(() => playTTS(q.spelling.toLowerCase().trim()), 1000); // 延迟1秒后播放TTS
+                    console.log('切换到TTS发音:', q.spelling);
+                    // 立即播放TTS，不再延迟
+                    playTTS(q.spelling.toLowerCase().trim());
                 }
             } finally {
                 isAudioLoading = false;
@@ -615,27 +823,39 @@ rux
         }
 
         // 英音按钮点击事件
-        document.getElementById('play-audio-uk').addEventListener('click', () => {
-            const q = questions[currentQuestionIndex];
-            if (q.audio_path_uk) {
-                playAudio(q.audio_path_uk, 'play-audio-uk');
-            } else {
-                document.getElementById('audio-error').textContent = '该单词暂无英音音频，已自动切换到TTS发音';
-                document.getElementById('audio-error').style.display = 'block';
+        document.getElementById('play-audio-uk').addEventListener('click', async () => {
+            try {
+                const q = questions[currentQuestionIndex];
+                if (q.audio_path_uk) {
+                    await playAudio(q.audio_path_uk, 'play-audio-uk');
+                } else {
+                    document.getElementById('audio-error').textContent = '该单词暂无英音音频，已自动切换到TTS发音';
+                    document.getElementById('audio-error').style.display = 'block';
+                    playTTS(q.spelling.toLowerCase().trim());
+                }
+            } catch (error) {
+                console.error('英音播放错误:', error);
+                const q = questions[currentQuestionIndex];
                 playTTS(q.spelling.toLowerCase().trim());
             }
         });
 
         // 美音按钮点击事件
-        document.getElementById('play-audio-us').addEventListener('click', () => {
-            const q = questions[currentQuestionIndex];
-            if (q.audio_path_us) {
-                playAudio(q.audio_path_us, 'play-audio-us');
-            } else {
-                document.getElementById('audio-error').textContent = '该单词暂无美音音频，已自动切换到TTS发音';
-                document.getElementById('audio-error').style.display = 'block';
-                playTTS(q.spelling.toLowerCase().trim());
-            }
+         document.getElementById('play-audio-us').addEventListener('click', async () => {
+             try {
+                 const q = questions[currentQuestionIndex];
+                 if (q.audio_path_us) {
+                     await playAudio(q.audio_path_us, 'play-audio-us');
+                 } else {
+                     document.getElementById('audio-error').textContent = '该单词暂无美音音频，已自动切换到TTS发音';
+                     document.getElementById('audio-error').style.display = 'block';
+                     playTTS(q.spelling.toLowerCase().trim());
+                 }
+             } catch (error) {
+                 console.error('美音播放错误:', error);
+                 const q = questions[currentQuestionIndex];
+                 playTTS(q.spelling.toLowerCase().trim());
+             }
         });
 
         // TTS按钮点击事件

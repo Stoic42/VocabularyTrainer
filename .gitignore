@@ -26,6 +26,8 @@ config.py
 # 词库文件可能很大，且包含特定内容，不适合放入版本控制
 *.csv
 wordlists/*.csv
+wordlists/*.txt
+wordlists/*.mp3
 # 但保留README.md文件
 !wordlists/README.md
 
