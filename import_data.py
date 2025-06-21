@@ -25,6 +25,8 @@ def create_database_tables():
             spelling TEXT NOT NULL,
             meaning_cn TEXT NOT NULL,
             pos TEXT,
+            audio_path_uk TEXT,  -- 英式发音文件路径
+            audio_path_us TEXT,  -- 美式发音文件路径
             list_id INTEGER NOT NULL
         );
         """)
@@ -102,13 +104,13 @@ def import_words_from_csv():
                         print(f"处理结果: list_id={list_id}, spelling={spelling}, pos={pos}, meaning_cn={meaning_cn}")
                     
                     # 准备SQL插入语句
-                    # 现在我们插入拼写、中文意思、词性和列表ID
-                    sql = """
-                    INSERT INTO Words (spelling, meaning_cn, pos, list_id) 
-                    VALUES (?, ?, ?, ?);
-                    """
                     # 执行SQL语句 (使用CSV中的list_id)
-                    cursor.execute(sql, (spelling, meaning_cn, pos, list_id))
+                    sql = """
+                    INSERT INTO Words (spelling, meaning_cn, pos, audio_path_uk, audio_path_us, list_id) 
+                    VALUES (?, ?, ?, ?, ?, ?);
+                    """
+                    # 执行SQL语句
+                    cursor.execute(sql, (spelling, meaning_cn, pos, audio_path_uk, audio_path_us, list_id))
                     count += 1
                 except Exception as e:
                     print(f"处理行 {i+1} 时出错: {e}, 行内容: {row}")

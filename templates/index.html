@@ -6,7 +6,12 @@
     <style>
         body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
         #quiz-area, #results-area { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
-        #results-area { display: none; } /* 默认隐藏结果区 */
+        #results-area { display: none; }
+        .audio-loading { opacity: 0.6; cursor: not-allowed; }
+        .audio-loading::after { content: '加载中...'; margin-left: 5px; font-size: 0.8em; }
+        #audio-error { display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .loading-indicator { display: none; margin-left: 10px; color: #666; }
+        #preload-status { font-size: 0.8em; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -15,7 +20,14 @@
 
     <div id="quiz-area" style="display: none;">
         <h2 id="question-meaning"></h2>
-        <button id="play-audio" style="margin-right: 10px;">播放发音</button>
+        <div class="audio-controls" style="margin: 10px 0;">
+            <button id="play-audio-uk" style="margin-right: 10px;">🔊 英音</button>
+            <button id="play-audio-us" style="margin-right: 10px;">🔊 美音</button>
+            <button id="play-tts" style="margin-right: 10px;">🤖 TTS</button>
+            <span class="loading-indicator">加载中...</span>
+        </div>
+        <div id="audio-error"></div>
+        <div id="preload-status"></div>
         <p>第 <span id="current-q-num">1</span> / <span id="total-q-num"></span> 题</p>
         <input type="text" id="answer-input" placeholder="输入单词拼写...">
         <button id="next-btn">下一题</button>
@@ -33,6 +45,8 @@
         let currentQuestionIndex = 0;
         let userAnswers = [];
         let voices = [];
+        let audioCache = new Map();
+        let isAudioLoading = false;
 
         // 初始化语音列表
         function loadVoices() {
@@ -91,7 +105,7 @@
         });
 
         // 修改 displayQuestion 函数中的音频处理部分
-        function displayQuestion() {
+        async function displayQuestion() {
             const q = questions[currentQuestionIndex];
             let displayText = q.meaning_cn;
 
@@ -113,23 +127,113 @@
             if (currentQuestionIndex === questions.length - 1) {
                 nextBtn.textContent = '完成并提交';
             }
+
+            // 预加载当前单词的音频
+            if (q.audio_path_uk) await preloadAudio(q.audio_path_uk);
+            if (q.audio_path_us) await preloadAudio(q.audio_path_us);
+            
+            // 预加载下一个单词的音频
+            if (currentQuestionIndex < questions.length - 1) {
+                const nextQ = questions[currentQuestionIndex + 1];
+                if (nextQ.audio_path_uk) await preloadAudio(nextQ.audio_path_uk);
+                if (nextQ.audio_path_us) await preloadAudio(nextQ.audio_path_us);
+            }
         }
 
-        // 播放音频按钮点击事件
-        document.getElementById('play-audio').addEventListener('click', () => {
+        // 预加载音频文件
+        async function preloadAudio(audioPath) {
+            if (!audioPath || audioCache.has(audioPath)) return;
+            
+            try {
+                const response = await fetch(`/static/audio/${audioPath}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const blob = await response.blob();
+                audioCache.set(audioPath, URL.createObjectURL(blob));
+                document.getElementById('preload-status').textContent = `已预加载: ${audioPath}`;
+            } catch (error) {
+                console.error('预加载音频失败:', error);
+            }
+        }
+
+        // 播放音频的通用函数
+        async function playAudio(audioPath, buttonId, fallbackToTTS = true) {
+            const button = document.getElementById(buttonId);
+            const loadingIndicator = document.querySelector('.loading-indicator');
+            const audioError = document.getElementById('audio-error');
+            
+            if (isAudioLoading) return;
+            
+            try {
+                isAudioLoading = true;
+                button.classList.add('audio-loading');
+                loadingIndicator.style.display = 'inline';
+                audioError.style.display = 'none';
+
+                const audioEl = document.getElementById('word-audio');
+                if (audioCache.has(audioPath)) {
+                    audioEl.src = audioCache.get(audioPath);
+                } else {
+                    audioEl.src = `/static/audio/${audioPath}`;
+                }
+
+                await audioEl.play();
+            } catch (error) {
+                console.error('播放音频失败:', error);
+                audioError.textContent = '音频播放失败，已自动切换到TTS发音';
+                audioError.style.display = 'block';
+                
+                if (fallbackToTTS) {
+                    const q = questions[currentQuestionIndex];
+                    playTTS(q.spelling.toLowerCase().trim());
+                }
+            } finally {
+                isAudioLoading = false;
+                button.classList.remove('audio-loading');
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // 播放TTS的函数
+        function playTTS(word) {
             window.speechSynthesis.cancel(); // 停止当前正在播放的语音
-            const q = questions[currentQuestionIndex];
-            const word = q.spelling.toLowerCase().trim();
             const utterance = new SpeechSynthesisUtterance(word);
             utterance.lang = 'en-US';
-            // 获取可用的语音列表
             const voices = window.speechSynthesis.getVoices();
-            // 选择英语语音
             const englishVoice = voices.find(voice => voice.lang.startsWith('en-'));
             if (englishVoice) {
                 utterance.voice = englishVoice;
             }
             window.speechSynthesis.speak(utterance);
+        }
+
+        // 英音按钮点击事件
+        document.getElementById('play-audio-uk').addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            if (q.audio_path_uk) {
+                playAudio(q.audio_path_uk, 'play-audio-uk');
+            } else {
+                document.getElementById('audio-error').textContent = '该单词暂无英音音频，已自动切换到TTS发音';
+                document.getElementById('audio-error').style.display = 'block';
+                playTTS(q.spelling.toLowerCase().trim());
+            }
+        });
+
+        // 美音按钮点击事件
+        document.getElementById('play-audio-us').addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            if (q.audio_path_us) {
+                playAudio(q.audio_path_us, 'play-audio-us');
+            } else {
+                document.getElementById('audio-error').textContent = '该单词暂无美音音频，已自动切换到TTS发音';
+                document.getElementById('audio-error').style.display = 'block';
+                playTTS(q.spelling.toLowerCase().trim());
+            }
+        });
+
+        // TTS按钮点击事件
+        document.getElementById('play-tts').addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            playTTS(q.spelling.toLowerCase().trim());
         });
 
         // 提交测试
