@@ -12,6 +12,12 @@
         #audio-error { display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin: 10px 0; border-radius: 4px; }
         .loading-indicator { display: none; margin-left: 10px; color: #666; }
         #preload-status { font-size: 0.8em; color: #666; margin-top: 5px; }
+        .audio-controls { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+        .volume-control { display: flex; align-items: center; gap: 5px; }
+        .progress-container { width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-bar { width: 0; height: 100%; background: #4CAF50; transition: width 0.1s linear; }
+        .keyboard-shortcuts { font-size: 0.8em; color: #666; margin-top: 5px; }
+        .loop-control { display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
@@ -20,11 +26,25 @@
 
     <div id="quiz-area" style="display: none;">
         <h2 id="question-meaning"></h2>
-        <div class="audio-controls" style="margin: 10px 0;">
-            <button id="play-audio-uk" style="margin-right: 10px;">🔊 英音</button>
-            <button id="play-audio-us" style="margin-right: 10px;">🔊 美音</button>
-            <button id="play-tts" style="margin-right: 10px;">🤖 TTS</button>
+        <div class="audio-controls">
+            <button id="play-audio-uk" title="快捷键: 1">🔊 英音</button>
+            <button id="play-audio-us" title="快捷键: 2">🔊 美音</button>
+            <button id="play-tts" title="快捷键: 3">🤖 TTS</button>
+            <div class="volume-control">
+                <label for="volume">音量:</label>
+                <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+            </div>
+            <div class="loop-control">
+                <input type="checkbox" id="loop-audio">
+                <label for="loop-audio">循环播放</label>
+            </div>
             <span class="loading-indicator">加载中...</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="audio-progress"></div>
+        </div>
+        <div class="keyboard-shortcuts">
+            快捷键: 1=英音 2=美音 3=TTS Space=暂停/播放 L=循环开关
         </div>
         <div id="audio-error"></div>
         <div id="preload-status"></div>
@@ -47,6 +67,9 @@
         let voices = [];
         let audioCache = new Map();
         let isAudioLoading = false;
+        let isPlaying = false;
+        let currentAudio = null;
+        let loopEnabled = false;
 
         // 初始化语音列表
         function loadVoices() {
@@ -157,6 +180,11 @@
 
         // 播放音频的通用函数
         async function playAudio(audioPath, buttonId, fallbackToTTS = true) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+                isPlaying = false;
+            }
             const button = document.getElementById(buttonId);
             const loadingIndicator = document.querySelector('.loading-indicator');
             const audioError = document.getElementById('audio-error');
@@ -170,11 +198,29 @@
                 audioError.style.display = 'none';
 
                 const audioEl = document.getElementById('word-audio');
+                audioEl.volume = document.getElementById('volume').value;
                 if (audioCache.has(audioPath)) {
                     audioEl.src = audioCache.get(audioPath);
                 } else {
                     audioEl.src = `/static/audio/${audioPath}`;
                 }
+                
+                audioEl.loop = document.getElementById('loop-audio').checked;
+                
+                // 更新进度条
+                audioEl.addEventListener('timeupdate', () => {
+                    const progress = (audioEl.currentTime / audioEl.duration) * 100;
+                    document.getElementById('audio-progress').style.width = `${progress}%`;
+                });
+                
+                // 重置进度条
+                audioEl.addEventListener('ended', () => {
+                    document.getElementById('audio-progress').style.width = '0%';
+                    isPlaying = false;
+                });
+                
+                currentAudio = audioEl;
+                isPlaying = true;
 
                 await audioEl.play();
             } catch (error) {
@@ -234,6 +280,54 @@
         document.getElementById('play-tts').addEventListener('click', () => {
             const q = questions[currentQuestionIndex];
             playTTS(q.spelling.toLowerCase().trim());
+        });
+
+        // 音量控制
+        document.getElementById('volume').addEventListener('input', (e) => {
+            const audioEl = document.getElementById('word-audio');
+            audioEl.volume = e.target.value;
+        });
+
+        // 循环播放控制
+        document.getElementById('loop-audio').addEventListener('change', (e) => {
+            const audioEl = document.getElementById('word-audio');
+            audioEl.loop = e.target.checked;
+            loopEnabled = e.target.checked;
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'text') return; // 在输入框中不触发快捷键
+            
+            switch(e.key) {
+                case '1':
+                    document.getElementById('play-audio-uk').click();
+                    break;
+                case '2':
+                    document.getElementById('play-audio-us').click();
+                    break;
+                case '3':
+                    document.getElementById('play-tts').click();
+                    break;
+                case ' ':
+                    e.preventDefault(); // 防止空格键滚动页面
+                    if (currentAudio) {
+                        if (isPlaying) {
+                            currentAudio.pause();
+                            isPlaying = false;
+                        } else {
+                            currentAudio.play();
+                            isPlaying = true;
+                        }
+                    }
+                    break;
+                case 'l':
+                case 'L':
+                    const loopCheckbox = document.getElementById('loop-audio');
+                    loopCheckbox.checked = !loopCheckbox.checked;
+                    loopCheckbox.dispatchEvent(new Event('change'));
+                    break;
+            }
         });
 
         // 提交测试
