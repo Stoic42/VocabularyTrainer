@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, render_template
 import sqlite3
 import random
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='assets')
 DATABASE_FILE = 'vocabulary.db'
 
 def get_db_connection():

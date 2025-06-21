@@ -3,25 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>MVP Vocabulary Trainer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --hover-color: #45a049;
-            --error-color: #dc3545;
-            --warning-color: #ffc107;
-            --text-color: #333;
-            --bg-color: #f8f9fa;
+            --primary-color: #FFB347;  /* 明亮的橙黄色 */
+            --hover-color: #FF9F1C;   /* 深橙色 */
+            --error-color: #4f2b4b;    /* 保留原有的深紫色 */
+            --warning-color: #ffc107;  /* 保留原有的警告色 */
+            --text-color: #2D3436;    /* 更深的文字颜色 */
+            --bg-color: #FFF8E7;      /* 温暖的米色背景 */
+            --accent-color: #FF7B54;  /* 活力珊瑚橙 */
             --border-radius: 8px;
         }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background-color: var(--bg-color);
+rux
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             color: var(--text-color);
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        #main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #background-words {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-word {
+            position: absolute;
+            font-size: 2em;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+            white-space: nowrap;
+            animation: floatAnimation 20s linear infinite;
         }
 
         button {
@@ -48,10 +83,29 @@
 
         #quiz-area, #results-area {
             margin-top: 20px;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 25px;
             border-radius: var(--border-radius);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            position: relative;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-color);
+        }
+
+        .lumi-reaction {
+            position: absolute;
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 1000px) {
+            .lumi-reaction {
+                display: none;
+            }
         }
 
         #results-area { display: none; }
@@ -193,11 +247,57 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(-50%); }
+            50% { transform: translateY(-60%); }
+        }
+
+        @keyframes floatAnimation {
+            0% { transform: translate(-100%, 0); }
+            100% { transform: translate(100vw, 0); }
+        }
+
+        .lumi-reaction {
+            position: absolute;
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 100px;
+            transition: opacity 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        #lumi-mascot {
+            transition: all 0.3s ease;
+        }
+
+        #lumi-mascot:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
     </style>
 </head>
 <body>
-    <h1>快速单词测试 (MVP)</h1>
-    <button id="start-btn">开始测试</button>
+    <div id="background-words"></div>
+    <div id="main-container">
+        <header style="text-align: center; margin-bottom: 30px; position: relative;">
+            <div style="position: relative; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: var(--border-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <img src="../assets/img/Logo/logo-original.svg" alt="Logo" style="height: 80px; margin-bottom: 15px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                <h1 style="margin: 0; color: var(--text-color); font-size: 2em; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">快速单词测试</h1>
+            </div>
+            <div style="position: absolute; top: -10px; left: 0; right: 0; height: 40px; background: url('../assets/img/Logo/logo-original.svg') repeat-x center; opacity: 0.05; transform: scale(0.8);"></div>
+            <div style="position: absolute; bottom: -10px; left: 0; right: 0; height: 40px; background: url('../assets/img/Logo/logo-original.svg') repeat-x center; opacity: 0.05; transform: scale(0.8);"></div>
+        </header>
+
+    <div style="text-align: center;">
+        <img src="../assets/img/Lumi/Lumi_HoldingWordCard.png" alt="Lumi Welcome" style="height: 120px; margin-bottom: 20px;" id="lumi-mascot">
+        <button id="start-btn">开始测试</button>
+    </div>
 
     <div id="quiz-area" style="display: none;">
         <h2 id="question-meaning"></h2>
@@ -235,6 +335,37 @@
         <ul id="error-list"></ul>
     </div>
 
+    </div>
+    <script>
+        // 创建背景浮动单词
+        function createFloatingWords() {
+            const container = document.getElementById('background-words');
+            const words = ['Vocabulary', 'Learning', 'English', 'Practice', 'Study', 'Words', 'Test', 'Quiz', 'Memory', 'Language'];
+            const lanes = 8; // 定义行数
+
+            for (let i = 0; i < lanes; i++) {
+                const word = document.createElement('div');
+                word.className = 'floating-word';
+                word.textContent = words[Math.floor(Math.random() * words.length)];
+                word.style.top = `${(100 / lanes) * i}%`;
+                word.style.animationDelay = `${Math.random() * 20}s`;
+                container.appendChild(word);
+
+                // 当动画结束时，更新单词并重新开始动画
+                word.addEventListener('animationend', () => {
+                    word.textContent = words[Math.floor(Math.random() * words.length)];
+                    word.style.animationDelay = '0s';
+                    word.style.animation = 'none';
+                    word.offsetHeight; // 触发重排
+                    word.style.animation = 'floatAnimation 20s linear infinite';
+                });
+            }
+        }
+
+        // 页面加载完成后创建浮动单词
+        document.addEventListener('DOMContentLoaded', createFloatingWords);
+
+    </script>
     <script>
         let questions = [];
         let currentQuestionIndex = 0;
@@ -278,14 +409,25 @@
                 startBtn.style.display = 'none';
                 quizArea.style.display = 'block';
                 totalQNumEl.textContent = questions.length;
+                // 添加 Lumi 反应元素
+                const lumiReaction = document.createElement('img');
+                lumiReaction.className = 'lumi-reaction';
+                quizArea.appendChild(lumiReaction);
+                updateLumiReaction('start');
                 displayQuestion();
             } else {
                 alert('无法加载题目！');
+                updateLumiReaction('wrong');
             }
         });
 
         // 下一题/提交按钮点击事件
         nextBtn.addEventListener('click', () => {
+            // 检查答案是否正确
+            const currentAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = questions[currentQuestionIndex].spelling.trim().toLowerCase();
+            updateLumiReaction(currentAnswer === correctAnswer ? 'correct' : 'wrong');
+
             // 保存当前答案
             userAnswers.push({
                 word_id: questions[currentQuestionIndex].word_id,
@@ -297,7 +439,10 @@
             answerInput.value = '';
 
             if (currentQuestionIndex < questions.length) {
-                displayQuestion();
+                setTimeout(() => {
+                    displayQuestion();
+                    updateLumiReaction('thinking');
+                }, 1000);
             } else {
                 // 测试结束
                 submitTest();
@@ -547,6 +692,38 @@
             }
         });
 
+        // 更新 Lumi 表情
+        function updateLumiReaction(state) {
+            const lumiImg = document.querySelector('.lumi-reaction');
+            if (!lumiImg) return;
+
+            let imgPath = '';
+            switch (state) {
+                case 'start':
+                    imgPath = '../assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png';
+                    break;
+                case 'thinking':
+                    imgPath = '../assets/img/Lumi/Lumi_Questioning.png';
+                    break;
+                case 'correct':
+                    imgPath = '../assets/img/Lumi/Lumi_ThumbUp.png';
+                    break;
+                case 'wrong':
+                    imgPath = '../assets/img/Lumi/Lumi_Crying.png';
+                    break;
+                case 'finish':
+                    imgPath = '../assets/img/Lumi/Lumi_Triumph.png';
+                    break;
+                default:
+                    imgPath = '../assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png';
+            }
+            lumiImg.src = imgPath;
+            lumiImg.style.animation = 'bounce 0.5s';
+            setTimeout(() => {
+                lumiImg.style.animation = 'float 3s ease-in-out infinite';
+            }, 500);
+        }
+
         // 提交测试
         async function submitTest() {
             quizArea.style.display = 'none';
@@ -557,6 +734,7 @@
             });
             const results = await response.json();
             displayResults(results);
+            updateLumiReaction('finish');
         }
 
         // 显示结果
