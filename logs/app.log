@@ -6,3 +6,45 @@
 2025-06-21 23:08:18,175 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
 2025-06-21 23:21:59,405 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
 2025-06-21 23:30:42,459 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-21 23:43:09,031 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-21 23:47:34,703 ERROR: Exception on /api/submit [POST] [in P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\VocabularyTrainer\app.py", line 101, in submit_answers
+    cursor.execute(
+sqlite3.OperationalError: no such table: ErrorLogs
+2025-06-22 07:36:08,234 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-22 07:36:50,516 ERROR: Exception on /api/submit [POST] [in P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "P:\conda_envs\VocabMVP\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\VocabularyTrainer\app.py", line 101, in submit_answers
+    cursor.execute(
+sqlite3.OperationalError: no such table: ErrorLogs
+2025-06-22 07:42:51,710 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-22 07:42:53,362 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-22 08:08:25,029 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-22 08:08:25,551 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:28]
+2025-06-22 08:10:02,096 INFO: 记录错误: 单词ID=1, 学生答案=fourteen [in D:\Projects\VocabularyTrainer\app.py:124]
+2025-06-22 08:10:02,100 INFO: 记录错误: 单词ID=40, 学生答案=paradise [in D:\Projects\VocabularyTrainer\app.py:124]

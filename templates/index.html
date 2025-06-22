@@ -271,13 +271,33 @@
             <h1>快速单词测试 (MVP)</h1>
         </div>
 
-        <!-- List 选择器 -->
+<!--         <!-- List 选择器 -->
         <div class="list-selector">
             <label for="list-select">选择单词列表:</label>
             <select id="list-select">
                 <!-- 列表选项将通过 JavaScript 动态加载 -->
                 <option value="">加载中...</option>
             </select>
+        </div> -->
+        <div style="margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 20px;">
+            <div>
+                <label for="list-select">选择测试列表: </label>
+                <select id="list-select" style="padding: 5px; font-size: 16px;">
+                    <option value="1">List 1</option>
+                    <option value="2">List 2</option>
+                    <option value="3">List 3</option>
+                    </select>
+            </div>
+        
+            <div>
+                <label for="count-select">选择数量: </label>
+                <select id="count-select" style="padding: 5px; font-size: 16px;">
+                    <option value="10">10个</option>
+                    <option value="20">20个</option>
+                    <option value="50">50个</option>
+                    <option value="all">全部</option>
+                </select>
+            </div>
         </div>
 
         <button id="start-btn">开始测试</button>
@@ -419,17 +439,51 @@
             displayResults(results);
         }
 
-        // 显示结果的函数
+        // 请确保这个函数存在且代码完整
         function displayResults(results) {
+            // 显示结果区域，隐藏测试区域和开始按钮
+            quizArea.style.display = 'none';
+            startBtn.style.display = 'none';
             resultsArea.style.display = 'block';
+            
+            // 添加一个返回按钮，允许用户返回开始界面
+            if (!document.getElementById('back-btn')) {
+                const backBtn = document.createElement('button');
+                backBtn.id = 'back-btn';
+                backBtn.textContent = '返回开始界面';
+                backBtn.style.marginTop = '20px';
+                backBtn.onclick = function() {
+                    // 重置状态
+                    resultsArea.style.display = 'none';
+                    startBtn.style.display = 'block';
+                    questions = [];
+                    currentQuestionIndex = 0;
+                    userAnswers = [];
+                };
+                resultsArea.appendChild(backBtn);
+            }
+
+            // 更新错误数量
             document.getElementById('error-count').textContent = results.error_count;
+
             const errorListEl = document.getElementById('error-list');
-            errorListEl.innerHTML = '';
-            results.error_details.forEach(err => {
+            errorListEl.innerHTML = ''; // 清空上一次的错误列表
+
+            // 遍历错误详情，创建列表项并添加到页面
+            if (results.error_details && results.error_details.length > 0) {
+                results.error_details.forEach(err => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>正确:</strong> <span class="math-inline">\{err\.correct\_spelling\} / <strong\>你的答案\:</strong\> <span style\="color\: \#c0392b;"\></span>{err.your_answer}</span>`;
+                    errorListEl.appendChild(li);
+                });
+            } else {
+                // 如果没有错误，显示祝贺信息
                 const li = document.createElement('li');
-                li.textContent = `正确: ${err.correct_spelling} / 你的答案: ${err.your_answer}`;
+                li.innerHTML = '🎉 恭喜你，全部正确！太棒了！';
+                li.style.borderLeftColor = '#27ae60'; // 绿色边框表示成功
+                li.style.background = '#f0fff4';
                 errorListEl.appendChild(li);
-            });
+            }
         }
         
         // “下一步”按钮的逻辑
@@ -453,7 +507,10 @@
         startBtn.addEventListener('click', async () => {
             try {
                 const selectedListId = document.getElementById('list-select').value;
-                const response = await fetch(`/api/questions?list_id=${selectedListId}`);
+                const selectedCount = document.getElementById('count-select').value; // 新增：获取数量
+                
+                // 在URL中同时加入list_id和count两个参数
+                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}`);
                 if (!response.ok) throw new Error('网络请求失败');
                 questions = await response.json();
                 
@@ -492,8 +549,8 @@
         const lumiImages = {
             'start': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
             'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
-            'correct': '/assets/img/Lumi/Lumi_Celebrating.png',
-            'wrong': '/assets/img/Lumi/Lumi_Encouraging.png'
+            'correct': '/assets/img/Lumi/Lumi_Triumph.png', // 替换为现有的图片
+            'wrong': '/assets/img/Lumi/Lumi_ThumbUp.png' // 替换为现有的图片
         };
 
         // 预加载Lumi图片

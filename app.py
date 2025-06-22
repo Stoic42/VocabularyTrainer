@@ -47,24 +47,41 @@ def serve_wordlist_files(subpath):
         return {'error': '服务器内部错误'}, 500
 
 # API 1: 获取问题 (已升级)
+# 在app.py中找到这个函数并替换它
+
 @app.route('/api/questions')
 def get_questions():
-    # 从URL参数中获取list_id，如果前端没提供，就默认为1
-    list_id_str = request.args.get('list_id', default='1', type=str)
+    # 从URL参数中获取list_id，如果没提供，默认为1
+    list_id = request.args.get('list_id', default=1, type=int)
+    # 新增：从URL获取单词数量, 默认为'10'
+    count_str = request.args.get('count', default='10', type=str)
     
     conn = get_db_connection()
-    # 在SQL查询中加入 WHERE 子句，根据list_id筛选
-    words = conn.execute(
-        'SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us FROM Words WHERE list_id = ? ORDER BY RANDOM() LIMIT 10',
-        (list_id_str,)
-    ).fetchall()
+    
+    # 基础SQL查询
+    sql_query = 'SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us FROM Words WHERE list_id = ? ORDER BY RANDOM()'
+    params = (list_id,)
+
+    # 只有当数量不是'all'时，我们才加上LIMIT子句
+    if count_str.lower() != 'all':
+        try:
+            # 确保count可以被转换为整数
+            limit_count = int(count_str)
+            sql_query += ' LIMIT ?'
+            params += (limit_count,) # 将数量添加到参数元组中
+        except ValueError:
+            # 如果count不是一个有效的数字，就使用默认值10，并记录一个警告
+            app.logger.warning(f"无效的count参数: '{count_str}', 将使用默认值10。")
+            sql_query += ' LIMIT ?'
+            params += (10,)
+
+    words = conn.execute(sql_query, params).fetchall()
     conn.close()
     
+    # --- 后续的数据处理逻辑保持不变 ---
     word_list = []
     for word in words:
         word_dict = dict(word)
-        # --- 修复了URL路径问题 ---
-        # 生成正确的、从网站根目录开始的URL
         if word_dict['audio_path_uk']:
             word_dict['audio_path_uk'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_uk']}"
         if word_dict['audio_path_us']:
@@ -98,10 +115,13 @@ def submit_answers():
                     'correct_spelling': correct_spelling,
                     'your_answer': student_answer
                 })
-                cursor.execute(
-                    "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
-                    (1, word_id, 'spelling_mvp', student_answer)
-                )
+                # 暂时注释掉ErrorLogs表的插入操作，直到表被创建
+                # cursor.execute(
+                #     "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
+                #     (1, word_id, 'spelling_mvp', student_answer)
+                # )
+                # 记录错误到日志
+                app.logger.info(f"记录错误: 单词ID={word_id}, 学生答案={student_answer}")
 
     conn.commit()
     conn.close()
