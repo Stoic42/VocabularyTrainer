@@ -6,9 +6,9 @@ from logging.handlers import RotatingFileHandler
 import os
 
 # --- 应用设置 ---
-app = Flask(__name__)
-# 将静态文件目录设置为项目根目录下的 'assets' 文件夹
-app.static_folder = 'assets' 
+app = Flask(__name__, 
+           static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets'),
+           static_url_path='/assets')
 DATABASE_FILE = 'vocabulary.db'
 # 我们将所有词库资源（音频、txt）都统一放在 'wordlists' 文件夹下进行管理
 WORDLISTS_BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wordlists')
