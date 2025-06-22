@@ -301,6 +301,7 @@
         </div>
 
         <button id="start-btn">开始测试</button>
+        <a href="/error-history" class="btn" style="margin-left: 10px; background-color: #2980b9;">查看错误历史</a>
 
         <div id="quiz-area" style="display: none;">
             <div>
@@ -473,7 +474,7 @@
             if (results.error_details && results.error_details.length > 0) {
                 results.error_details.forEach(err => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>正确:</strong> <span class="math-inline">\{err\.correct\_spelling\} / <strong\>你的答案\:</strong\> <span style\="color\: \#c0392b;"\></span>{err.your_answer}</span>`;
+                    li.innerHTML = `<strong>正确:</strong> ${err.correct_spelling} / <strong>你的答案:</strong> <span style="color: #c0392b;">${err.your_answer}</span>`;
                     errorListEl.appendChild(li);
                 });
             } else {

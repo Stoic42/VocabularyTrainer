@@ -115,13 +115,38 @@ def submit_answers():
                     'correct_spelling': correct_spelling,
                     'your_answer': student_answer
                 })
-                # 暂时注释掉ErrorLogs表的插入操作，直到表被创建
-                # cursor.execute(
-                #     "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
-                #     (1, word_id, 'spelling_mvp', student_answer)
-                # )
-                # 记录错误到日志
-                app.logger.info(f"记录错误: 单词ID={word_id}, 学生答案={student_answer}")
+                # 将错误记录到ErrorLogs表
+                try:
+                    cursor.execute(
+                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
+                        (1, word_id, 'spelling_mvp', student_answer)
+                    )
+                    app.logger.info(f"记录错误: 单词ID={word_id}, 学生答案={student_answer}")
+                except sqlite3.Error as e:
+                    app.logger.error(f"记录错误到ErrorLogs表失败: {e}")
+                    # 如果表不存在，尝试创建它
+                    if 'no such table' in str(e).lower():
+                        try:
+                            cursor.execute('''
+                            CREATE TABLE IF NOT EXISTS ErrorLogs (
+                                error_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                student_id INTEGER,
+                                word_id INTEGER,
+                                error_type TEXT,
+                                student_answer TEXT,
+                                error_date TEXT,
+                                FOREIGN KEY (word_id) REFERENCES Words(word_id)
+                            )
+                            ''')
+                            conn.commit()
+                            app.logger.info("ErrorLogs表已创建")
+                            # 重新尝试插入
+                            cursor.execute(
+                                "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
+                                (1, word_id, 'spelling_mvp', student_answer)
+                            )
+                        except sqlite3.Error as e2:
+                            app.logger.error(f"创建ErrorLogs表并插入数据失败: {e2}")
 
     conn.commit()
     conn.close()
@@ -155,10 +180,105 @@ def get_lists():
         if conn:
             conn.close()
 
-# --- 主页面路由 ---
+# --- 页面路由 ---
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/error-history')
+def error_history():
+    return render_template('error_history.html')
+
+# --- 错误历史记录API ---
+@app.route('/api/error-history')
+def get_error_history():
+    """获取用户的错误历史记录"""
+    try:
+        # 获取查询参数
+        student_id = request.args.get('student_id', default=1, type=int)  # 默认为学生ID 1
+        limit = request.args.get('limit', default=50, type=int)  # 默认最多返回50条记录
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 查询错误记录，并关联单词信息
+        query = """
+        SELECT e.error_id, e.word_id, w.spelling, w.meaning_cn, w.pos, w.list_id, 
+               e.student_answer, e.error_type, e.error_date,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = e.word_id AND student_id = e.student_id) as error_count
+        FROM ErrorLogs e
+        JOIN Words w ON e.word_id = w.word_id
+        WHERE e.student_id = ?
+        ORDER BY e.error_date DESC
+        LIMIT ?
+        """
+        
+        cursor.execute(query, (student_id, limit))
+        errors = cursor.fetchall()
+        
+        # 查询错误统计信息
+        stats_query = """
+        SELECT w.list_id, COUNT(*) as error_count,
+               (SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ? AND word_id IN 
+                (SELECT word_id FROM Words WHERE list_id = w.list_id)) as unique_words_count
+        FROM ErrorLogs e
+        JOIN Words w ON e.word_id = w.word_id
+        WHERE e.student_id = ?
+        GROUP BY w.list_id
+        ORDER BY w.list_id
+        """
+        
+        cursor.execute(stats_query, (student_id, student_id))
+        stats = cursor.fetchall()
+        
+        # 查询每个单词的错误历史
+        word_history_query = """
+        SELECT w.word_id, w.spelling, w.list_id,
+               COUNT(*) as total_errors,
+               GROUP_CONCAT(e.student_answer, ', ') as wrong_answers,
+               GROUP_CONCAT(e.error_date, ', ') as error_dates
+        FROM ErrorLogs e
+        JOIN Words w ON e.word_id = w.word_id
+        WHERE e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY total_errors DESC
+        LIMIT 20
+        """
+        
+        cursor.execute(word_history_query, (student_id,))
+        word_history = cursor.fetchall()
+        
+        # 转换为JSON格式
+        error_list = [dict(error) for error in errors]
+        stats_list = [dict(stat) for stat in stats]
+        word_history_list = [dict(item) for item in word_history]
+        
+        # 计算总体正确率（假设每个单词测试一次）
+        total_tested_query = "SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ?"
+        cursor.execute(total_tested_query, (student_id,))
+        total_tested = cursor.fetchone()[0]
+        
+        # 假设我们有一个记录总测试单词数的方法，这里简化处理
+        # 实际应用中可能需要一个单独的表来记录每次测试的所有单词
+        accuracy_rate = 0
+        if total_tested > 0:
+            # 这里的计算是简化的，实际应用中需要更准确的数据
+            # 假设每个单词只测试一次，错误的单词数就是total_tested
+            accuracy_rate = round((1 - total_tested / 100) * 100, 2)  # 假设总共测试了100个单词
+        
+        conn.close()
+        
+        return jsonify({
+            'errors': error_list,
+            'stats': stats_list,
+            'word_history': word_history_list,
+            'total_tested': total_tested,
+            'accuracy_rate': accuracy_rate
+        })
+        
+    except sqlite3.Error as e:
+        app.logger.error(f"获取错误历史记录时出错: {e}")
+        return jsonify({'error': '获取错误历史记录失败'}), 500
 
 # --- 启动命令 ---
 if __name__ == '__main__':
