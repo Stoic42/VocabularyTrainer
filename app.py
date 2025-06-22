@@ -282,4 +282,4 @@ def get_error_history():
 
 # --- 启动命令 ---
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
