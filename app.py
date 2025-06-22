@@ -172,6 +172,16 @@ def get_lists():
         # 转换为列表格式
         list_ids = [{'id': list_id[0], 'name': f'List {list_id[0]}'} for list_id in lists]
         
+        # 确保返回32个列表选项
+        # 如果数据库中的列表数量不足32个，则补充剩余的列表选项
+        existing_list_ids = {item['id'] for item in list_ids}
+        for i in range(1, 33):
+            if i not in existing_list_ids:
+                list_ids.append({'id': i, 'name': f'List {i}'})
+        
+        # 按list_id排序
+        list_ids.sort(key=lambda x: x['id'])
+        
         return jsonify(list_ids)
     except sqlite3.Error as e:
         app.logger.error(f"获取单词列表时出错: {e}")
