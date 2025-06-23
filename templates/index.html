@@ -84,18 +84,71 @@
             background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
         }
         .lumi-reaction {
-            position: fixed; bottom: 20px; left: 50%;
-            width: 200px; height: 200px;
+            position: fixed; 
+            bottom: 3vh; /* 使用视口高度的百分比 */
+            left: 50%;
+            width: calc(min(20vh, 20vw, 200px)); /* 根据视口高度、宽度和最大像素值取最小值 */
+            height: calc(min(20vh, 20vw, 200px)); /* 保持宽高比例一致 */
             transform: translateX(-50%);
             transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
             z-index: 9999; opacity: 1;
             background-size: contain; background-repeat: no-repeat; background-position: center;
             pointer-events: none;
         }
+        
+        /* 当窗口高度较低时，将 Lumi 移到右下角 */
+        .lumi-reaction.corner {
+            left: auto;
+            right: 2vw;
+            bottom: 2vh;
+            transform: none;
+            width: calc(min(15vh, 15vw, 150px)); /* 在角落时稍微缩小 */
+            height: calc(min(15vh, 15vw, 150px));
+            opacity: 0.8; /* 稍微降低透明度 */
+        }
+        
+        /* 角落模式下的动画 */
+        .lumi-reaction.corner.active { 
+            animation: lumiFloatCorner 15s ease-in-out infinite alternate; 
+        }
+        .lumi-reaction.corner.bounce { 
+            animation: lumiJumpCorner 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; 
+        }
+        
+        /* 当窗口高度极低时，隐藏 Lumi */
+        .lumi-reaction.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
         .lumi-reaction.active { opacity: 1; animation: lumiFloat 15s ease-in-out infinite alternate; }
         .lumi-reaction.bounce { animation: lumiJump 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; }
-        @keyframes lumiJump { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.1) translateY(-10px); } 100% { transform: translateX(-50%) scale(1); } }
-        @keyframes lumiFloat { 0%{transform:translateX(-50%)} 25%{transform:translate(-52%, 3px)} 50%{transform:translate(-48%, -3px)} 75%{transform:translate(-51%, 2px)} 100%{transform:translateX(-50%)} }
+        /* 中心位置的动画 */
+        @keyframes lumiJump { 
+            0% { transform: translateX(-50%) scale(1); } 
+            50% { transform: translateX(-50%) scale(1.1) translateY(-1vh); } /* 使用视口高度的百分比 */ 
+            100% { transform: translateX(-50%) scale(1); } 
+        }
+        @keyframes lumiFloat { 
+            0% { transform: translateX(-50%); } 
+            25% { transform: translate(calc(-50% - 0.5vw), 0.5vh); } /* 使用视口宽度和高度的百分比 */ 
+            50% { transform: translate(calc(-50% + 0.5vw), -0.5vh); } 
+            75% { transform: translate(calc(-50% - 0.3vw), 0.3vh); } 
+            100% { transform: translateX(-50%); } 
+        }
+        
+        /* 角落位置的动画 */
+        @keyframes lumiJumpCorner { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.1) translateY(-1vh); } 
+            100% { transform: scale(1); } 
+        }
+        @keyframes lumiFloatCorner { 
+            0% { transform: none; } 
+            25% { transform: translate(-0.5vw, 0.5vh); } 
+            50% { transform: translate(0.5vw, -0.5vh); } 
+            75% { transform: translate(-0.3vw, 0.3vh); } 
+            100% { transform: none; } 
+        }
         
         /* 开关按钮样式 */
         .switch {
@@ -536,6 +589,58 @@
                 void lumiImg.offsetWidth; // 触发重排以重置动画
                 lumiImg.classList.add('bounce');
             }
+            
+            // 每次更新 Lumi 状态时检查位置
+            checkLumiPosition();
+        }
+        
+        // 检查并调整 Lumi 的位置
+        function checkLumiPosition() {
+            if (!lumiImg || !lumiEnabled) return;
+            
+            const quizAreaRect = quizArea.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const lumiHeight = lumiImg.offsetHeight;
+            
+            // 保存当前的动画状态
+            const wasActive = lumiImg.classList.contains('active');
+            const wasBounce = lumiImg.classList.contains('bounce');
+            
+            // 清除之前的位置类和动画类
+            lumiImg.classList.remove('corner', 'hidden', 'active', 'bounce');
+            
+            // 如果窗口高度小于 700px，完全隐藏 Lumi
+            if (windowHeight < 700) {
+                lumiImg.classList.add('hidden');
+                return;
+            }
+            
+            // 如果 quiz-area 在视口中且与 Lumi 有重叠，将 Lumi 移到角落
+            let shouldBeInCorner = false;
+            if (quizArea.style.display !== 'none') {
+                const lumiBottom = windowHeight - 3 * windowHeight / 100; // 3vh 转换为像素
+                const lumiTop = lumiBottom - lumiHeight;
+                
+                // 检查 Lumi 是否与 quiz-area 重叠
+                if (lumiTop < quizAreaRect.bottom && quizAreaRect.top < lumiBottom) {
+                    shouldBeInCorner = true;
+                }
+            }
+            
+            // 应用位置类
+            if (shouldBeInCorner) {
+                lumiImg.classList.add('corner');
+            }
+            
+            // 恢复动画状态
+            if (wasActive) {
+                lumiImg.classList.add('active');
+            }
+            if (wasBounce) {
+                // 重新触发弹跳动画
+                void lumiImg.offsetWidth; // 触发重排以重置动画
+                lumiImg.classList.add('bounce');
+            }
         }
 
         // 显示问题
@@ -661,6 +766,12 @@
             if (!lumiEnabled) {
                 lumiImg.classList.remove('active');
             }
+            
+            // 初始检查 Lumi 位置
+            checkLumiPosition();
+            
+            // 添加窗口大小变化事件监听器
+            window.addEventListener('resize', checkLumiPosition);
             
             // 初始化自动播放开关状态
             autoPlayEnabled = autoPlayToggle.checked;
