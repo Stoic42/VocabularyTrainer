@@ -463,7 +463,26 @@
                     <button id="play-us-btn" style="display: none;">美 🔊</button>
                 </div>
             </div>
+            <p id="question-ipa" style="font-size: 1.1em; color: #555; margin-top: 5px;"></p>
+            <p id="question-meaning-en" style="font-style: italic; color: #666; margin-top: 5px;"></p>
+            <p id="question-example-en" style="margin-top: 15px; font-size: 0.95em; color: #444;"></p>
+            <p id="question-example-cn" style="font-size: 0.9em; color: #777;"></p>
             <p>第 <span id="current-q-num">1</span> / <span id="total-q-num"></span> 题</p>
+            <div class="details-toggle">
+                <button id="toggle-details-btn">显示更多详情</button>
+                <div id="word-details-container" style="display: none;">
+                    <p id="question-derivatives" style="margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+                    <p id="question-root-etymology" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-mnemonic" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-comparison" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-collocation" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-exam-sentence" style="margin-top: 10px; font-size: 0.95em; color: #444;"></p>
+                    <p id="question-exam-year-source" style="font-size: 0.85em; color: #777;"></p>
+                    <p id="question-exam-options" style="font-size: 0.9em; color: #444;"></p>
+                    <p id="question-exam-explanation" style="font-size: 0.9em; color: #444;"></p>
+                    <p id="question-tips" style="font-size: 0.9em; color: #666;"></p>
+                </div>
+            </div>
             <input type="text" id="answer-input" placeholder="输入单词拼写...">
             <button id="next-btn" style="margin-top: 10px;">下一题</button>
         </div>
@@ -539,6 +558,10 @@
         const quizArea = document.getElementById('quiz-area');
         const resultsArea = document.getElementById('results-area');
         const questionMeaningEl = document.getElementById('question-meaning');
+        const questionIpaEl = document.getElementById('question-ipa');
+        const questionMeaningEnEl = document.getElementById('question-meaning-en');
+        const questionExampleEnEl = document.getElementById('question-example-en');
+        const questionExampleCnEl = document.getElementById('question-example-cn');
         const currentQNumEl = document.getElementById('current-q-num');
         const totalQNumEl = document.getElementById('total-q-num');
         const answerInput = document.getElementById('answer-input');
@@ -546,6 +569,20 @@
         const audioEl = document.getElementById('word-audio');
         const ukBtn = document.getElementById('play-uk-btn');
         const usBtn = document.getElementById('play-us-btn');
+
+        const toggleDetailsBtn = document.getElementById('toggle-details-btn');
+        const wordDetailsContainer = document.getElementById('word-details-container');
+
+        const questionDerivativesEl = document.getElementById('question-derivatives');
+        const questionRootEtymologyEl = document.getElementById('question-root-etymology');
+        const questionMnemonicEl = document.getElementById('question-mnemonic');
+        const questionComparisonEl = document.getElementById('question-comparison');
+        const questionCollocationEl = document.getElementById('question-collocation');
+        const questionExamSentenceEl = document.getElementById('question-exam-sentence');
+        const questionExamYearSourceEl = document.getElementById('question-exam-year-source');
+        const questionExamOptionsEl = document.getElementById('question-exam-options');
+        const questionExamExplanationEl = document.getElementById('question-exam-explanation');
+        const questionTipsEl = document.getElementById('question-tips');
         const lumiImg = document.querySelector('.lumi-reaction');
         const lumiToggle = document.getElementById('lumi-toggle');
         const autoPlayToggle = document.getElementById('auto-play-toggle');
@@ -892,11 +929,27 @@
         // 显示问题
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
-            let displayText = q.meaning_cn;
-            if (q.pos && q.pos.trim() !== '') {
-                displayText = `${q.meaning_cn} (${q.pos})`;
-            }
-            questionMeaningEl.textContent = displayText;
+            questionMeaningEl.textContent = q.meaning_cn; // 中文释义
+            questionIpaEl.textContent = q.ipa ? `/${q.ipa}/` : ''; // 音标
+            questionMeaningEnEl.textContent = q.meaning_en || ''; // 英文释义
+            questionExampleEnEl.textContent = q.example_en || ''; // 例句英文
+            questionExampleCnEl.textContent = q.example_cn || ''; // 例句中文
+
+            // 填充更多详细信息
+            questionDerivativesEl.textContent = q.derivatives ? `派生词: ${q.derivatives}` : '';
+            questionRootEtymologyEl.textContent = q.root_etymology ? `词根词源: ${q.root_etymology}` : '';
+            questionMnemonicEl.textContent = q.mnemonic ? `联想记忆: ${q.mnemonic}` : '';
+            questionComparisonEl.textContent = q.comparison ? `词义辨析: ${q.comparison}` : '';
+            questionCollocationEl.textContent = q.collocation ? `搭配用法: ${q.collocation}` : '';
+            questionExamSentenceEl.textContent = q.exam_sentence ? `真题例句: ${q.exam_sentence}` : '';
+            questionExamYearSourceEl.textContent = q.exam_year_source ? `真题出处: ${q.exam_year_source}` : '';
+            questionExamOptionsEl.textContent = q.exam_options ? `选项: ${q.exam_options}` : '';
+            questionExamExplanationEl.textContent = q.exam_explanation ? `解析: ${q.exam_explanation}` : '';
+            questionTipsEl.textContent = q.tips ? `提示: ${q.tips}` : '';
+
+            // 重置详情显示状态
+            wordDetailsContainer.style.display = 'none';
+            toggleDetailsBtn.textContent = '显示更多详情';
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
             ukBtn.style.display = q.audio_path_uk ? 'inline-block' : 'none';
@@ -1140,6 +1193,16 @@
 
         // 下一步按钮和回车键
         nextBtn.addEventListener('click', handleNextQuestion);
+
+        toggleDetailsBtn.addEventListener('click', () => {
+            if (wordDetailsContainer.style.display === 'none') {
+                wordDetailsContainer.style.display = 'block';
+                toggleDetailsBtn.textContent = '隐藏更多详情';
+            } else {
+                wordDetailsContainer.style.display = 'none';
+                toggleDetailsBtn.textContent = '显示更多详情';
+            }
+        });
         answerInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
