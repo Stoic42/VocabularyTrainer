@@ -146,12 +146,57 @@
     </style>
 </head>
 <body>
-    <div id="app-container">
+    <div id="auth-container" style="max-width: 400px; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
+        <div class="header">
+            <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px; margin-right: 15px;">
+            </div>
+            <h1 style="text-align: center;">用户登录</h1>
+        </div>
+        
+        <div id="login-form">
+            <div style="margin-bottom: 15px;">
+                <label for="login-username">用户名:</label>
+                <input type="text" id="login-username" placeholder="请输入用户名" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="login-password">密码:</label>
+                <input type="password" id="login-password" placeholder="请输入密码" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+            </div>
+            <div id="login-error" style="color: red; margin-bottom: 15px; display: none;"></div>
+            <button id="login-btn" style="width: 100%; margin-bottom: 10px;">登录</button>
+            <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register">立即注册</a></p>
+        </div>
+        
+        <div id="register-form" style="display: none;">
+            <div style="margin-bottom: 15px;">
+                <label for="register-username">用户名:</label>
+                <input type="text" id="register-username" placeholder="请输入用户名" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="register-password">密码:</label>
+                <input type="password" id="register-password" placeholder="请输入密码" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="register-confirm-password">确认密码:</label>
+                <input type="password" id="register-confirm-password" placeholder="请再次输入密码" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+            </div>
+            <div id="register-error" style="color: red; margin-bottom: 15px; display: none;"></div>
+            <button id="register-btn" style="width: 100%; margin-bottom: 10px;">注册</button>
+            <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login">返回登录</a></p>
+        </div>
+    </div>
+    
+    <div id="app-container" style="display: none;">
         <div class="header">
             <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
                 <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px; margin-right: 15px;">
             </div>
             <h1>烛梦单词考核</h1>
+            <div style="text-align: right; margin-top: -40px;">
+                <span id="user-info" style="margin-right: 10px;"></span>
+                <a href="#" id="logout-btn" style="color: var(--primary-color);">退出登录</a>
+            </div>
         </div>
 
         <div class="list-selector">
@@ -225,6 +270,7 @@
         let consecutiveCorrect = 0; // 连续正确的次数
         let lumiEnabled = true; // Lumi显示状态
         let autoPlayEnabled = false; // 自动播放状态
+        let currentUser = null; // 当前登录用户
         const lumiImages = {
             'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
             'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
@@ -234,6 +280,24 @@
         };
 
         // --- DOM 元素缓存 ---
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginUsername = document.getElementById('login-username');
+        const loginPassword = document.getElementById('login-password');
+        const loginError = document.getElementById('login-error');
+        const loginBtn = document.getElementById('login-btn');
+        const registerUsername = document.getElementById('register-username');
+        const registerPassword = document.getElementById('register-password');
+        const registerConfirmPassword = document.getElementById('register-confirm-password');
+        const registerError = document.getElementById('register-error');
+        const registerBtn = document.getElementById('register-btn');
+        const showRegisterLink = document.getElementById('show-register');
+        const showLoginLink = document.getElementById('show-login');
+        const userInfoEl = document.getElementById('user-info');
+        const logoutBtn = document.getElementById('logout-btn');
+        
         const startBtn = document.getElementById('start-btn');
         const quizArea = document.getElementById('quiz-area');
         const resultsArea = document.getElementById('results-area');
@@ -250,6 +314,136 @@
         const autoPlayToggle = document.getElementById('auto-play-toggle');
 
         // --- 功能函数 ---
+        
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            // 从sessionStorage获取用户信息
+            const userJson = sessionStorage.getItem('currentUser');
+            if (userJson) {
+                try {
+                    currentUser = JSON.parse(userJson);
+                    showAppInterface();
+                } catch (e) {
+                    console.error('解析用户信息失败:', e);
+                    showAuthInterface();
+                }
+            } else {
+                showAuthInterface();
+            }
+        }
+        
+        // 显示认证界面
+        function showAuthInterface() {
+            authContainer.style.display = 'block';
+            appContainer.style.display = 'none';
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        }
+        
+        // 显示应用界面
+        function showAppInterface() {
+            authContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            if (currentUser) {
+                userInfoEl.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
+            }
+        }
+        
+        // 处理登录
+        async function handleLogin() {
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+            
+            if (!username || !password) {
+                loginError.textContent = '用户名和密码不能为空';
+                loginError.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 登录成功
+                    currentUser = data.user;
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showAppInterface();
+                    loginUsername.value = '';
+                    loginPassword.value = '';
+                    loginError.style.display = 'none';
+                } else {
+                    // 登录失败
+                    loginError.textContent = data.error || '登录失败';
+                    loginError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('登录请求出错:', error);
+                loginError.textContent = '网络错误，请稍后再试';
+                loginError.style.display = 'block';
+            }
+        }
+        
+        // 处理注册
+        async function handleRegister() {
+            const username = registerUsername.value.trim();
+            const password = registerPassword.value.trim();
+            const confirmPassword = registerConfirmPassword.value.trim();
+            
+            if (!username || !password || !confirmPassword) {
+                registerError.textContent = '所有字段都必须填写';
+                registerError.style.display = 'block';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                registerError.textContent = '两次输入的密码不一致';
+                registerError.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 注册成功，切换到登录表单
+                    registerUsername.value = '';
+                    registerPassword.value = '';
+                    registerConfirmPassword.value = '';
+                    registerError.style.display = 'none';
+                    loginForm.style.display = 'block';
+                    registerForm.style.display = 'none';
+                    loginUsername.value = username; // 自动填充用户名
+                    alert('注册成功，请登录');
+                } else {
+                    // 注册失败
+                    registerError.textContent = data.error || '注册失败';
+                    registerError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('注册请求出错:', error);
+                registerError.textContent = '网络错误，请稍后再试';
+                registerError.style.display = 'block';
+            }
+        }
+        
+        // 处理退出登录
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            showAuthInterface();
+        }
         
         // 动态加载单词列表
         async function loadWordLists() {
@@ -460,6 +654,7 @@
             Object.values(lumiImages).forEach(path => { (new Image()).src = path; }); // 预加载图片
             updateLumiReaction('welcome');
             loadWordLists();
+            checkLoginStatus();
             
             // 初始化Lumi开关状态
             lumiEnabled = lumiToggle.checked;
@@ -469,6 +664,19 @@
             
             // 初始化自动播放开关状态
             autoPlayEnabled = autoPlayToggle.checked;
+            
+            // 添加认证相关事件监听器
+            loginBtn.addEventListener('click', handleLogin);
+            registerBtn.addEventListener('click', handleRegister);
+            showRegisterLink.addEventListener('click', function() {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+            showLoginLink.addEventListener('click', function() {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+            logoutBtn.addEventListener('click', handleLogout);
         });
         
         // Lumi开关事件监听

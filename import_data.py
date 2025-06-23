@@ -25,7 +25,30 @@ def create_tables(conn):
         list_id INTEGER
     );
     """)
-    # 还可以加入其它表的创建...
+    
+    # 创建错误日志表
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ErrorLogs (
+        error_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id INTEGER,
+        word_id INTEGER,
+        error_type TEXT,
+        student_answer TEXT,
+        error_date TEXT,
+        FOREIGN KEY (word_id) REFERENCES Words(word_id)
+    );
+    """)
+    
+    # 新增：创建用户表
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS Users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'student' CHECK(role IN ('student', 'admin'))
+    );
+    """)
+    
     conn.commit()
     print("数据库表已确认或创建。")
 

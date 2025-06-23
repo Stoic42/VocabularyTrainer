@@ -1,14 +1,17 @@
-from flask import Flask, jsonify, request, render_template, send_from_directory
+from flask import Flask, jsonify, request, render_template, send_from_directory, session
 import sqlite3
 import random
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+# 新增这一行，导入 werkzeug 的安全模块，用于密码加密
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # --- 应用设置 ---
 app = Flask(__name__, 
            static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets'),
            static_url_path='/assets')
+app.secret_key = 'your-super-secret-key-for-mvp' # MVP阶段随便写一个即可
 DATABASE_FILE = 'vocabulary.db'
 # 我们将所有词库资源（音频、txt）都统一放在 'wordlists' 文件夹下进行管理
 WORDLISTS_BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wordlists')
@@ -289,6 +292,57 @@ def get_error_history():
     except sqlite3.Error as e:
         app.logger.error(f"获取错误历史记录时出错: {e}")
         return jsonify({'error': '获取错误历史记录失败'}), 500
+
+# --- 新增：用户认证API ---
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    """处理用户注册"""
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': '用户名和密码不能为空'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 检查用户名是否已存在
+    user = cursor.execute('SELECT * FROM Users WHERE username = ?', (username,)).fetchone()
+    if user:
+        conn.close()
+        return jsonify({'error': '用户名已存在'}), 409 # 409代表冲突
+
+    # 将密码加密后存储
+    password_hash = generate_password_hash(password)
+
+    cursor.execute('INSERT INTO Users (username, password_hash, role) VALUES (?, ?, ?)', 
+                   (username, password_hash, 'student')) # 默认为学生
+    conn.commit()
+    conn.close()
+
+    return jsonify({'message': '用户注册成功'}), 201 # 201代表创建成功
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """处理用户登录"""
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM Users WHERE username = ?', (username,)).fetchone()
+    conn.close()
+
+    if user and check_password_hash(user['password_hash'], password):
+        # 密码正确，将用户信息存入 session
+        session['user_id'] = user['id']
+        session['username'] = user['username']
+        session['role'] = user['role']
+        return jsonify({'message': '登录成功', 'user': {'username': user['username'], 'role': user['role']}}), 200
+
+    return jsonify({'error': '用户名或密码错误'}), 401 # 401代表未授权
 
 # --- 启动命令 ---
 if __name__ == '__main__':
