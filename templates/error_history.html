@@ -218,6 +218,34 @@
             border-left: 4px solid var(--error-color);
         }
         
+        /* 登录提示样式 */
+        .login-required {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .login-required p {
+            font-size: 18px;
+            margin: 0;
+        }
+        
+        .login-required button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .login-required button:hover {
+            background-color: #0056b3;
+        }
+        
         .no-data {
             text-align: center;
             padding: 40px;
@@ -361,11 +389,20 @@
         async function fetchErrorHistory() {
             try {
                 const response = await fetch('/api/error-history');
+                
+                // 解析响应数据
+                const data = await response.json();
+                
+                // 检查响应状态
                 if (!response.ok) {
-                    throw new Error('获取错误历史记录失败');
+                    // 如果是401未授权错误，显示登录提示
+                    if (response.status === 401) {
+                        throw new Error(data.error || '请先登录后查看错误历史记录');
+                    } else {
+                        throw new Error(data.error || '获取错误历史记录失败');
+                    }
                 }
                 
-                const data = await response.json();
                 return data;
             } catch (error) {
                 console.error('获取错误历史记录时出错:', error);
@@ -471,7 +508,31 @@
             } catch (error) {
                 // 显示错误信息
                 loadingEl.style.display = 'none';
-                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                
+                // 检查是否是未登录错误
+                if (error.message.includes('请先登录')) {
+                    // 创建登录提示和按钮
+                    errorMessageEl.innerHTML = `
+                        <div class="login-required">
+                            <p>${error.message}</p>
+                            <button id="goToLoginBtn" class="btn btn-primary">返回主页登录</button>
+                        </div>
+                    `;
+                    
+                    // 添加按钮点击事件
+                    setTimeout(() => {
+                        const goToLoginBtn = document.getElementById('goToLoginBtn');
+                        if (goToLoginBtn) {
+                            goToLoginBtn.addEventListener('click', () => {
+                                window.location.href = '/';
+                            });
+                        }
+                    }, 0);
+                } else {
+                    // 其他错误
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                }
+                
                 errorMessageEl.style.display = 'block';
             }
         }

@@ -93,12 +93,14 @@ def get_questions():
         
     return jsonify(word_list)
 
-# API 2: 提交答案并批改 (您的优秀代码，我们保留)
+# API 2: 提交答案并批改
 @app.route('/api/submit', methods=['POST'])
 def submit_answers():
-    # ... 您的 submit_answers 函数逻辑非常完美，无需改动 ...
     data = request.get_json()
     answers = data.get('answers', [])
+    
+    # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+    student_id = session.get('user_id', -1)
     
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -118,13 +120,13 @@ def submit_answers():
                     'correct_spelling': correct_spelling,
                     'your_answer': student_answer
                 })
-                # 将错误记录到ErrorLogs表
+                # 将错误记录到ErrorLogs表，使用当前用户ID
                 try:
                     cursor.execute(
                         "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
-                        (1, word_id, 'spelling_mvp', student_answer)
+                        (student_id, word_id, 'spelling_mvp', student_answer)
                     )
-                    app.logger.info(f"记录错误: 单词ID={word_id}, 学生答案={student_answer}")
+                    app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}")
                 except sqlite3.Error as e:
                     app.logger.error(f"记录错误到ErrorLogs表失败: {e}")
                     # 如果表不存在，尝试创建它
@@ -146,7 +148,7 @@ def submit_answers():
                             # 重新尝试插入
                             cursor.execute(
                                 "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
-                                (1, word_id, 'spelling_mvp', student_answer)
+                                (student_id, word_id, 'spelling_mvp', student_answer)
                             )
                         except sqlite3.Error as e2:
                             app.logger.error(f"创建ErrorLogs表并插入数据失败: {e2}")
@@ -207,8 +209,12 @@ def error_history():
 def get_error_history():
     """获取用户的错误历史记录"""
     try:
-        # 获取查询参数
-        student_id = request.args.get('student_id', default=1, type=int)  # 默认为学生ID 1
+        # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+        student_id = session.get('user_id', -1)
+        # 如果用户未登录，返回错误信息
+        if student_id == -1:
+            return jsonify({'error': '请先登录后查看错误历史记录'}), 401
+            
         limit = request.args.get('limit', default=50, type=int)  # 默认最多返回50条记录
         
         conn = get_db_connection()
