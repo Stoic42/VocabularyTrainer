@@ -1,6 +1,7 @@
 import sqlite3
 import csv
 import os
+import sqlite3
 
 # --- 配置区 ---
 DATABASE_FILE = 'vocabulary.db'
@@ -13,7 +14,26 @@ TXT_FILE_PATH = 'wordlists/junior_high/初中 乱序 绿宝书.txt'
 def create_tables(conn):
     """创建数据库表，如果它们不存在的话"""
     cursor = conn.cursor()
-    # 我们之前的建表语句非常完美，直接使用
+    
+    # 创建词书表
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS Books (
+        book_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_name TEXT NOT NULL UNIQUE
+    );
+    """)
+    
+    # 创建单元表
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS WordLists (
+        list_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        list_name TEXT NOT NULL,
+        book_id INTEGER,
+        FOREIGN KEY (book_id) REFERENCES Books(book_id)
+    );
+    """)
+    
+    # 创建单词表，修改外键引用
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Words (
         word_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +42,8 @@ def create_tables(conn):
         pos TEXT,
         audio_path_uk TEXT,
         audio_path_us TEXT,
-        list_id INTEGER
+        list_id INTEGER,
+        FOREIGN KEY (list_id) REFERENCES WordLists(list_id)
     );
     """)
     
@@ -35,11 +56,12 @@ def create_tables(conn):
         error_type TEXT,
         student_answer TEXT,
         error_date TEXT,
-        FOREIGN KEY (word_id) REFERENCES Words(word_id)
+        FOREIGN KEY (word_id) REFERENCES Words(word_id),
+        FOREIGN KEY (student_id) REFERENCES Users(id)
     );
     """)
     
-    # 新增：创建用户表
+    # 创建用户表
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,12 +110,21 @@ def load_audio_paths_from_txt(txt_path):
 
 def import_merged_data(conn, csv_path, audio_map):
     """
-    第二步：扫描CSV文件，合并音频数据，并导入数据库。
+    第二步：扫描CSV文件，创建词书和单元，合并音频数据，并导入数据库。
     """
     print(f"正在从 '{csv_path}' 导入单词并合并音频数据...")
     cursor = conn.cursor()
     count = 0
     try:
+        # 创建初中词书
+        book_name = "初中英语词汇"
+        cursor.execute("INSERT INTO Books (book_name) VALUES (?)", (book_name,))
+        book_id = cursor.lastrowid
+        print(f"创建词书：{book_name} (ID: {book_id})")
+        
+        # 用于记录已创建的单元
+        created_lists = set()
+        
         with open(csv_path, mode='r', encoding='utf-8-sig') as file:
             csv_reader = csv.reader(file, delimiter=',')
             next(csv_reader, None) # 跳过表头
@@ -104,9 +135,27 @@ def import_merged_data(conn, csv_path, audio_map):
 
                 # 从CSV获取基础数据
                 list_id_str = row[0].replace("List", "").strip()
-                list_id = int(list_id_str)
+                list_num = int(list_id_str)
                 spelling = row[1].strip()
                 full_meaning = row[3].strip()
+
+                # 如果这个单元还没有创建，就创建它
+                if list_num not in created_lists:
+                    list_name = f"Unit {list_num}"
+                    cursor.execute(
+                        "INSERT INTO WordLists (list_name, book_id) VALUES (?, ?)",
+                        (list_name, book_id)
+                    )
+                    list_id = cursor.lastrowid
+                    created_lists.add(list_num)
+                    print(f"创建单元：{list_name} (ID: {list_id})")
+                else:
+                    # 获取已创建的单元ID
+                    cursor.execute(
+                        "SELECT list_id FROM WordLists WHERE book_id = ? AND list_name = ?",
+                        (book_id, f"Unit {list_num}")
+                    )
+                    list_id = cursor.fetchone()[0]
 
                 # 解析词性和意思
                 pos = ""

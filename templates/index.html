@@ -411,9 +411,15 @@
 
         <div class="list-selector">
             <div>
-                <label for="list-select">选择单词列表: </label>
-                <select id="list-select">
+                <label for="book-select">选择词书: </label>
+                <select id="book-select">
                     <option value="">加载中...</option>
+                </select>
+            </div>
+            <div>
+                <label for="list-select">选择单元: </label>
+                <select id="list-select">
+                    <option value="">请先选择词书...</option>
                 </select>
             </div>
             <div>
@@ -705,12 +711,45 @@
             showAuthInterface();
         }
         
-        // 动态加载单词列表
-        async function loadWordLists() {
+        // 动态加载词书列表
+        async function loadBookLists() {
+            try {
+                const bookSelect = document.getElementById('book-select');
+                const response = await fetch('/api/books');
+                if (!response.ok) throw new Error('获取词书列表失败');
+                const books = await response.json();
+                
+                bookSelect.innerHTML = ''; // 清空加载中选项
+                
+                if (books && books.length > 0) {
+                    books.forEach(book => {
+                        const option = document.createElement('option');
+                        option.value = book.id;
+                        option.textContent = book.name;
+                        bookSelect.appendChild(option);
+                    });
+                    // 加载第一本书的单元列表
+                    loadWordLists(books[0].id);
+                } else {
+                    bookSelect.innerHTML = '<option value="">无可用词书</option>';
+                    document.getElementById('list-select').innerHTML = '<option value="">无可用单元</option>';
+                }
+            } catch (error) {
+                console.error('加载词书列表时出错:', error);
+                document.getElementById('book-select').innerHTML = '<option value="">加载失败</option>';
+                document.getElementById('list-select').innerHTML = '<option value="">加载失败</option>';
+            }
+        }
+        
+        // 动态加载单词列表（根据选定的词书）
+        async function loadWordLists(bookId) {
             try {
                 const listSelect = document.getElementById('list-select');
-                const response = await fetch('/api/lists');
-                if (!response.ok) throw new Error('获取单词列表失败');
+                listSelect.innerHTML = '<option value="">加载中...</option>';
+                
+                const url = bookId ? `/api/lists?book_id=${bookId}` : '/api/lists';
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('获取单元列表失败');
                 const lists = await response.json();
                 
                 listSelect.innerHTML = ''; // 清空加载中选项
@@ -723,10 +762,10 @@
                         listSelect.appendChild(option);
                     });
                 } else {
-                    listSelect.innerHTML = '<option value="">无可用列表</option>';
+                    listSelect.innerHTML = '<option value="">无可用单元</option>';
                 }
             } catch (error) {
-                console.error('加载单词列表时出错:', error);
+                console.error('加载单元列表时出错:', error);
                 document.getElementById('list-select').innerHTML = '<option value="">加载失败</option>';
             }
         }
@@ -965,7 +1004,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             Object.values(lumiImages).forEach(path => { (new Image()).src = path; }); // 预加载图片
             updateLumiReaction('welcome');
-            loadWordLists();
+            loadBookLists(); // 加载词书列表，而不是直接加载单词列表
             checkLoginStatus();
             
             // 初始化Lumi开关状态
@@ -982,6 +1021,17 @@
             
             // 初始化自动播放开关状态
             autoPlayEnabled = autoPlayToggle.checked;
+            
+            // 添加词书选择变化事件监听器
+            document.getElementById('book-select').addEventListener('change', function() {
+                const selectedBookId = this.value;
+                if (selectedBookId) {
+                    loadWordLists(selectedBookId);
+                } else {
+                    // 如果没有选择词书，清空单元列表
+                    document.getElementById('list-select').innerHTML = '<option value="">请先选择词书...</option>';
+                }
+            });
             
             // 添加认证相关事件监听器
             loginBtn.addEventListener('click', handleLogin);

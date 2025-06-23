@@ -162,27 +162,65 @@ def submit_answers():
         'error_details': error_details
     })
 
-# --- API路由：获取单词列表 ---
-@app.route('/api/lists')
-def get_lists():
-    """获取所有可用的单词列表"""
+# --- API路由：获取词书列表 ---
+@app.route('/api/books')
+def get_books():
+    """获取所有可用的词书列表"""
     try:
         conn = sqlite3.connect(DATABASE_FILE)
         cursor = conn.cursor()
         
-        # 查询数据库中所有不同的 list_id
-        cursor.execute("SELECT DISTINCT list_id FROM Words ORDER BY list_id")
-        lists = cursor.fetchall()
+        # 查询数据库中所有词书
+        cursor.execute("SELECT book_id, book_name FROM Books ORDER BY book_id")
+        books = cursor.fetchall()
         
         # 转换为列表格式
-        list_ids = [{'id': list_id[0], 'name': f'List {list_id[0]}'} for list_id in lists]
+        book_list = [{'id': book[0], 'name': book[1]} for book in books]
         
-        # 确保返回32个列表选项
-        # 如果数据库中的列表数量不足32个，则补充剩余的列表选项
-        existing_list_ids = {item['id'] for item in list_ids}
-        for i in range(1, 33):
-            if i not in existing_list_ids:
-                list_ids.append({'id': i, 'name': f'List {i}'})
+        return jsonify(book_list)
+    except sqlite3.Error as e:
+        app.logger.error(f"获取词书列表时出错: {e}")
+        return jsonify({'error': '获取词书列表失败'}), 500
+    finally:
+        if conn:
+            conn.close()
+
+# --- API路由：获取单词列表 ---
+@app.route('/api/lists')
+def get_lists():
+    """获取可用的单词列表，可以按book_id筛选"""
+    try:
+        book_id = request.args.get('book_id', type=int)
+        
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        
+        if book_id:
+            # 如果提供了book_id，查询特定词书下的单元
+            cursor.execute(
+                "SELECT list_id, list_name FROM WordLists WHERE book_id = ? ORDER BY list_id", 
+                (book_id,)
+            )
+            lists = cursor.fetchall()
+            list_ids = [{'id': list_item[0], 'name': list_item[1]} for list_item in lists]
+        else:
+            # 兼容旧版本，如果没有提供book_id，返回所有单元
+            cursor.execute("SELECT list_id, list_name FROM WordLists ORDER BY list_id")
+            lists = cursor.fetchall()
+            
+            if lists:
+                list_ids = [{'id': list_item[0], 'name': list_item[1]} for list_item in lists]
+            else:
+                # 如果WordLists表为空，尝试从Words表获取list_id（兼容旧数据）
+                cursor.execute("SELECT DISTINCT list_id FROM Words ORDER BY list_id")
+                old_lists = cursor.fetchall()
+                list_ids = [{'id': list_id[0], 'name': f'List {list_id[0]}'} for list_id in old_lists]
+                
+                # 确保返回32个列表选项（兼容旧逻辑）
+                existing_list_ids = {item['id'] for item in list_ids}
+                for i in range(1, 33):
+                    if i not in existing_list_ids:
+                        list_ids.append({'id': i, 'name': f'List {i}'})
         
         # 按list_id排序
         list_ids.sort(key=lambda x: x['id'])
