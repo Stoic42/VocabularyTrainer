@@ -17,6 +17,162 @@
             --accent-color: #FF7B54;   /* 活力珊瑚橙 */
             --border-radius: 8px;
         }
+        
+        /* 认证表单样式 */
+        .auth-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-color);
+            font-size: 1.8em;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .auth-form h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
+        }
+        
+        .auth-button {
+            width: 100%;
+            margin-bottom: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-button:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .auth-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-button::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .auth-button:hover::after {
+            left: 100%;
+        }
+        
+        .auth-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding-bottom: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-link:hover {
+            color: var(--hover-color);
+        }
+        
+        .auth-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--hover-color);
+            transition: width 0.3s ease;
+        }
+        
+        .auth-link:hover::after {
+            width: 100%;
+        }
+        
+        .auth-error {
+            color: var(--error-color);
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            display: none;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 3px solid var(--error-color);
+            transition: all 0.3s ease;
+        }
+        
+        .auth-notification {
+            color: var(--success-color);
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 3px solid var(--success-color);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+            transition: opacity 0.5s ease;
+        }
+        
+        @media (max-width: 480px) {
+            .auth-link {
+                display: inline-block;
+                margin-top: 5px;
+                font-size: 1.1em;
+            }
+            
+            .auth-form {
+                padding: 20px;
+            }
+        }
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
             font-family: 'Noto Sans SC', system-ui, sans-serif;
@@ -199,44 +355,45 @@
     </style>
 </head>
 <body>
-    <div id="auth-container" style="max-width: 400px; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
+    <div id="auth-container" style="max-width: 400px; margin: 40px auto; padding: 20px; background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
         <div class="header">
             <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px; margin-right: 15px;">
+                <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px;">
             </div>
-            <h1 style="text-align: center;">用户登录</h1>
         </div>
         
-        <div id="login-form">
+        <div id="login-form" class="auth-form">
+            <h2>用户登录</h2>
             <div style="margin-bottom: 15px;">
                 <label for="login-username">用户名:</label>
-                <input type="text" id="login-username" placeholder="请输入用户名" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+                <input type="text" id="login-username" placeholder="请输入用户名" class="auth-input">
             </div>
             <div style="margin-bottom: 15px;">
                 <label for="login-password">密码:</label>
-                <input type="password" id="login-password" placeholder="请输入密码" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+                <input type="password" id="login-password" placeholder="请输入密码" class="auth-input">
             </div>
-            <div id="login-error" style="color: red; margin-bottom: 15px; display: none;"></div>
-            <button id="login-btn" style="width: 100%; margin-bottom: 10px;">登录</button>
-            <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register">立即注册</a></p>
+            <div id="login-error" class="auth-error"></div>
+            <button id="login-btn" class="auth-button">登录</button>
+            <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register" class="auth-link">立即注册</a></p>
         </div>
         
-        <div id="register-form" style="display: none;">
+        <div id="register-form" class="auth-form" style="display: none;">
+            <h2>用户注册</h2>
             <div style="margin-bottom: 15px;">
                 <label for="register-username">用户名:</label>
-                <input type="text" id="register-username" placeholder="请输入用户名" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+                <input type="text" id="register-username" placeholder="请输入用户名" class="auth-input">
             </div>
             <div style="margin-bottom: 15px;">
                 <label for="register-password">密码:</label>
-                <input type="password" id="register-password" placeholder="请输入密码" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+                <input type="password" id="register-password" placeholder="请输入密码" class="auth-input">
             </div>
             <div style="margin-bottom: 15px;">
                 <label for="register-confirm-password">确认密码:</label>
-                <input type="password" id="register-confirm-password" placeholder="请再次输入密码" style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef; border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box;">
+                <input type="password" id="register-confirm-password" placeholder="请再次输入密码" class="auth-input">
             </div>
-            <div id="register-error" style="color: red; margin-bottom: 15px; display: none;"></div>
-            <button id="register-btn" style="width: 100%; margin-bottom: 10px;">注册</button>
-            <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login">返回登录</a></p>
+            <div id="register-error" class="auth-error"></div>
+            <button id="register-btn" class="auth-button">注册</button>
+            <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login" class="auth-link">返回登录</a></p>
         </div>
     </div>
     
@@ -315,6 +472,27 @@
     <div class="lumi-reaction"></div>
     <audio id="word-audio" style="display: none;"></audio>
 
+    <style>
+        /* 表单切换动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+        
+        .auth-form {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        .auth-form.fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+    </style>
+    
     <script>
         // --- 全局变量 ---
         let questions = [];
@@ -475,10 +653,31 @@
                     registerPassword.value = '';
                     registerConfirmPassword.value = '';
                     registerError.style.display = 'none';
-                    loginForm.style.display = 'block';
-                    registerForm.style.display = 'none';
                     loginUsername.value = username; // 自动填充用户名
-                    alert('注册成功，请登录');
+                    
+                    // 添加淡出动画
+                    registerForm.classList.add('fade-out');
+                    
+                    // 等待动画完成后切换表单
+                    setTimeout(function() {
+                        registerForm.style.display = 'none';
+                        registerForm.classList.remove('fade-out');
+                        
+                        // 显示登录表单并添加淡入动画
+                        loginForm.style.display = 'block';
+                        
+                        // 使用更现代的通知而不是 alert
+                        const notification = document.createElement('div');
+                        notification.className = 'auth-notification';
+                        notification.textContent = '注册成功，请登录';
+                        loginForm.prepend(notification);
+                        
+                        // 3秒后自动移除通知
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                            setTimeout(() => notification.remove(), 500);
+                        }, 3000);
+                    }, 300);
                 } else {
                     // 注册失败
                     registerError.textContent = data.error || '注册失败';
@@ -779,13 +978,39 @@
             // 添加认证相关事件监听器
             loginBtn.addEventListener('click', handleLogin);
             registerBtn.addEventListener('click', handleRegister);
-            showRegisterLink.addEventListener('click', function() {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
+            
+            // 显示注册表单，隐藏登录表单
+            showRegisterLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 添加淡出动画
+                loginForm.classList.add('fade-out');
+                
+                // 等待动画完成后切换表单
+                setTimeout(function() {
+                    loginForm.style.display = 'none';
+                    loginForm.classList.remove('fade-out');
+                    
+                    // 显示注册表单并添加淡入动画
+                    registerForm.style.display = 'block';
+                }, 300);
             });
-            showLoginLink.addEventListener('click', function() {
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'block';
+            
+            // 显示登录表单，隐藏注册表单
+            showLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 添加淡出动画
+                registerForm.classList.add('fade-out');
+                
+                // 等待动画完成后切换表单
+                setTimeout(function() {
+                    registerForm.style.display = 'none';
+                    registerForm.classList.remove('fade-out');
+                    
+                    // 显示登录表单并添加淡入动画
+                    loginForm.style.display = 'block';
+                }, 300);
             });
             logoutBtn.addEventListener('click', handleLogout);
         });
