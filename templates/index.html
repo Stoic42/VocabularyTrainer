@@ -578,6 +578,14 @@
             if (currentUser) {
                 userInfoEl.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
             }
+            
+            // 确保 Lumi 开关状态正确
+            lumiEnabled = lumiToggle.checked;
+            if (!lumiEnabled) {
+                lumiImg.classList.remove('active');
+            } else {
+                updateLumiReaction('welcome');
+            }
         }
         
         // 处理登录
@@ -1019,7 +1027,19 @@
         lumiToggle.addEventListener('change', function() {
             lumiEnabled = this.checked;
             if (lumiEnabled) {
-                updateLumiReaction(currentQuestionIndex < questions.length ? 'thinking' : 'welcome');
+                // 根据当前状态更新 Lumi 反应
+                if (appContainer.style.display === 'block') {
+                    // 如果在应用界面
+                    if (quizArea.style.display === 'block' && currentQuestionIndex < questions.length) {
+                        updateLumiReaction('thinking');
+                    } else if (resultsArea.style.display === 'block') {
+                        updateLumiReaction('celebration');
+                    } else {
+                        updateLumiReaction('welcome');
+                    }
+                } else {
+                    updateLumiReaction('welcome');
+                }
             } else {
                 lumiImg.classList.remove('active');
             }
