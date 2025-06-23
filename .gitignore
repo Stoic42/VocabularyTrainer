@@ -46,3 +46,6 @@ assets/img/*.html
 assets/audio/*
 assets/video/*
 assets/fonts/*
+
+# 忽略Obsidian配置文件
+product_manager/.obsidian/
