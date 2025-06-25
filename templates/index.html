@@ -649,7 +649,26 @@
             authContainer.style.display = 'none';
             appContainer.style.display = 'block';
             if (currentUser) {
-                userInfoEl.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
+                // 清空用户信息元素
+                userInfoEl.innerHTML = '';
+                
+                // 创建欢迎文本
+                const welcomeText = document.createElement('span');
+                welcomeText.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
+                userInfoEl.appendChild(welcomeText);
+                
+                // 如果是管理员，添加仪表盘链接
+                if (currentUser.role === 'admin') {
+                    const dashboardLink = document.createElement('a');
+                    dashboardLink.href = '/admin';
+                    dashboardLink.className = 'admin-dashboard-link';
+                    dashboardLink.innerHTML = '<i class="fas fa-chart-line"></i> 管理仪表盘';
+                    dashboardLink.style.marginLeft = '15px';
+                    dashboardLink.style.color = '#8e44ad';
+                    dashboardLink.style.textDecoration = 'none';
+                    dashboardLink.style.fontWeight = 'bold';
+                    userInfoEl.appendChild(dashboardLink);
+                }
             }
             
             // 确保 Lumi 开关状态正确
@@ -773,8 +792,29 @@
         
         // 处理退出登录
         function handleLogout() {
+            // 清除用户信息
             currentUser = null;
             sessionStorage.removeItem('currentUser');
+            
+            // 重置测试状态
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            consecutiveCorrect = 0;
+            
+            // 清除界面状态
+            quizArea.style.display = 'none';
+            resultsArea.style.display = 'none';
+            answerInput.value = '';
+            questionMeaningEl.textContent = '';
+            questionIpaEl.textContent = '';
+            questionMeaningEnEl.textContent = '';
+            
+            // 重置详情区域
+            wordDetailsContainer.style.display = 'none';
+            toggleDetailsBtn.textContent = '显示更多详情';
+            
+            // 显示登录界面
             showAuthInterface();
         }
         
@@ -846,6 +886,9 @@
             
             // 替换其他可能导致TTS发音问题的模式
             text = text.replace(/\b(\w+)\/(\w+)\b/gi, "$1 or $2"); // 将 "word1/word2" 替换为 "word1 or word2"
+            
+            // 不对单词进行特殊处理，让每个单词使用自己的正确发音
+            // 避免像"dare"等单词被错误地发音为"horoscope"的问题
             
             return text;
         }
@@ -1031,7 +1074,8 @@
         // 显示问题
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
-            questionMeaningEl.textContent = q.meaning_cn; // 中文释义
+            // 显示中文释义，如果有词性信息，确保一起显示
+            questionMeaningEl.textContent = q.meaning_cn || ''; // 中文释义
             questionIpaEl.textContent = q.ipa ? `/${q.ipa}/` : ''; // 音标
             questionMeaningEnEl.textContent = q.meaning_en || ''; // 英文释义
             questionExampleEnEl.textContent = q.example_en || ''; // 例句英文
@@ -1049,21 +1093,49 @@
             questionExamExplanationEl.textContent = q.exam_explanation ? `解析: ${q.exam_explanation}` : '';
             questionTipsEl.textContent = q.tips ? `提示: ${q.tips}` : '';
 
-            // 重置详情显示状态
-            wordDetailsContainer.style.display = 'none';
-            toggleDetailsBtn.textContent = '显示更多详情';
+            // 根据学习模式决定是否默认展开详情
+            const studyMode = document.getElementById('study-mode').value;
+            if (studyMode === 'learning') {
+                // 学习模式下默认展开详情
+                wordDetailsContainer.style.display = 'block';
+                toggleDetailsBtn.textContent = '隐藏更多详情';
+            } else {
+                // 其他模式下默认隐藏详情
+                wordDetailsContainer.style.display = 'none';
+                toggleDetailsBtn.textContent = '显示更多详情';
+            }
+            
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
             // 根据学习模式和音频路径决定是否显示音频按钮
-            const studyMode = document.getElementById('study-mode').value;
             const showAudio = studyMode === 'standard';
             
+            // 显示TTS按钮，无论是否有本地音频
+            const ttsBtn = document.createElement('button');
+            ttsBtn.className = 'audio-btn';
+            ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i> TTS';
+            ttsBtn.onclick = () => playTTS(q.spelling);
+            
+            // 清除之前的TTS按钮
+            const oldTtsBtn = document.querySelector('.audio-btn.tts-btn');
+            if (oldTtsBtn) oldTtsBtn.remove();
+            
+            // 添加TTS按钮样式
+            ttsBtn.classList.add('tts-btn');
+            ttsBtn.style.backgroundColor = '#9b59b6';
+            ttsBtn.style.marginLeft = '5px';
+            
+            // 显示音频按钮
             ukBtn.style.display = showAudio && q.audio_path_uk ? 'inline-block' : 'none';
             usBtn.style.display = showAudio && q.audio_path_us ? 'inline-block' : 'none';
             
             if (showAudio) {
                 if (q.audio_path_uk) ukBtn.onclick = () => playAudio(q.audio_path_uk, q.spelling);
                 if (q.audio_path_us) usBtn.onclick = () => playAudio(q.audio_path_us, q.spelling);
+                
+                // 添加TTS按钮到音频按钮区域
+                const audioButtonsContainer = ukBtn.parentElement;
+                audioButtonsContainer.appendChild(ttsBtn);
             }
 
             nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? '完成并提交' : '下一题';
@@ -1273,6 +1345,21 @@
             
             // 添加认证相关事件监听器
             loginBtn.addEventListener('click', handleLogin);
+            
+            // 添加回车键登录功能
+            loginPassword.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleLogin();
+                }
+            });
+            
+            loginUsername.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleLogin();
+                }
+            });
             registerBtn.addEventListener('click', handleRegister);
             
             // 显示注册表单，隐藏登录表单

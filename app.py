@@ -9,6 +9,10 @@ import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 # 导入gTTS库，用于文本到语音转换
 from gtts import gTTS
+# 导入Flask
+from flask import Flask, request, jsonify, render_template, session, send_from_directory
+# 导入管理员路由蓝图
+from admin_routes import admin_bp
 
 # --- 应用设置 ---
 app = Flask(__name__, 
@@ -22,17 +26,33 @@ WORDLISTS_BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'w
 TTS_CACHE_DIR = os.path.join(WORDLISTS_BASE_DIR, 'tts_cache')
 os.makedirs(TTS_CACHE_DIR, exist_ok=True)
 
+# 注册管理员路由蓝图
+app.register_blueprint(admin_bp)
+
 # --- 日志配置 (您的优秀代码，我们保留) ---
 def setup_logger(app):
     if not os.path.exists('logs'):
         os.makedirs('logs')
     
-    file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
+    try:
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+    except PermissionError:
+        # 如果无法访问日志文件，使用带时间戳的新文件名
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_handler = RotatingFileHandler(f'logs/app_{timestamp}.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        print(f"警告: 无法访问原始日志文件。已创建新的日志文件: app_{timestamp}.log")
+    
     app.logger.setLevel(logging.INFO)
     app.logger.info('应用启动')
 
@@ -360,7 +380,7 @@ def get_error_history():
         
         # 查询每个单词的错误历史
         word_history_query = """
-        SELECT w.word_id, w.spelling, w.list_id,
+        SELECT w.word_id, w.spelling, w.list_id, w.meaning_cn, w.pos,
                COUNT(*) as total_errors,
                GROUP_CONCAT(e.student_answer, ', ') as wrong_answers,
                GROUP_CONCAT(e.error_date, ', ') as error_dates
@@ -457,6 +477,49 @@ def login():
         return jsonify({'message': '登录成功', 'user': {'username': user['username'], 'role': user['role']}}), 200
 
     return jsonify({'error': '用户名或密码错误'}), 401 # 401代表未授权
+
+# --- 数据库初始化 ---
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # 检查Users表是否存在role字段
+    cursor.execute("PRAGMA table_info(Users)")
+    columns = cursor.fetchall()
+    has_role_column = any(column['name'] == 'role' for column in columns)
+    
+    # 如果没有role字段，添加该字段
+    if not has_role_column and any(column['name'] == 'id' for column in columns):
+        cursor.execute("ALTER TABLE Users ADD COLUMN role TEXT DEFAULT 'student'")
+        conn.commit()
+        app.logger.info("已向Users表添加role字段")
+    
+    # 检查是否有管理员账户
+    admin = cursor.execute("SELECT * FROM Users WHERE role = 'admin'").fetchone()
+    if not admin:
+        # 创建默认管理员账户
+        admin_username = 'admin'
+        admin_password = 'admin123'  # 默认密码，应提示用户首次登录后修改
+        password_hash = generate_password_hash(admin_password)
+        
+        # 检查是否已存在同名用户
+        existing_user = cursor.execute("SELECT * FROM Users WHERE username = ?", (admin_username,)).fetchone()
+        if existing_user:
+            # 将已存在的用户升级为管理员
+            cursor.execute("UPDATE Users SET role = 'admin' WHERE username = ?", (admin_username,))
+        else:
+            # 创建新的管理员账户
+            cursor.execute("INSERT INTO Users (username, password_hash, role) VALUES (?, ?, ?)", 
+                          (admin_username, password_hash, 'admin'))
+        
+        conn.commit()
+        app.logger.info("已创建默认管理员账户")
+    
+    conn.close()
+
+# 应用启动时初始化数据库
+with app.app_context():
+    init_db()
 
 # --- 启动命令 ---
 if __name__ == '__main__':
