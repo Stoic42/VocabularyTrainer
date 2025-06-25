@@ -169,7 +169,21 @@ def submit_answers():
         correct_word = cursor.execute('SELECT spelling FROM Words WHERE word_id = ?', (word_id,)).fetchone()
         if correct_word:
             correct_spelling = correct_word['spelling']
+            # 处理斜杠分隔的拼写变体
             valid_spellings = [s.strip().lower() for s in correct_spelling.split('/')]
+            
+            # 处理逗号分隔的拼写变体（如"wis, wit"）
+            expanded_spellings = []
+            for spelling in valid_spellings:
+                if ',' in spelling:
+                    # 对于逗号分隔的变体，将它们分开并添加到有效拼写列表中
+                    comma_variants = [v.strip().lower() for v in spelling.split(',')]
+                    expanded_spellings.extend(comma_variants)
+                else:
+                    expanded_spellings.append(spelling)
+            
+            valid_spellings = expanded_spellings
+            
             if student_answer.strip().lower() not in valid_spellings:
                 error_details.append({
                     'word_id': word_id,

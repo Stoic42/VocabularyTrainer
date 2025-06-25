@@ -230,6 +230,29 @@
         #results-area { display: none; }
         #error-list { list-style-type: none; padding-left: 0; }
         #error-list li { margin: 10px 0; padding: 10px; background: #fff5f5; border-radius: var(--border-radius); border-left: 4px solid var(--error-color); }
+        
+        /* 拼写变体样式 */
+        .spelling-variant {
+            display: inline-block;
+            padding: 2px 6px;
+            margin: 0 2px;
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        /* 拼写提示样式 */
+        .spelling-tip {
+            animation: fadeInOut 3s ease-in-out;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
         .list-selector { margin: 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .list-selector label { font-weight: 500; }
         select {
@@ -1056,7 +1079,21 @@
         function handleNextQuestion() {
             const currentAnswer = answerInput.value.trim().toLowerCase();
             const correctSpelling = questions[currentQuestionIndex].spelling.trim().toLowerCase();
-            const validSpellings = correctSpelling.split('/');
+            
+            // 处理斜杠分隔的拼写变体
+            const slashSpellings = correctSpelling.split('/');
+            
+            // 处理逗号分隔的拼写变体
+            let validSpellings = [];
+            slashSpellings.forEach(spelling => {
+                if (spelling.includes(',')) {
+                    // 对于逗号分隔的变体，将它们分开并添加到有效拼写列表中
+                    const commaVariants = spelling.split(',').map(v => v.trim().toLowerCase());
+                    validSpellings = validSpellings.concat(commaVariants);
+                } else {
+                    validSpellings.push(spelling);
+                }
+            });
             
             if (validSpellings.includes(currentAnswer)) {
                 // 答案正确
@@ -1067,6 +1104,43 @@
                     updateLumiReaction('celebration'); // 连续3次以上正确，使用庆祝表情
                 } else {
                     updateLumiReaction('correct'); // 普通的正确反馈
+                }
+                
+                // 如果有多种拼写方式，且用户使用了其中一种，提示其他可能的写法
+                if (validSpellings.length > 1 && currentAnswer !== correctSpelling) {
+                    // 创建一个临时提示元素
+                    const spellingTip = document.createElement('div');
+                    spellingTip.className = 'spelling-tip';
+                    
+                    // 格式化显示所有可能的拼写形式
+                    let formattedSpellings;
+                    if (correctSpelling.includes('/') || correctSpelling.includes(',')) {
+                        // 如果原始拼写包含分隔符，则显示所有有效拼写
+                        formattedSpellings = validSpellings
+                            .filter(s => s !== currentAnswer) // 排除用户当前输入的拼写
+                            .map(s => `<span class="spelling-variant">${s}</span>`)
+                            .join(' 或 ');
+                    } else {
+                        // 否则直接显示原始拼写
+                        formattedSpellings = `<strong>${correctSpelling}</strong>`;
+                    }
+                    
+                    spellingTip.innerHTML = `<span style="color: #27ae60">✓ 正确!</span> 该单词还有其他拼写形式: ${formattedSpellings}`;
+                    spellingTip.style.marginTop = '10px';
+                    spellingTip.style.padding = '8px';
+                    spellingTip.style.backgroundColor = '#f0fff4';
+                    spellingTip.style.borderLeft = '4px solid #27ae60';
+                    spellingTip.style.borderRadius = '4px';
+                    
+                    // 添加到答案输入框后面
+                    answerInput.parentNode.appendChild(spellingTip);
+                    
+                    // 3秒后自动移除提示
+                    setTimeout(() => {
+                        if (spellingTip.parentNode) {
+                            spellingTip.parentNode.removeChild(spellingTip);
+                        }
+                    }, 3000);
                 }
             } else {
                 // 答案错误
@@ -1115,7 +1189,33 @@
             if (results.error_details && results.error_details.length > 0) {
                 results.error_details.forEach(err => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>正确:</strong> ${err.correct_spelling} / <strong>你的答案:</strong> <span style="color: #c0392b;">${err.your_answer}</span>`;
+                    
+                    // 处理斜杠分隔的拼写变体
+                    const slashSpellings = err.correct_spelling.split('/');
+                    
+                    // 处理逗号分隔的拼写变体
+                    let allSpellings = [];
+                    slashSpellings.forEach(spelling => {
+                        if (spelling.includes(',')) {
+                            // 对于逗号分隔的变体，将它们分开并添加到拼写列表中
+                            const commaVariants = spelling.split(',').map(v => v.trim());
+                            allSpellings = allSpellings.concat(commaVariants);
+                        } else {
+                            allSpellings.push(spelling.trim());
+                        }
+                    });
+                    
+                    let correctSpellingDisplay = '';
+                    
+                    if (allSpellings.length > 1) {
+                        // 如果有多种拼写形式，以更友好的方式显示
+                        correctSpellingDisplay = allSpellings.map(s => `<span class="spelling-variant">${s}</span>`).join(' 或 ');
+                        li.innerHTML = `<strong>正确拼写:</strong> ${correctSpellingDisplay} / <strong>你的答案:</strong> <span style="color: #c0392b;">${err.your_answer}</span>`;
+                    } else {
+                        // 单一拼写形式
+                        li.innerHTML = `<strong>正确:</strong> ${err.correct_spelling} / <strong>你的答案:</strong> <span style="color: #c0392b;">${err.your_answer}</span>`;
+                    }
+                    
                     errorListEl.appendChild(li);
                 });
             } else {
