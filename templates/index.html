@@ -431,6 +431,13 @@
                     <option value="all">全部</option>
                 </select>
             </div>
+            <div>
+                <label for="study-mode">学习模式: </label>
+                <select id="study-mode">
+                    <option value="standard">标准模式</option>
+                    <option value="dictation">默写模式</option>
+                </select>
+            </div>
         </div>
 
         <div class="lumi-toggle-container">
@@ -807,10 +814,26 @@
             }
         }
 
+        // 预处理文本以改进TTS发音
+        function preprocessTextForTTS(text) {
+            if (!text) return text;
+            
+            // 替换 "a/an" 为 "a or an"
+            text = text.replace(/\ba\/an\b/gi, "a or an");
+            
+            // 替换其他可能导致TTS发音问题的模式
+            text = text.replace(/\b(\w+)\/(\w+)\b/gi, "$1 or $2"); // 将 "word1/word2" 替换为 "word1 or word2"
+            
+            return text;
+        }
+        
         // TTS 朗读函数
         function playTTS(text) {
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
+                // 预处理文本以改进发音
+                const processedText = preprocessTextForTTS(text);
+                
+                const utterance = new SpeechSynthesisUtterance(processedText);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.9;
                 window.speechSynthesis.speak(utterance);
@@ -821,23 +844,79 @@
 
         // 音频播放函数（带TTS后备）
         function playAudio(audioPath, fallbackText) {
+            // 检查当前学习模式，如果是默写模式则不播放
+            const studyMode = document.getElementById('study-mode').value;
+            if (studyMode !== 'standard') return;
+            
             if (audioPath && audioPath.trim() !== "") {
+                // 尝试使用本地音频文件
                 audioEl.src = audioPath;
                 const playPromise = audioEl.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(error => {
                         console.error(`本地音频播放失败: ${audioPath}`, error);
-                        playTTS(fallbackText); 
+                        // 本地音频失败，尝试使用TTS API
+                        if (fallbackText) {
+                            // 首先尝试使用后端TTS API
+                            fetch(`/api/tts/${encodeURIComponent(fallbackText)}`)
+                                .then(response => {
+                                    if (response.ok) {
+                                        // 使用后端生成的TTS音频
+                                        return response.blob();
+                                    } else {
+                                        // 后端TTS失败，使用浏览器TTS
+                                        throw new Error('后端TTS API失败');
+                                    }
+                                })
+                                .then(blob => {
+                                    const audioUrl = URL.createObjectURL(blob);
+                                    audioEl.src = audioUrl;
+                                    return audioEl.play();
+                                })
+                                .catch(err => {
+                                    console.error('后端TTS失败，使用浏览器TTS:', err);
+                                    // 最后使用浏览器TTS作为备选
+                                    playTTS(fallbackText);
+                                });
+                        } else {
+                            console.error('没有可用的备选文本进行TTS');
+                        }
                     });
                 }
+            } else if (fallbackText) {
+                // 没有本地音频，尝试使用后端TTS API
+                fetch(`/api/tts/${encodeURIComponent(fallbackText)}`)
+                    .then(response => {
+                        if (response.ok) {
+                            // 使用后端生成的TTS音频
+                            return response.blob();
+                        } else {
+                            // 后端TTS失败，使用浏览器TTS
+                            throw new Error('后端TTS API失败');
+                        }
+                    })
+                    .then(blob => {
+                        const audioUrl = URL.createObjectURL(blob);
+                        audioEl.src = audioUrl;
+                        return audioEl.play();
+                    })
+                    .catch(err => {
+                        console.error('后端TTS失败，使用浏览器TTS:', err);
+                        // 最后使用浏览器TTS作为备选
+                        playTTS(fallbackText);
+                    });
             } else {
-                playTTS(fallbackText);
+                console.error('没有可用的音频路径或备选文本');
             }
         }
 
         // 自动播放音频序列（英音然后美音）
         function autoPlayAudios() {
             if (!autoPlayEnabled) return;
+            
+            // 检查当前学习模式，如果是默写模式则不播放
+            const studyMode = document.getElementById('study-mode').value;
+            if (studyMode !== 'standard') return;
             
             const q = questions[currentQuestionIndex];
             
@@ -952,17 +1031,23 @@
             toggleDetailsBtn.textContent = '显示更多详情';
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
-            ukBtn.style.display = q.audio_path_uk ? 'inline-block' : 'none';
-            usBtn.style.display = q.audio_path_us ? 'inline-block' : 'none';
+            // 根据学习模式和音频路径决定是否显示音频按钮
+            const studyMode = document.getElementById('study-mode').value;
+            const showAudio = studyMode === 'standard';
             
-            if (q.audio_path_uk) ukBtn.onclick = () => playAudio(q.audio_path_uk, q.spelling);
-            if (q.audio_path_us) usBtn.onclick = () => playAudio(q.audio_path_us, q.spelling);
+            ukBtn.style.display = showAudio && q.audio_path_uk ? 'inline-block' : 'none';
+            usBtn.style.display = showAudio && q.audio_path_us ? 'inline-block' : 'none';
+            
+            if (showAudio) {
+                if (q.audio_path_uk) ukBtn.onclick = () => playAudio(q.audio_path_uk, q.spelling);
+                if (q.audio_path_us) usBtn.onclick = () => playAudio(q.audio_path_us, q.spelling);
+            }
 
             nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? '完成并提交' : '下一题';
             answerInput.focus();
             
-            // 如果启用了自动播放，自动播放音频
-            if (autoPlayEnabled) {
+            // 如果启用了自动播放且是标准模式，自动播放音频
+            if (autoPlayEnabled && showAudio) {
                 setTimeout(() => autoPlayAudios(), 500); // 延迟500ms后播放，给页面渲染一些时间
             }
         }
@@ -1161,6 +1246,7 @@
         startBtn.addEventListener('click', async () => {
             const selectedListId = document.getElementById('list-select').value;
             const selectedCount = document.getElementById('count-select').value;
+            const selectedMode = document.getElementById('study-mode').value;
             
             if (!selectedListId) {
                 alert('请先选择一个单词列表！');
@@ -1168,7 +1254,7 @@
             }
 
             try {
-                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}`);
+                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${selectedMode}`);
                 if (!response.ok) throw new Error('网络请求失败');
                 questions = await response.json();
                 

@@ -188,15 +188,41 @@ def import_merged_data(conn, csv_path, audio_map):
 
 def main():
     """主执行函数"""
-    # 0. 删除旧数据库，确保全新导入
-    if os.path.exists(DATABASE_FILE):
-        os.remove(DATABASE_FILE)
-        print(f"已删除旧数据库 '{DATABASE_FILE}'。")
-
+    # 连接数据库，如果不存在则创建
     conn = sqlite3.connect(DATABASE_FILE)
     
-    # 1. 创建表
+    # 1. 创建表（如果不存在）
     create_tables(conn)
+    
+    # 2. 删除特定词书的数据，而不是整个数据库
+    cursor = conn.cursor()
+    book_name = "初中英语词汇"
+    cursor.execute("SELECT book_id FROM Books WHERE book_name = ?", (book_name,))
+    book_result = cursor.fetchone()
+    
+    if book_result:
+        book_id = book_result[0]
+        print(f"找到词书：{book_name} (ID: {book_id})，正在删除相关数据...")
+        
+        # 获取该词书下的所有单元
+        cursor.execute("SELECT list_id FROM WordLists WHERE book_id = ?",(book_id,))
+        list_results = cursor.fetchall()
+        
+        # 删除这些单元下的所有单词
+        for list_result in list_results:
+            list_id = list_result[0]
+            cursor.execute("DELETE FROM Words WHERE list_id = ?", (list_id,))
+        
+        # 删除这些单元
+        cursor.execute("DELETE FROM WordLists WHERE book_id = ?",(book_id,))
+        
+        # 删除词书
+        cursor.execute("DELETE FROM Books WHERE book_id = ?",(book_id,))
+        
+        conn.commit()
+        print(f"已删除词书 {book_name} 及其相关数据")
+    else:
+        print(f"未找到词书：{book_name}，将创建新词书")
     
     # 2. 从TXT加载音频数据到内存
     audio_map = load_audio_paths_from_txt(TXT_FILE_PATH)

@@ -4,8 +4,11 @@ import random
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+import hashlib
 # 新增这一行，导入 werkzeug 的安全模块，用于密码加密
 from werkzeug.security import generate_password_hash, check_password_hash
+# 导入gTTS库，用于文本到语音转换
+from gtts import gTTS
 
 # --- 应用设置 ---
 app = Flask(__name__, 
@@ -15,6 +18,9 @@ app.secret_key = 'your-super-secret-key-for-mvp' # MVP阶段随便写一个即�
 DATABASE_FILE = 'vocabulary.db'
 # 我们将所有词库资源（音频、txt）都统一放在 'wordlists' 文件夹下进行管理
 WORDLISTS_BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wordlists')
+# TTS音频缓存目录
+TTS_CACHE_DIR = os.path.join(WORDLISTS_BASE_DIR, 'tts_cache')
+os.makedirs(TTS_CACHE_DIR, exist_ok=True)
 
 # --- 日志配置 (您的优秀代码，我们保留) ---
 def setup_logger(app):
@@ -49,6 +55,38 @@ def serve_wordlist_files(subpath):
         app.logger.error(f'发送媒体文件时出错: {subpath}, 错误: {str(e)}')
         return {'error': '服务器内部错误'}, 500
 
+# TTS文本预处理函数
+def preprocess_text_for_tts(text):
+    """预处理文本以优化TTS效果"""
+    # 处理特殊情况
+    text = text.replace('a/an', 'a or an')
+    text = text.replace('/', ' or ')
+    # 可以添加更多替换规则
+    return text
+
+# TTS API端点
+@app.route('/api/tts/<word>')
+def get_tts_audio(word):
+    """生成单词的TTS音频并返回"""
+    try:
+        # 文本预处理
+        processed_word = preprocess_text_for_tts(word)
+        
+        # 生成文件名（使用哈希避免文件名问题）
+        filename = hashlib.md5(processed_word.encode()).hexdigest() + '.mp3'
+        filepath = os.path.join(TTS_CACHE_DIR, filename)
+        
+        # 如果文件不存在，则生成
+        if not os.path.exists(filepath):
+            tts = gTTS(text=processed_word, lang='en', slow=False)
+            tts.save(filepath)
+            app.logger.info(f"已生成TTS音频: {word} -> {filepath}")
+        
+        return send_from_directory(TTS_CACHE_DIR, filename)
+    except Exception as e:
+        app.logger.error(f"生成TTS音频失败: {word}, 错误: {str(e)}")
+        return {'error': '生成TTS音频失败'}, 500
+
 # API 1: 获取问题 (已升级)
 # 在app.py中找到这个函数并替换它
 
@@ -58,6 +96,8 @@ def get_questions():
     list_id = request.args.get('list_id', default=1, type=int)
     # 新增：从URL获取单词数量, 默认为'10'
     count_str = request.args.get('count', default='10', type=str)
+    # 新增：学习模式参数，默认为'standard'
+    study_mode = request.args.get('mode', default='standard', type=str)
     
     conn = get_db_connection()
     
@@ -81,14 +121,30 @@ def get_questions():
     words = conn.execute(sql_query, params).fetchall()
     conn.close()
     
-    # --- 后续的数据处理逻辑保持不变 ---
+    # --- 数据处理逻辑，根据学习模式决定是否包含音频URL ---
     word_list = []
     for word in words:
         word_dict = dict(word)
-        if word_dict['audio_path_uk']:
-            word_dict['audio_path_uk'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_uk']}"
-        if word_dict['audio_path_us']:
-            word_dict['audio_path_us'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_us']}"
+        
+        # 根据学习模式决定是否包含音频URL
+        if study_mode.lower() != 'dictation':
+            # 标准模式：包含音频URL
+            if word_dict['audio_path_uk']:
+                word_dict['audio_path_uk'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_uk']}"
+            else:
+                # 如果没有音频文件，提供TTS URL
+                word_dict['audio_path_uk'] = f"/api/tts/{word_dict['spelling']}"
+                
+            if word_dict['audio_path_us']:
+                word_dict['audio_path_us'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_us']}"
+            else:
+                # 如果没有音频文件，提供TTS URL
+                word_dict['audio_path_us'] = f"/api/tts/{word_dict['spelling']}"
+        else:
+            # 默写模式：不提供音频
+            word_dict['audio_path_uk'] = ""
+            word_dict['audio_path_us'] = ""
+            
         word_list.append(word_dict)
         
     return jsonify(word_list)
