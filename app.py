@@ -11,6 +11,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from gtts import gTTS
 # 导入Flask
 from flask import Flask, request, jsonify, render_template, session, send_from_directory
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import io
+import datetime
+import os
 # 导入管理员路由蓝图
 from admin_routes import admin_bp
 
@@ -344,6 +355,8 @@ def get_error_history():
             return jsonify({'error': '请先登录后查看错误历史记录'}), 401
             
         limit = request.args.get('limit', default=50, type=int)  # 默认最多返回50条记录
+        book_id = request.args.get('book_id', default=None, type=int)  # 词书ID筛选
+        list_id = request.args.get('list_id', default=None, type=int)  # 列表ID筛选
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -352,30 +365,63 @@ def get_error_history():
         query = """
         SELECT e.error_id, e.word_id, w.spelling, w.meaning_cn, w.pos, w.list_id, 
                e.student_answer, e.error_type, e.error_date,
-               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = e.word_id AND student_id = e.student_id) as error_count
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = e.word_id AND student_id = e.student_id) as error_count,
+               wl.book_id
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
         WHERE e.student_id = ?
+        """
+        
+        params = [student_id]
+        
+        # 添加词书和列表筛选条件
+        if book_id is not None:
+            query += " AND wl.book_id = ?"
+            params.append(book_id)
+        
+        if list_id is not None:
+            query += " AND w.list_id = ?"
+            params.append(list_id)
+        
+        query += """
         ORDER BY e.error_date DESC
         LIMIT ?
         """
+        params.append(limit)
         
-        cursor.execute(query, (student_id, limit))
+        cursor.execute(query, params)
         errors = cursor.fetchall()
         
         # 查询错误统计信息
         stats_query = """
         SELECT w.list_id, COUNT(*) as error_count,
                (SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ? AND word_id IN 
-                (SELECT word_id FROM Words WHERE list_id = w.list_id)) as unique_words_count
+                (SELECT word_id FROM Words WHERE list_id = w.list_id)) as unique_words_count,
+               wl.book_id
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
         WHERE e.student_id = ?
+        """
+        
+        stats_params = [student_id, student_id]
+        
+        # 添加词书和列表筛选条件
+        if book_id is not None:
+            stats_query += " AND wl.book_id = ?"
+            stats_params.append(book_id)
+        
+        if list_id is not None:
+            stats_query += " AND w.list_id = ?"
+            stats_params.append(list_id)
+        
+        stats_query += """
         GROUP BY w.list_id
         ORDER BY w.list_id
         """
         
-        cursor.execute(stats_query, (student_id, student_id))
+        cursor.execute(stats_query, stats_params)
         stats = cursor.fetchall()
         
         # 查询每个单词的错误历史
@@ -383,16 +429,32 @@ def get_error_history():
         SELECT w.word_id, w.spelling, w.list_id, w.meaning_cn, w.pos,
                COUNT(*) as total_errors,
                GROUP_CONCAT(e.student_answer, ', ') as wrong_answers,
-               GROUP_CONCAT(e.error_date, ', ') as error_dates
+               GROUP_CONCAT(e.error_date, ', ') as error_dates,
+               wl.book_id
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
         WHERE e.student_id = ?
+        """
+        
+        word_history_params = [student_id]
+        
+        # 添加词书和列表筛选条件
+        if book_id is not None:
+            word_history_query += " AND wl.book_id = ?"
+            word_history_params.append(book_id)
+        
+        if list_id is not None:
+            word_history_query += " AND w.list_id = ?"
+            word_history_params.append(list_id)
+        
+        word_history_query += """
         GROUP BY w.word_id
         ORDER BY total_errors DESC
         LIMIT 20
         """
         
-        cursor.execute(word_history_query, (student_id,))
+        cursor.execute(word_history_query, word_history_params)
         word_history = cursor.fetchall()
         
         # 转换为JSON格式
@@ -520,6 +582,248 @@ def init_db():
 # 应用启动时初始化数据库
 with app.app_context():
     init_db()
+
+# --- PDF导出功能 ---
+@app.route('/api/export-pdf', methods=['POST'])
+def export_pdf():
+    """导出错误历史记录为PDF"""
+    try:
+        app.logger.info("开始导出PDF")
+        start_time = datetime.datetime.now()
+        
+        # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+        student_id = session.get('user_id', -1)
+        # 如果用户未登录，返回错误信息
+        if student_id == -1:
+            return jsonify({'error': '请先登录后导出错误历史记录'}), 401
+            
+        # 获取请求数据
+        data = request.get_json()
+        errors = data.get('errors', [])
+        selected_fields = data.get('fields', [])
+        hide_word = data.get('hideWord', False)
+        book_name = data.get('bookName', '')
+        list_name = data.get('listName', '')
+        
+        app.logger.info(f"PDF导出数据: {len(errors)}条记录, {len(selected_fields)}个字段")
+        
+        # 如果没有错误记录，返回错误信息
+        if not errors:
+            return jsonify({'error': '没有可导出的数据'}), 400
+            
+        # 导入reportlab库
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch, cm
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        import io
+        import datetime
+        
+        # 注册中文字体
+        try:
+            # 检查是否已经注册了字体，避免重复注册
+            if 'SimSun' not in pdfmetrics.getRegisteredFontNames():
+                app.logger.info("注册中文字体: SimSun")
+                # 尝试注册系统中的中文字体
+                pdfmetrics.registerFont(TTFont('SimSun', 'C:\\Windows\\Fonts\\simsun.ttc'))
+        except Exception as font_error:
+            # 如果失败，使用默认字体
+            app.logger.warning(f"无法加载中文字体，将使用默认字体: {str(font_error)}")
+            
+        app.logger.info("初始化PDF文档")
+        start_pdf_time = datetime.datetime.now()
+        
+        # 创建PDF文档
+        buffer = io.BytesIO()
+        
+        # 获取当前用户名
+        username = session.get('username', 'User')
+        
+        # 生成文件名
+        current_date = datetime.datetime.now().strftime("%Y%m%d")
+        if book_name and list_name:
+            filename = f"{username}-{current_date}当日错词考核纸-{book_name}{list_name}.pdf"
+        elif book_name:
+            filename = f"{username}-{current_date}当日错词考核纸-{book_name}.pdf"
+        elif list_name:
+            filename = f"{username}-{current_date}当日错词考核纸-{list_name}.pdf"
+        else:
+            filename = f"{username}-{current_date}当日错词考核纸.pdf"
+        
+        # 创建PDF文档
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4,
+            rightMargin=72,
+            leftMargin=72,
+            topMargin=72,
+            bottomMargin=72
+        )
+        
+        # 创建样式
+        styles = getSampleStyleSheet()
+        styles.add(ParagraphStyle(
+            name='Chinese',
+            fontName='SimSun',
+            fontSize=10,
+            leading=12
+        ))
+        styles.add(ParagraphStyle(
+            name='ChineseTitle',
+            fontName='SimSun',
+            fontSize=16,
+            leading=20,
+            alignment=1  # 居中对齐
+        ))
+        
+        # 创建内容列表
+        elements = []
+        
+        # 添加Logo
+        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'img', 'Logo', 'orange-theme-logo.svg')
+        if os.path.exists(logo_path):
+            img = Image(logo_path, width=2*inch, height=1*inch)
+            img.hAlign = 'CENTER'
+            elements.append(img)
+            elements.append(Spacer(1, 0.5*inch))
+        
+        # 添加标题
+        title = f"{username} - {current_date}当日错词考核纸"
+        if book_name or list_name:
+            subtitle = []
+            if book_name:
+                subtitle.append(book_name)
+            if list_name:
+                subtitle.append(list_name)
+            title += f" - {' '.join(subtitle)}"
+        elements.append(Paragraph(title, styles['ChineseTitle']))
+        elements.append(Spacer(1, 0.25*inch))
+        
+        # 添加错误记录
+        total_errors = len(errors)
+        app.logger.info(f"开始处理{total_errors}条错误记录")
+        
+        # 批量处理，每50条记录记录一次日志
+        batch_size = 50
+        
+        # 如果错误记录过多，可能导致内存问题，限制最大处理数量
+        max_errors = 500
+        if total_errors > max_errors:
+            app.logger.warning(f"错误记录数量过多({total_errors})，将只处理前{max_errors}条记录")
+            errors = errors[:max_errors]
+            total_errors = max_errors
+        
+        for i, error in enumerate(errors):
+            # 创建表格数据
+            data = []
+            
+            # 添加序号和单词
+            if hide_word:
+                data.append([f"{i+1}.", "______"])
+            else:
+                data.append([f"{i+1}.", error.get('spelling', '')])
+            
+            # 添加选定的字段
+            for field in selected_fields:
+                if field != 'word':  # 单词已经作为标题显示了
+                    label = ''
+                    value = ''
+                    
+                    if field == 'meaning_cn':
+                        label = '中文意思'
+                        value = error.get('meaning_cn', '-')
+                    elif field == 'pos':
+                        label = '词性'
+                        value = error.get('pos', '-')
+                    elif field == 'ipa':
+                        label = '音标'
+                        value = error.get('ipa', '-')
+                    elif field == 'meaning_en':
+                        label = '英文释义'
+                        value = error.get('meaning_en', '-')
+                    elif field == 'example_en':
+                        label = '英文例句'
+                        value = error.get('example_en', '-')
+                    elif field == 'example_cn':
+                        label = '中文例句'
+                        value = error.get('example_cn', '-')
+                    elif field == 'list':
+                        label = '所属列表'
+                        value = error.get('list_name', '-')
+                    elif field == 'wrong_answers':
+                        label = '错误答案'
+                        wrong_answers = error.get('wrong_answers', [])
+                        if wrong_answers and isinstance(wrong_answers, list) and len(wrong_answers) > 0:
+                            value = '; '.join(wrong_answers)
+                        else:
+                            value = '-'
+                    elif field == 'error_date':
+                        label = '错误日期'
+                        value = error.get('error_date', '-')
+                    elif field == 'error_count':
+                        label = '错误次数'
+                        value = str(error.get('error_count', '0'))
+                    
+                    data.append(['', f"{label}: {value}"])
+            
+            # 记录处理进度
+            if (i + 1) % batch_size == 0 or i == total_errors - 1:
+                app.logger.info(f"PDF生成进度: {i+1}/{total_errors} ({((i+1)/total_errors*100):.1f}%)")
+            
+            # 创建表格
+            table = Table(data, colWidths=[0.5*inch, 4*inch])
+            table.setStyle(TableStyle([
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('FONTNAME', (0, 0), (-1, -1), 'SimSun'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ]))
+            
+            elements.append(table)
+            elements.append(Spacer(1, 0.1*inch))
+        
+        # 记录表格生成完成时间
+        pre_build_time = datetime.datetime.now()
+        table_gen_duration = (pre_build_time - start_pdf_time).total_seconds()
+        app.logger.info(f"表格数据准备完成，耗时: {table_gen_duration:.2f}秒")
+        
+        # 构建PDF文档
+        app.logger.info("开始构建PDF文档")
+        doc.build(elements)
+        
+        # 记录PDF构建完成时间
+        post_build_time = datetime.datetime.now()
+        build_duration = (post_build_time - pre_build_time).total_seconds()
+        app.logger.info(f"PDF文档构建完成，耗时: {build_duration:.2f}秒")
+        
+        # 获取PDF内容
+        pdf_data = buffer.getvalue()
+        buffer.close()
+        
+        # 记录PDF大小
+        pdf_size = len(pdf_data) / 1024  # KB
+        app.logger.info(f"PDF文件大小: {pdf_size:.2f}KB")
+        
+        # 计算生成PDF所需时间
+        end_time = datetime.datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        app.logger.info(f"PDF生成完成，耗时: {duration:.2f}秒, 文件大小: {len(pdf_data)/1024:.2f}KB")
+        
+        # 返回PDF文件
+        from flask import send_file
+        return send_file(
+            io.BytesIO(pdf_data),
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        app.logger.error(f"导出PDF时出错: {e}")
+        return jsonify({'error': f'导出PDF失败: {str(e)}'}), 500
 
 # --- 启动命令 ---
 if __name__ == '__main__':
