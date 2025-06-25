@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误历史 - 烛梦单词训练营</title>
+    <style>
+        :root {
+            --primary-color: #ffb347; /* 橙色主题 */
+            --hover-color: #ff9914;
+            --bg-color: #f8f9fa;
+            --text-color: #343a40;
+            --border-radius: 8px;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f8f9fa"/><path d="M0 0L100 100M100 0L0 100" stroke="%23f0f0f0" stroke-width="2"/></svg>');
+            background-size: 20px 20px;
+            padding: 20px;
+        }
+        #container {
+            max-width: 1000px; margin: 0 auto; padding: 30px;
+            background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            position: relative; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .logo-container {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 15px;
+        }
+        button, .btn {
+            background-color: var(--primary-color); color: white; border: none;
+            padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer;
+            transition: all 0.3s ease; font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button:hover, .btn:hover {
+            background-color: var(--hover-color); transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn {
+            background-color: #6c757d;
+            margin-right: 10px;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+        .statistics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: space-between;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        .stat-card p {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-right: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .tab:hover {
+            color: var(--primary-color);
+        }
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .error-count {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            background-color: var(--error-color);
+            color: white;
+        }
+        .word-card {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        .word-card h3 {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .word-card p {
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .word-card .meaning {
+            font-weight: 500;
+            color: #333;
+        }
+        .word-card .example {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            padding-left: 10px;
+            border-left: 2px solid #e9ecef;
+        }
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        .list-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .list-stat-card {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .list-stat-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-stat-card .error-rate {
+            font-size: 0.85em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        .high-error-rate {
+            background-color: var(--error-color);
+        }
+        .medium-error-rate {
+            background-color: var(--warning-color);
+            color: #212529 !important;
+        }
+        .low-error-rate {
+            background-color: var(--success-color);
+        }
+        .list-stat-card ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .list-stat-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        .list-stat-card li:last-child {
+            border-bottom: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+        .loading::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #login-container {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            position: relative;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+        #login-container h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        #login-container p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="container" style="display: none;">
+        <div class="header">
+            <div class="logo-container">
+                <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px;">
+            </div>
+            <h1>错误历史记录</h1>
+            <div style="margin-top: 15px;">
+                <a href="/" class="btn back-btn">返回主页</a>
+                <span id="user-info" style="margin-left: 10px;"></span>
+                <a href="#" id="logout-btn" style="color: var(--primary-color); margin-left: 10px;">退出登录</a>
+            </div>
+        </div>
+
+        <div class="statistics">
+            <div class="stat-card">
+                <h3>总测试次数</h3>
+                <p id="total-tests">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>总错误次数</h3>
+                <p id="total-errors">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>平均正确率</h3>
+                <p id="average-accuracy">0%</p>
+            </div>
+            <div class="stat-card">
+                <h3>最常错的单词</h3>
+                <p id="most-common-error">-</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="recent-errors">最近错误</div>
+            <div class="tab" data-tab="word-history">单词历史</div>
+            <div class="tab" data-tab="list-stats">单元统计</div>
+        </div>
+
+        <div id="recent-errors" class="tab-content active">
+            <div id="recent-errors-loading" class="loading">加载中</div>
+            <div id="recent-errors-content" style="display: none;"></div>
+        </div>
+
+        <div id="word-history" class="tab-content">
+            <div id="word-history-loading" class="loading">加载中</div>
+            <div id="word-history-content" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>单词</th>
+                            <th>错误次数</th>
+                            <th>最近错误</th>
+                            <th>中文释义</th>
+                        </tr>
+                    </thead>
+                    <tbody id="word-history-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="list-stats" class="tab-content">
+            <div id="list-stats-loading" class="loading">加载中</div>
+            <div id="list-stats-content" class="list-stats" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="login-container">
+        <div class="logo-container">
+            <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px;">
+        </div>
+        <h2>需要登录</h2>
+        <p>请先登录以查看您的错误历史记录</p>
+        <a href="/" class="btn">返回登录页面</a>
+    </div>
+
+    <script>
+        // DOM 元素缓存
+        const container = document.getElementById('container');
+        const loginContainer = document.getElementById('login-container');
+        const userInfoEl = document.getElementById('user-info');
+        const logoutBtn = document.getElementById('logout-btn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // 统计数据元素
+        const totalTestsEl = document.getElementById('total-tests');
+        const totalErrorsEl = document.getElementById('total-errors');
+        const averageAccuracyEl = document.getElementById('average-accuracy');
+        const mostCommonErrorEl = document.getElementById('most-common-error');
+        
+        // 内容区域元素
+        const recentErrorsLoading = document.getElementById('recent-errors-loading');
+        const recentErrorsContent = document.getElementById('recent-errors-content');
+        const wordHistoryLoading = document.getElementById('word-history-loading');
+        const wordHistoryContent = document.getElementById('word-history-content');
+        const wordHistoryTable = document.getElementById('word-history-table');
+        const listStatsLoading = document.getElementById('list-stats-loading');
+        const listStatsContent = document.getElementById('list-stats-content');
+        
+        // 全局变量
+        let currentUser = null;
+        let errorHistory = null;
+        
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            // 从sessionStorage获取用户信息
+            const userJson = sessionStorage.getItem('currentUser');
+            if (userJson) {
+                try {
+                    currentUser = JSON.parse(userJson);
+                    showMainInterface();
+                    fetchErrorHistory();
+                } catch (e) {
+                    console.error('解析用户信息失败:', e);
+                    showLoginInterface();
+                }
+            } else {
+                showLoginInterface();
+            }
+        }
+        
+        // 显示主界面
+        function showMainInterface() {
+            loginContainer.style.display = 'none';
+            container.style.display = 'block';
+            if (currentUser) {
+                userInfoEl.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
+            }
+        }
+        
+        // 显示登录界面
+        function showLoginInterface() {
+            container.style.display = 'none';
+            loginContainer.style.display = 'block';
+        }
+        
+        // 处理退出登录
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            window.location.href = '/';
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // 获取错误历史数据
+        async function fetchErrorHistory() {
+            try {
+                const response = await fetch('/api/error-history');
+                
+                if (response.status === 401) {
+                    // 未授权，显示登录界面
+                    showLoginInterface();
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('获取错误历史失败');
+                }
+                
+                errorHistory = await response.json();
+                updateStatistics(errorHistory);
+                displayRecentErrors(errorHistory);
+                displayWordHistory(errorHistory);
+                displayListStats(errorHistory);
+            } catch (error) {
+                console.error('获取错误历史时出错:', error);
+                recentErrorsLoading.textContent = '加载失败，请稍后再试';
+                wordHistoryLoading.textContent = '加载失败，请稍后再试';
+                listStatsLoading.textContent = '加载失败，请稍后再试';
+            }
+        }
+        
+        // 更新统计数据
+        function updateStatistics(data) {
+            if (!data || !data.summary) return;
+            
+            const summary = data.summary;
+            totalTestsEl.textContent = summary.total_tests || 0;
+            totalErrorsEl.textContent = summary.total_errors || 0;
+            
+            // 计算平均正确率
+            if (summary.total_questions && summary.total_questions > 0) {
+                const accuracy = ((summary.total_questions - summary.total_errors) / summary.total_questions * 100).toFixed(1);
+                averageAccuracyEl.textContent = `${accuracy}%`;
+            } else {
+                averageAccuracyEl.textContent = '0%';
+            }
+            
+            // 最常错的单词
+            if (summary.most_common_error) {
+                mostCommonErrorEl.textContent = summary.most_common_error.spelling || '-';
+            }
+        }
+        
+        // 显示最近错误
+        function displayRecentErrors(data) {
+            recentErrorsLoading.style.display = 'none';
+            recentErrorsContent.style.display = 'block';
+            
+            if (!data || !data.recent_errors || data.recent_errors.length === 0) {
+                recentErrorsContent.innerHTML = '<div class="no-data">暂无错误记录</div>';
+                return;
+            }
+            
+            let html = '';
+            data.recent_errors.forEach(error => {
+                html += `
+                <div class="word-card">
+                    <h3>
+                        ${error.spelling}
+                        <span class="error-count">${error.error_count}次</span>
+                    </h3>
+                    <p class="meaning">${error.meaning_cn}</p>
+                    <p>${error.ipa ? `/${error.ipa}/` : ''} ${error.meaning_en || ''}</p>
+                    ${error.example_en ? `<p class="example">${error.example_en}</p>` : ''}
+                    ${error.example_cn ? `<p class="example">${error.example_cn}</p>` : ''}
+                    <p style="margin-top: 10px; color: #999;">最近错误: ${formatDate(error.last_error_time)}</p>
+                </div>
+                `;
+            });
+            
+            recentErrorsContent.innerHTML = html;
+        }
+        
+        // 显示单词历史
+        function displayWordHistory(data) {
+            wordHistoryLoading.style.display = 'none';
+            wordHistoryContent.style.display = 'block';
+            
+            if (!data || !data.word_history || data.word_history.length === 0) {
+                wordHistoryTable.innerHTML = '<tr><td colspan="4" class="no-data">暂无错误记录</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            data.word_history.forEach(word => {
+                html += `
+                <tr>
+                    <td>${word.spelling}</td>
+                    <td><span class="error-count">${word.error_count}</span></td>
+                    <td>${formatDate(word.last_error_time)}</td>
+                    <td>${word.meaning_cn}</td>
+                </tr>
+                `;
+            });
+            
+            wordHistoryTable.innerHTML = html;
+        }
+        
+        // 显示单元统计
+        function displayListStats(data) {
+            listStatsLoading.style.display = 'none';
+            listStatsContent.style.display = 'flex';
+            
+            if (!data || !data.list_stats || data.list_stats.length === 0) {
+                listStatsContent.innerHTML = '<div class="no-data" style="width: 100%;">暂无单元统计数据</div>';
+                return;
+            }
+            
+            let html = '';
+            data.list_stats.forEach(list => {
+                // 计算错误率并确定颜色
+                let errorRateClass = 'low-error-rate';
+                if (list.error_rate > 30) {
+                    errorRateClass = 'high-error-rate';
+                } else if (list.error_rate > 10) {
+                    errorRateClass = 'medium-error-rate';
+                }
+                
+                html += `
+                <div class="list-stat-card">
+                    <h3>
+                        ${list.book_name} - ${list.list_name}
+                        <span class="error-rate ${errorRateClass}">${list.error_rate}% 错误率</span>
+                    </h3>
+                    <ul>
+                `;
+                
+                if (list.top_errors && list.top_errors.length > 0) {
+                    list.top_errors.forEach(error => {
+                        html += `
+                        <li>
+                            <span>${error.spelling}</span>
+                            <span class="error-count">${error.error_count}次</span>
+                        </li>
+                        `;
+                    });
+                } else {
+                    html += '<li>暂无错误数据</li>';
+                }
+                
+                html += `
+                    </ul>
+                </div>
+                `;
+            });
+            
+            listStatsContent.innerHTML = html;
+        }
+        
+        // 切换标签页
+        function switchTab(tabId) {
+            // 移除所有标签和内容的活动状态
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // 添加当前标签和内容的活动状态
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+            
+            // 标签切换事件
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    switchTab(tab.getAttribute('data-tab'));
+                });
+            });
+            
+            // 退出登录事件
+            logoutBtn.addEventListener('click', handleLogout);
+        });
+    </script>
+</body>
+</html>

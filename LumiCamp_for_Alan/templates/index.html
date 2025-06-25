@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烛梦单词训练营</title>
+    <style>
+        :root {
+            --primary-color: #ffb347; /* 橙色主题 */
+            --hover-color: #ff9914;
+            --bg-color: #f8f9fa;
+            --text-color: #343a40;
+            --border-radius: 8px;
+            --error-color: #dc3545;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f8f9fa"/><path d="M0 0L100 100M100 0L0 100" stroke="%23f0f0f0" stroke-width="2"/></svg>');
+            background-size: 20px 20px;
+            padding: 20px;
+        }
+        .auth-form {
+            margin-bottom: 20px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+        .auth-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .auth-button:hover {
+            background-color: var(--hover-color);
+        }
+        .auth-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        .auth-error {
+            color: var(--error-color);
+            margin-bottom: 10px;
+            display: none;
+        }
+        #app-container {
+            max-width: 800px; margin: 0 auto; padding: 30px;
+            background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            position: relative; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        button, .btn {
+            background-color: var(--primary-color); color: white; border: none;
+            padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer;
+            transition: all 0.3s ease; font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button:hover, .btn:hover {
+            background-color: var(--hover-color); transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        #play-uk-btn, #play-us-btn {
+            background-color: var(--bg-color); color: var(--text-color);
+            margin: 0 5px; padding: 8px 15px; font-size: 0.9em;
+        }
+        input[type="text"] {
+            width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef;
+            border-radius: var(--border-radius); font-size: 1em;
+            transition: border-color 0.3s ease; box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,179,71,0.1);
+        }
+        #quiz-area, #results-area { margin-top: 20px; padding: 20px; border-radius: var(--border-radius); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        #results-area { display: none; }
+        #error-list { list-style-type: none; padding-left: 0; }
+        #error-list li { margin: 10px 0; padding: 10px; background: #fff5f5; border-radius: var(--border-radius); border-left: 4px solid var(--error-color); }
+        .list-selector { margin: 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .list-selector label { font-weight: 500; }
+        select {
+            min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: var(--border-radius);
+            font-size: 16px; background-color: white; cursor: pointer;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+        }
+        .lumi-reaction {
+            position: fixed; 
+            bottom: 3vh; /* 使用视口高度的百分比 */
+            left: 50%;
+            width: calc(min(20vh, 20vw, 200px)); /* 根据视口高度、宽度和最大像素值取最小值 */
+            height: calc(min(20vh, 20vw, 200px)); /* 保持宽高比例一致 */
+            transform: translateX(-50%);
+            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 9999; opacity: 1;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            pointer-events: none;
+        }
+        
+        /* 当窗口高度较低时，将 Lumi 移到右下角 */
+        .lumi-reaction.corner {
+            left: auto;
+            right: 2vw;
+            bottom: 2vh;
+            transform: none;
+            width: calc(min(15vh, 15vw, 150px)); /* 在角落时稍微缩小 */
+            height: calc(min(15vh, 15vw, 150px));
+            opacity: 0.8; /* 稍微降低透明度 */
+        }
+        
+        /* 角落模式下的动画 */
+        .lumi-reaction.corner.active { 
+            animation: lumiFloatCorner 15s ease-in-out infinite alternate; 
+        }
+        .lumi-reaction.corner.bounce { 
+            animation: lumiJumpCorner 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; 
+        }
+        
+        /* 当窗口高度极低时，隐藏 Lumi */
+        .lumi-reaction.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .lumi-reaction.active { opacity: 1; animation: lumiFloat 15s ease-in-out infinite alternate; }
+        .lumi-reaction.bounce { animation: lumiJump 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; }
+        /* 中心位置的动画 */
+        @keyframes lumiJump { 
+            0% { transform: translateX(-50%) scale(1); } 
+            50% { transform: translateX(-50%) scale(1.1) translateY(-1vh); } /* 使用视口高度的百分比 */ 
+            100% { transform: translateX(-50%) scale(1); } 
+        }
+        @keyframes lumiFloat { 
+            0% { transform: translateX(-50%); } 
+            25% { transform: translate(calc(-50% - 0.5vw), 0.5vh); } /* 使用视口宽度和高度的百分比 */ 
+            50% { transform: translate(calc(-50% + 0.5vw), -0.5vh); } 
+            75% { transform: translate(calc(-50% - 0.3vw), 0.3vh); } 
+            100% { transform: translateX(-50%); } 
+        }
+        
+        /* 角落位置的动画 */
+        @keyframes lumiJumpCorner { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.1) translateY(-1vh); } 
+            100% { transform: scale(1); } 
+        }
+        @keyframes lumiFloatCorner { 
+            0% { transform: none; } 
+            25% { transform: translate(-0.5vw, 0.5vh); } 
+            50% { transform: translate(0.5vw, -0.5vh); } 
+            75% { transform: translate(-0.3vw, 0.3vh); } 
+            100% { transform: none; } 
+        }
+        
+        /* 开关按钮样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .lumi-toggle-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-container" style="max-width: 400px; margin: 40px auto; padding: 20px; background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
+        <div class="header">
+            <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px;">
+            </div>
+        </div>
+        
+        <div id="login-form" class="auth-form">
+            <h2>用户登录</h2>
+            <div style="margin-bottom: 15px;">
+                <label for="login-username">用户名:</label>
+                <input type="text" id="login-username" placeholder="请输入用户名" class="auth-input">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="login-password">密码:</label>
+                <input type="password" id="login-password" placeholder="请输入密码" class="auth-input">
+            </div>
+            <div id="login-error" class="auth-error"></div>
+            <button id="login-btn" class="auth-button">登录</button>
+            <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register" class="auth-link">立即注册</a></p>
+        </div>
+        
+        <div id="register-form" class="auth-form" style="display: none;">
+            <h2>用户注册</h2>
+            <div style="margin-bottom: 15px;">
+                <label for="register-username">用户名:</label>
+                <input type="text" id="register-username" placeholder="请输入用户名" class="auth-input">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="register-password">密码:</label>
+                <input type="password" id="register-password" placeholder="请输入密码" class="auth-input">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="register-confirm-password">确认密码:</label>
+                <input type="password" id="register-confirm-password" placeholder="请再次输入密码" class="auth-input">
+            </div>
+            <div id="register-error" class="auth-error"></div>
+            <button id="register-btn" class="auth-button">注册</button>
+            <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login" class="auth-link">返回登录</a></p>
+        </div>
+    </div>
+    
+    <div id="app-container" style="display: none;">
+        <div class="header">
+            <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px; margin-right: 15px;">
+            </div>
+            <h1>烛梦单词考核</h1>
+            <div style="text-align: right; margin-top: -40px;">
+                <span id="user-info" style="margin-right: 10px;"></span>
+                <a href="#" id="logout-btn" style="color: var(--primary-color);">退出登录</a>
+            </div>
+        </div>
+
+        <div class="list-selector">
+            <div>
+                <label for="book-select">选择词书: </label>
+                <select id="book-select">
+                    <option value="">加载中...</option>
+                </select>
+            </div>
+            <div>
+                <label for="list-select">选择单元: </label>
+                <select id="list-select">
+                    <option value="">请先选择词书...</option>
+                </select>
+            </div>
+            <div>
+                <label for="count-select">选择数量: </label>
+                <select id="count-select">
+                    <option value="10">10个</option>
+                    <option value="20">20个</option>
+                    <option value="50">50个</option>
+                    <option value="all">全部</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="lumi-toggle-container">
+            <label for="lumi-toggle">Lumi即时反馈: </label>
+            <label class="switch">
+                <input type="checkbox" id="lumi-toggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- 添加自动播放开关 -->
+        <div class="auto-play-container" style="display: flex; align-items: center; margin-top: 10px;">
+            <label for="auto-play-toggle">自动播放发音: </label>
+            <label class="switch">
+                <input type="checkbox" id="auto-play-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 20px;">
+            <button id="start-btn">开始测试</button>
+            <a href="/error-history" class="btn" style="background-color: #3498db;">查看错误历史</a>
+        </div>
+
+        <div id="quiz-area" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2 id="question-meaning"></h2>
+                <div>
+                    <button id="play-uk-btn" style="display: none;">英 🔊</button>
+                    <button id="play-us-btn" style="display: none;">美 🔊</button>
+                </div>
+            </div>
+            <p id="question-ipa" style="font-size: 1.1em; color: #555; margin-top: 5px;"></p>
+            <p id="question-meaning-en" style="font-style: italic; color: #666; margin-top: 5px;"></p>
+            <p id="question-example-en" style="margin-top: 15px; font-size: 0.95em; color: #444;"></p>
+            <p id="question-example-cn" style="font-size: 0.9em; color: #777;"></p>
+            <p>第 <span id="current-q-num">1</span> / <span id="total-q-num"></span> 题</p>
+            <div class="details-toggle">
+                <button id="toggle-details-btn">显示更多详情</button>
+                <div id="word-details-container" style="display: none;">
+                    <p id="question-derivatives" style="margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+                    <p id="question-root-etymology" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-mnemonic" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-comparison" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-collocation" style="font-size: 0.9em; color: #666;"></p>
+                    <p id="question-exam-sentence" style="margin-top: 10px; font-size: 0.95em; color: #444;"></p>
+                    <p id="question-exam-year-source" style="font-size: 0.85em; color: #777;"></p>
+                    <p id="question-exam-options" style="font-size: 0.9em; color: #444;"></p>
+                    <p id="question-exam-explanation" style="font-size: 0.9em; color: #444;"></p>
+                    <p id="question-tips" style="font-size: 0.9em; color: #666;"></p>
+                </div>
+            </div>
+            <input type="text" id="answer-input" placeholder="输入单词拼写...">
+            <button id="next-btn" style="margin-top: 10px;">下一题</button>
+        </div>
+
+        <div id="results-area">
+            <h2>测试结果</h2>
+            <p>你错了 <strong id="error-count"></strong> 个单词。</p>
+            <ul id="error-list"></ul>
+        </div>
+    </div>
+    
+    <div class="lumi-reaction"></div>
+    <audio id="word-audio" style="display: none;"></audio>
+
+    <style>
+        /* 表单切换动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+        
+        .auth-form {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        .auth-form.fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+    </style>
+    
+    <script>
+        // --- 全局变量 ---
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let consecutiveCorrect = 0; // 连续正确的次数
+        let lumiEnabled = true; // Lumi显示状态
+        let autoPlayEnabled = false; // 自动播放状态
+        let currentUser = null; // 当前登录用户
+        const lumiImages = {
+            'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
+            'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
+            'correct': '/assets/img/Lumi/Lumi_Triumph.png',
+            'wrong': '/assets/img/Lumi/Lumi_Crying.png',
+            'celebration': '/assets/img/Lumi/Lumi_Yeah.png'
+        };
+
+        // --- DOM 元素缓存 ---
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginUsername = document.getElementById('login-username');
+        const loginPassword = document.getElementById('login-password');
+        const loginError = document.getElementById('login-error');
+        const loginBtn = document.getElementById('login-btn');
+        const registerUsername = document.getElementById('register-username');
+        const registerPassword = document.getElementById('register-password');
+        const registerConfirmPassword = document.getElementById('register-confirm-password');
+        const registerError = document.getElementById('register-error');
+        const registerBtn = document.getElementById('register-btn');
+        const showRegisterLink = document.getElementById('show-register');
+        const showLoginLink = document.getElementById('show-login');
+        const userInfoEl = document.getElementById('user-info');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        const startBtn = document.getElementById('start-btn');
+        const quizArea = document.getElementById('quiz-area');
+        const resultsArea = document.getElementById('results-area');
+        const questionMeaningEl = document.getElementById('question-meaning');
+        const questionIpaEl = document.getElementById('question-ipa');
+        const questionMeaningEnEl = document.getElementById('question-meaning-en');
+        const questionExampleEnEl = document.getElementById('question-example-en');
+        const questionExampleCnEl = document.getElementById('question-example-cn');
+        const currentQNumEl = document.getElementById('current-q-num');
+        const totalQNumEl = document.getElementById('total-q-num');
+        const answerInput = document.getElementById('answer-input');
+        const nextBtn = document.getElementById('next-btn');
+        const audioEl = document.getElementById('word-audio');
+        const ukBtn = document.getElementById('play-uk-btn');
+        const usBtn = document.getElementById('play-us-btn');
+
+        const toggleDetailsBtn = document.getElementById('toggle-details-btn');
+        const wordDetailsContainer = document.getElementById('word-details-container');
+
+        const questionDerivativesEl = document.getElementById('question-derivatives');
+        const questionRootEtymologyEl = document.getElementById('question-root-etymology');
+        const questionMnemonicEl = document.getElementById('question-mnemonic');
+        const questionComparisonEl = document.getElementById('question-comparison');
+        const questionCollocationEl = document.getElementById('question-collocation');
+        const questionExamSentenceEl = document.getElementById('question-exam-sentence');
+        const questionExamYearSourceEl = document.getElementById('question-exam-year-source');
+        const questionExamOptionsEl = document.getElementById('question-exam-options');
+        const questionExamExplanationEl = document.getElementById('question-exam-explanation');
+        const questionTipsEl = document.getElementById('question-tips');
+        const lumiImg = document.querySelector('.lumi-reaction');
+        const lumiToggle = document.getElementById('lumi-toggle');
+        const autoPlayToggle = document.getElementById('auto-play-toggle');
+
+        // --- 功能函数 ---
+        
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            // 从sessionStorage获取用户信息
+            const userJson = sessionStorage.getItem('currentUser');
+            if (userJson) {
+                try {
+                    currentUser = JSON.parse(userJson);
+                    showAppInterface();
+                } catch (e) {
+                    console.error('解析用户信息失败:', e);
+                    showAuthInterface();
+                }
+            } else {
+                showAuthInterface();
+            }
+        }
+        
+        // 显示认证界面
+        function showAuthInterface() {
+            authContainer.style.display = 'block';
+            appContainer.style.display = 'none';
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        }
+        
+        // 显示应用界面
+        function showAppInterface() {
+            authContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            if (currentUser) {
+                userInfoEl.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
+            }
+            
+            // 确保 Lumi 开关状态正确
+            lumiEnabled = lumiToggle.checked;
+            if (!lumiEnabled) {
+                lumiImg.classList.remove('active');
+            } else {
+                updateLumiReaction('welcome');
+            }
+        }
+        
+        // 处理登录
+        async function handleLogin() {
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+            
+            if (!username || !password) {
+                loginError.textContent = '用户名和密码不能为空';
+                loginError.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 登录成功
+                    currentUser = data.user;
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showAppInterface();
+                    loginUsername.value = '';
+                    loginPassword.value = '';
+                    loginError.style.display = 'none';
+                } else {
+                    // 登录失败
+                    loginError.textContent = data.error || '登录失败';
+                    loginError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('登录请求出错:', error);
+                loginError.textContent = '网络错误，请稍后再试';
+                loginError.style.display = 'block';
+            }
+        }
+        
+        // 处理注册
+        async function handleRegister() {
+            const username = registerUsername.value.trim();
+            const password = registerPassword.value.trim();
+            const confirmPassword = registerConfirmPassword.value.trim();
+            
+            if (!username || !password || !confirmPassword) {
+                registerError.textContent = '所有字段都必须填写';
+                registerError.style.display = 'block';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                registerError.textContent = '两次输入的密码不一致';
+                registerError.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 注册成功，切换到登录表单
+                    registerUsername.value = '';
+                    registerPassword.value = '';
+                    registerConfirmPassword.value = '';
+                    registerError.style.display = 'none';
+                    loginUsername.value = username; // 自动填充用户名
+                    
+                    // 添加淡出动画
+                    registerForm.classList.add('fade-out');
+                    
+                    // 等待动画完成后切换表单
+                    setTimeout(function() {
+                        registerForm.style.display = 'none';
+                        registerForm.classList.remove('fade-out');
+                        
+                        // 显示登录表单并添加淡入动画
+                        loginForm.style.display = 'block';
+                        
+                        // 使用更现代的通知而不是 alert
+                        const notification = document.createElement('div');
+                        notification.className = 'auth-notification';
+                        notification.textContent = '注册成功，请登录';
+                        loginForm.prepend(notification);
+                        
+                        // 3秒后自动移除通知
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                            setTimeout(() => notification.remove(), 500);
+                        }, 3000);
+                    }, 300);
+                } else {
+                    // 注册失败
+                    registerError.textContent = data.error || '注册失败';
+                    registerError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('注册请求出错:', error);
+                registerError.textContent = '网络错误，请稍后再试';
+                registerError.style.display = 'block';
+            }
+        }
+        
+        // 处理退出登录
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            showAuthInterface();
+        }
+        
+        // 动态加载词书列表
+        async function loadBookLists() {
+            try {
+                const bookSelect = document.getElementById('book-select');
+                const response = await fetch('/api/books');
+                if (!response.ok) throw new Error('获取词书列表失败');
+                const books = await response.json();
+                
+                bookSelect.innerHTML = ''; // 清空加载中选项
+                
+                if (books && books.length > 0) {
+                    books.forEach(book => {
+                        const option = document.createElement('option');
+                        option.value = book.id;
+                        option.textContent = book.name;
+                        bookSelect.appendChild(option);
+                    });
+                    // 加载第一本书的单元列表
+                    loadWordLists(books[0].id);
+                } else {
+                    bookSelect.innerHTML = '<option value="">无可用词书</option>';
+                    document.getElementById('list-select').innerHTML = '<option value="">无可用单元</option>';
+                }
+            } catch (error) {
+                console.error('加载词书列表时出错:', error);
+                document.getElementById('book-select').innerHTML = '<option value="">加载失败</option>';
+                document.getElementById('list-select').innerHTML = '<option value="">加载失败</option>';
+            }
+        }
+        
+        // 动态加载单词列表（根据选定的词书）
+        async function loadWordLists(bookId) {
+            try {
+                const listSelect = document.getElementById('list-select');
+                listSelect.innerHTML = '<option value="">加载中...</option>';
+                
+                const url = bookId ? `/api/lists?book_id=${bookId}` : '/api/lists';
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('获取单元列表失败');
+                const lists = await response.json();
+                
+                listSelect.innerHTML = ''; // 清空加载中选项
+                
+                if (lists && lists.length > 0) {
+                    lists.forEach(list => {
+                        const option = document.createElement('option');
+                        option.value = list.id;
+                        option.textContent = list.name;
+                        listSelect.appendChild(option);
+                    });
+                } else {
+                    listSelect.innerHTML = '<option value="">无可用单元</option>';
+                }
+            } catch (error) {
+                console.error('加载单元列表时出错:', error);
+                document.getElementById('list-select').innerHTML = '<option value="">加载失败</option>';
+            }
+        }
+
+        // TTS 朗读函数
+        function playTTS(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error('当前浏览器不支持语音合成');
+            }
+        }
+
+        // 音频播放函数（带TTS后备）
+        function playAudio(audioPath, fallbackText) {
+            if (audioPath && audioPath.trim() !== "") {
+                audioEl.src = audioPath;
+                const playPromise = audioEl.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.error(`本地音频播放失败: ${audioPath}`, error);
+                        playTTS(fallbackText); 
+                    });
+                }
+            } else {
+                playTTS(fallbackText);
+            }
+        }
+
+        // 自动播放音频序列（英音然后美音）
+        function autoPlayAudios() {
+            if (!autoPlayEnabled) return;
+            
+            const q = questions[currentQuestionIndex];
+            
+            // 先播放英音
+            if (q.audio_path_uk) {
+                playAudio(q.audio_path_uk, q.spelling);
+                
+                // 等待英音播放完毕后播放美音
+                setTimeout(() => {
+                    if (q.audio_path_us) {
+                        playAudio(q.audio_path_us, q.spelling);
+                    }
+                }, 1500); // 假设每个音频大约需要1.5秒
+            } else if (q.audio_path_us) {
+                // 如果没有英音但有美音，直接播放美音
+                playAudio(q.audio_path_us, q.spelling);
+            } else {
+                // 如果都没有，使用TTS
+                playTTS(q.spelling);
+            }
+        }
+
+        // 更新Lumi状态
+        function updateLumiReaction(state) {
+            if (!lumiImg || !lumiImages[state] || !lumiEnabled) return;
+            lumiImg.classList.remove('bounce');
+            lumiImg.style.backgroundImage = `url(${lumiImages[state]})`;
+            if (!lumiImg.classList.contains('active')) {
+                lumiImg.classList.add('active');
+            }
+            if (state === 'correct' || state === 'celebration') {
+                void lumiImg.offsetWidth; // 触发重排以重置动画
+                lumiImg.classList.add('bounce');
+            }
+            
+            // 每次更新 Lumi 状态时检查位置
+            checkLumiPosition();
+        }
+        
+        // 检查并调整 Lumi 的位置
+        function checkLumiPosition() {
+            if (!lumiImg || !lumiEnabled) return;
+            
+            const quizAreaRect = quizArea.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const lumiHeight = lumiImg.offsetHeight;
+            
+            // 保存当前的动画状态
+            const wasActive = lumiImg.classList.contains('active');
+            const wasBounce = lumiImg.classList.contains('bounce');
+            
+            // 清除之前的位置类和动画类
+            lumiImg.classList.remove('corner', 'hidden', 'active', 'bounce');
+            
+            // 如果窗口高度小于 700px，完全隐藏 Lumi
+            if (windowHeight < 700) {
+                lumiImg.classList.add('hidden');
+                return;
+            }
+            
+            // 如果 quiz-area 在视口中且与 Lumi 有重叠，将 Lumi 移到角落
+            let shouldBeInCorner = false;
+            if (quizArea.style.display !== 'none') {
+                const lumiBottom = windowHeight - 3 * windowHeight / 100; // 3vh 转换为像素
+                const lumiTop = lumiBottom - lumiHeight;
+                
+                // 检查 Lumi 是否与 quiz-area 重叠
+                if (lumiTop < quizAreaRect.bottom && quizAreaRect.top < lumiBottom) {
+                    shouldBeInCorner = true;
+                }
+            }
+            
+            // 应用位置类
+            if (shouldBeInCorner) {
+                lumiImg.classList.add('corner');
+            }
+            
+            // 恢复动画状态
+            if (wasActive) {
+                lumiImg.classList.add('active');
+            }
+            if (wasBounce) {
+                // 重新触发弹跳动画
+                void lumiImg.offsetWidth; // 触发重排以重置动画
+                lumiImg.classList.add('bounce');
+            }
+        }
+
+        // 显示问题
+        function displayQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionMeaningEl.textContent = q.meaning_cn; // 中文释义
+            questionIpaEl.textContent = q.ipa ? `/${q.ipa}/` : ''; // 音标
+            questionMeaningEnEl.textContent = q.meaning_en || ''; // 英文释义
+            questionExampleEnEl.textContent = q.example_en || ''; // 例句英文
+            questionExampleCnEl.textContent = q.example_cn || ''; // 例句中文
+
+            // 填充更多详细信息
+            questionDerivativesEl.textContent = q.derivatives ? `派生词: ${q.derivatives}` : '';
+            questionRootEtymologyEl.textContent = q.root_etymology ? `词根词源: ${q.root_etymology}` : '';
+            questionMnemonicEl.textContent = q.mnemonic ? `联想记忆: ${q.mnemonic}` : '';
+            questionComparisonEl.textContent = q.comparison ? `词义辨析: ${q.comparison}` : '';
+            questionCollocationEl.textContent = q.collocation ? `搭配用法: ${q.collocation}` : '';
+            questionExamSentenceEl.textContent = q.exam_sentence ? `真题例句: ${q.exam_sentence}` : '';
+            questionExamYearSourceEl.textContent = q.exam_year_source ? `真题出处: ${q.exam_year_source}` : '';
+            questionExamOptionsEl.textContent = q.exam_options ? `选项: ${q.exam_options}` : '';
+            questionExamExplanationEl.textContent = q.exam_explanation ? `解析: ${q.exam_explanation}` : '';
+            questionTipsEl.textContent = q.tips ? `提示: ${q.tips}` : '';
+
+            // 重置详情显示状态
+            wordDetailsContainer.style.display = 'none';
+            toggleDetailsBtn.textContent = '显示更多详情';
+            currentQNumEl.textContent = currentQuestionIndex + 1;
+
+            ukBtn.style.display = q.audio_path_uk ? 'inline-block' : 'none';
+            usBtn.style.display = q.audio_path_us ? 'inline-block' : 'none';
+            
+            if (q.audio_path_uk) ukBtn.onclick = () => playAudio(q.audio_path_uk, q.spelling);
+            if (q.audio_path_us) usBtn.onclick = () => playAudio(q.audio_path_us, q.spelling);
+
+            nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? '完成并提交' : '下一题';
+            answerInput.focus();
+            
+            // 如果启用了自动播放，自动播放音频
+            if (autoPlayEnabled) {
+                setTimeout(() => autoPlayAudios(), 500); // 延迟500ms后播放，给页面渲染一些时间
+            }
+        }
+
+        // 处理"下一步"逻辑
+        function handleNextQuestion() {
+            const currentAnswer = answerInput.value.trim().toLowerCase();
+            const correctSpelling = questions[currentQuestionIndex].spelling.trim().toLowerCase();
+            const validSpellings = correctSpelling.split('/');
+            
+            if (validSpellings.includes(currentAnswer)) {
+                // 答案正确
+                consecutiveCorrect++; // 连续正确次数+1
+                
+                // 根据连续正确的次数，决定Lumi的表情
+                if (consecutiveCorrect >= 3) {
+                    updateLumiReaction('celebration'); // 连续3次以上正确，使用庆祝表情
+                } else {
+                    updateLumiReaction('correct'); // 普通的正确反馈
+                }
+            } else {
+                // 答案错误
+                consecutiveCorrect = 0; // 重置连续正确次数
+                updateLumiReaction('wrong');
+            }
+
+            userAnswers.push({
+                word_id: questions[currentQuestionIndex].word_id,
+                answer: answerInput.value
+            });
+            
+            currentQuestionIndex++;
+            answerInput.value = '';
+
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length) {
+                    displayQuestion();
+                    updateLumiReaction('thinking');
+                } else {
+                    submitTest();
+                }
+            }, 700); // 延迟700毫秒，让用户能看到Lumi的反应
+        }
+
+        // 提交测试
+        async function submitTest() {
+            updateLumiReaction('celebration'); // 测试完成，庆祝一下
+            quizArea.style.display = 'none';
+            const response = await fetch('/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers: userAnswers })
+            });
+            const results = await response.json();
+            displayResults(results);
+        }
+
+        // 显示结果
+        function displayResults(results) {
+            resultsArea.style.display = 'block';
+            document.getElementById('error-count').textContent = results.error_count;
+            const errorListEl = document.getElementById('error-list');
+            errorListEl.innerHTML = '';
+
+            if (results.error_details && results.error_details.length > 0) {
+                results.error_details.forEach(err => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>正确:</strong> ${err.correct_spelling} / <strong>你的答案:</strong> <span style="color: #c0392b;">${err.your_answer}</span>`;
+                    errorListEl.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.innerHTML = '🎉 恭喜你，全部正确！太棒了！';
+                li.style.borderLeftColor = '#27ae60';
+                li.style.background = '#f0fff4';
+                errorListEl.appendChild(li);
+            }
+
+            if (!document.getElementById('back-btn')) {
+                const backBtn = document.createElement('button');
+                backBtn.id = 'back-btn';
+                backBtn.textContent = '返回开始界面';
+                backBtn.style.marginTop = '20px';
+                backBtn.onclick = function() { location.reload(); };
+                resultsArea.appendChild(backBtn);
+            }
+        }
+
+        // --- 事件监听器 ---
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', () => {
+            Object.values(lumiImages).forEach(path => { (new Image()).src = path; }); // 预加载图片
+            updateLumiReaction('welcome');
+            loadBookLists(); // 加载词书列表，而不是直接加载单词列表
+            checkLoginStatus();
+            
+            // 初始化Lumi开关状态
+            lumiEnabled = lumiToggle.checked;
+            if (!lumiEnabled) {
+                lumiImg.classList.remove('active');
+            }
+            
+            // 初始检查 Lumi 位置
+            checkLumiPosition();
+            
+            // 添加窗口大小变化事件监听器
+            window.addEventListener('resize', checkLumiPosition);
+            
+            // 初始化自动播放开关状态
+            autoPlayEnabled = autoPlayToggle.checked;
+            
+            // 添加词书选择变化事件监听器
+            document.getElementById('book-select').addEventListener('change', function() {
+                const selectedBookId = this.value;
+                if (selectedBookId) {
+                    loadWordLists(selectedBookId);
+                } else {
+                    // 如果没有选择词书，清空单元列表
+                    document.getElementById('list-select').innerHTML = '<option value="">请先选择词书...</option>';
+                }
+            });
+            
+            // 添加认证相关事件监听器
+            loginBtn.addEventListener('click', handleLogin);
+            registerBtn.addEventListener('click', handleRegister);
+            
+            // 显示注册表单，隐藏登录表单
+            showRegisterLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 添加淡出动画
+                loginForm.classList.add('fade-out');
+                
+                // 等待动画完成后切换表单
+                setTimeout(function() {
+                    loginForm.style.display = 'none';
+                    loginForm.classList.remove('fade-out');
+                    
+                    // 显示注册表单并添加淡入动画
+                    registerForm.style.display = 'block';
+                }, 300);
+            });
+            
+            // 显示登录表单，隐藏注册表单
+            showLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 添加淡出动画
+                registerForm.classList.add('fade-out');
+                
+                // 等待动画完成后切换表单
+                setTimeout(function() {
+                    registerForm.style.display = 'none';
+                    registerForm.classList.remove('fade-out');
+                    
+                    // 显示登录表单并添加淡入动画
+                    loginForm.style.display = 'block';
+                }, 300);
+            });
+            logoutBtn.addEventListener('click', handleLogout);
+        });
+        
+        // Lumi开关事件监听
+        lumiToggle.addEventListener('change', function() {
+            lumiEnabled = this.checked;
+            if (lumiEnabled) {
+                // 根据当前状态更新 Lumi 反应
+                if (appContainer.style.display === 'block') {
+                    // 如果在应用界面
+                    if (quizArea.style.display === 'block' && currentQuestionIndex < questions.length) {
+                        updateLumiReaction('thinking');
+                    } else if (resultsArea.style.display === 'block') {
+                        updateLumiReaction('celebration');
+                    } else {
+                        updateLumiReaction('welcome');
+                    }
+                } else {
+                    updateLumiReaction('welcome');
+                }
+            } else {
+                lumiImg.classList.remove('active');
+            }
+        });
+        
+        // 自动播放开关事件监听
+        autoPlayToggle.addEventListener('change', function() {
+            autoPlayEnabled = this.checked;
+            // 如果开启自动播放且当前正在显示问题，则立即播放当前问题的音频
+            if (autoPlayEnabled && questions.length > 0 && currentQuestionIndex < questions.length && quizArea.style.display !== 'none') {
+                autoPlayAudios();
+            }
+        });
+
+        // 开始按钮
+        startBtn.addEventListener('click', async () => {
+            const selectedListId = document.getElementById('list-select').value;
+            const selectedCount = document.getElementById('count-select').value;
+            
+            if (!selectedListId) {
+                alert('请先选择一个单词列表！');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}`);
+                if (!response.ok) throw new Error('网络请求失败');
+                questions = await response.json();
+                
+                if (questions && questions.length > 0) {
+                    document.querySelector('.list-selector').style.display = 'none';
+                    startBtn.style.display = 'none';
+                    document.querySelector('a.btn').style.display = 'none';
+                    quizArea.style.display = 'block';
+                    totalQNumEl.textContent = questions.length;
+                    userAnswers = []; // 重置答案
+                    currentQuestionIndex = 0; // 重置索引
+                    displayQuestion();
+                    updateLumiReaction('thinking');
+                } else {
+                    alert('无法加载题目或该列表为空！');
+                }
+            } catch (error) {
+                console.error("加载题目时出错:", error);
+                alert('加载题目时出错，请检查后端服务。');
+            }
+        });
+
+        // 下一步按钮和回车键
+        nextBtn.addEventListener('click', handleNextQuestion);
+
+        toggleDetailsBtn.addEventListener('click', () => {
+            if (wordDetailsContainer.style.display === 'none') {
+                wordDetailsContainer.style.display = 'block';
+                toggleDetailsBtn.textContent = '隐藏更多详情';
+            } else {
+                wordDetailsContainer.style.display = 'none';
+                toggleDetailsBtn.textContent = '显示更多详情';
+            }
+        });
+        answerInput.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                handleNextQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
