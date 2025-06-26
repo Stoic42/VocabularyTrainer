@@ -17,6 +17,8 @@
             --warning-color: #f39c12;
             --error-color: #c0392b;
             --hover-color: #e6eef7;
+            --pos-tag-bg: #e9ecef;
+            --pos-tag-color: #495057;
         }
         
         /* 打印样式 */
@@ -305,6 +307,22 @@
         .word-card .meaning {
             color: var(--dark-text);
             margin-bottom: 10px;
+        }
+        
+        .pos-tag {
+            display: inline-block;
+            background-color: var(--pos-tag-bg);
+            color: var(--pos-tag-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+        
+        .meaning div {
+            margin-bottom: 6px;
         }
         
         .word-card .wrong-answers {
@@ -706,6 +724,44 @@
             return pos.replace(/([a-z]+\.)(\s|;)/gi, '$1<br>');
         }
         
+        // 格式化多义词的显示
+        function formatMultiMeanings(pos, meaning) {
+            if (!pos || !meaning) return meaning || '-';
+            
+            // 分割词性和意思
+            const posItems = pos.split(/\s*[;\s]\s*/).filter(p => p.trim());
+            
+            // 如果只有一个词性或没有词性，直接返回原意思
+            if (posItems.length <= 1) return meaning;
+            
+            // 尝试将意思按照词性分割
+            const meaningParts = meaning.split(/\s*[;\s]\s*/).filter(m => m.trim());
+            
+            // 如果意思部分少于词性部分，可能格式不匹配，返回原意思
+            if (meaningParts.length < posItems.length) return meaning;
+            
+            // 构建格式化后的意思
+            let formattedMeaning = '';
+            let meaningIndex = 0;
+            
+            for (let i = 0; i < posItems.length; i++) {
+                const posItem = posItems[i].trim();
+                // 为每个词性找到对应的意思
+                if (meaningIndex < meaningParts.length) {
+                    formattedMeaning += `<div><span class="pos-tag">${posItem}</span> ${meaningParts[meaningIndex]}</div>`;
+                    meaningIndex++;
+                }
+            }
+            
+            // 如果还有剩余的意思，添加到最后
+            while (meaningIndex < meaningParts.length) {
+                formattedMeaning += `<div>${meaningParts[meaningIndex]}</div>`;
+                meaningIndex++;
+            }
+            
+            return formattedMeaning || meaning;
+        }
+        
         // 获取错误历史数据
         async function fetchErrorHistory(bookId = null, listId = null) {
             try {
@@ -895,7 +951,7 @@
                     
                     row.innerHTML = `
                         <td>${error.spelling}</td>
-                        <td>${error.meaning_cn || '-'}</td>
+                        <td>${formatMultiMeanings(error.pos, error.meaning_cn) || '-'}</td>
                         <td>${formatPOS(error.pos) || '-'}</td>
                         <td><span class="list-badge">${bookName} - ${listName}</span></td>
                         <td style="color: var(--error-color);">${error.student_answer}</td>
@@ -939,7 +995,7 @@
                         </h3>
                         <div class="meaning">
                             <strong>词性:</strong> ${formatPOS(word.pos) || '-'}<br>
-                            <strong>中文意思:</strong> ${word.meaning_cn || '-'}
+                            <strong>中文意思:</strong> ${formatMultiMeanings(word.pos, word.meaning_cn) || '-'}
                         </div>
                         <div class="wrong-answers">
                             <strong>错误次数:</strong> ${word.total_errors}<br>
