@@ -6,7 +6,7 @@ DATABASE_FILE = 'vocabulary.db'
 # 音频数据源 (包含[sound:xxx]标签)
 TXT_FILE_PATH = 'wordlists/junior_high/初中 乱序 绿宝书.txt'
 # 音频文件目录
-MEDIA_DIR = 'wordlists/junior_high/Media'
+MEDIA_DIR = 'wordlists/junior_high/media'
 # ----------------
 
 def load_audio_paths_from_txt(txt_path):

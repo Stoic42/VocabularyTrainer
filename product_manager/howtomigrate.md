@@ -148,7 +148,7 @@ toolName: run_command
             
 status: success
           
-command: Copy-Item -Path d:\Projects\VocabularyTrainer\wordlists\junior_high\Media\*.mp3 -Destination d:\Projects\VocabularyTrainer\LumiCamp_for_Alan\wordlists\junior_high\Media\ -Force
+command: Copy-Item -Path d:\Projects\VocabularyTrainer\wordlists\junior_high\media\*.mp3 -Destination d:\Projects\VocabularyTrainer\LumiCamp_for_Alan\wordlists\junior_high\Media\ -Force
           
 我需要检查是否有import_data.py和import_senior_high_data.py文件，并将它们复制到部署包中。
         

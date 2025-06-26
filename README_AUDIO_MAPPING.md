@@ -37,7 +37,7 @@ python update_all_audio_paths.py [--book 词书名称] [--txt 音频源文件路
 **参数说明**：
 - `--book`：词书名称，默认为"初中英语词汇"
 - `--txt`：音频源TXT文件路径，默认为"wordlists/junior_high/初中 乱序 绿宝书.txt"
-- `--media`：音频文件目录，默认为"wordlists/junior_high/Media"
+- `--media`：音频文件目录，默认为"wordlists/junior_high/media"
 - `--report`：生成详细报告
 
 ## 更新结果
@@ -58,7 +58,7 @@ python update_all_audio_paths.py [--book 词书名称] [--txt 音频源文件路
 1. **音频路径格式**：`cambridge-xxxxxxxx-xxxxxxxx-xxxxxxxx-xxxxxxxx-xxxxxxxx.mp3`
 2. **数据库表结构**：
    - `Words`表包含`audio_path_uk`和`audio_path_us`字段，用于存储音频文件路径
-3. **音频文件存储位置**：`wordlists/junior_high/Media/`目录
+3. **音频文件存储位置**：`wordlists/junior_high/media/`目录
 
 ## 注意事项
 

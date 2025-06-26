@@ -13,7 +13,7 @@
 ## 使用方法
 
 1. 确保`初中 乱序 绿宝书.txt`文件位于`wordlists/junior_high/`目录下。
-2. 确保音频文件位于`wordlists/junior_high/Media/`目录下。
+2. 确保音频文件位于`wordlists/junior_high/media/`目录下。
 3. 运行脚本：
 
 ```bash
@@ -45,4 +45,4 @@ python update_audio_paths.py
 1. 音频路径格式：`cambridge-xxxxxxxx-xxxxxxxx-xxxxxxxx-xxxxxxxx-xxxxxxxx.mp3`
 2. 数据库表结构：
    - `Words`表包含`audio_path_uk`和`audio_path_us`字段，用于存储音频文件路径
-3. 音频文件存储位置：`wordlists/junior_high/Media/`目录
+3. 音频文件存储位置：`wordlists/junior_high/media/`目录

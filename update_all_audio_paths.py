@@ -222,7 +222,7 @@ def main():
     parser = argparse.ArgumentParser(description='更新单词音频路径并验证音频文件')
     parser.add_argument('--book', default='初中英语词汇', help='词书名称 (默认: 初中英语词汇)')
     parser.add_argument('--txt', default='wordlists/junior_high/初中 乱序 绿宝书.txt', help='音频源TXT文件路径')
-    parser.add_argument('--media', default='wordlists/junior_high/Media', help='音频文件目录')
+    parser.add_argument('--media', default='wordlists/junior_high/media', help='音频文件目录')
     parser.add_argument('--report', action='store_true', help='生成详细报告')
     args = parser.parse_args()
     

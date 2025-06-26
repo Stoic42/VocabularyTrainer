@@ -168,13 +168,13 @@ def get_questions():
         if study_mode.lower() != 'dictation':
             # 标准模式：包含音频URL
             if word_dict['audio_path_uk']:
-                word_dict['audio_path_uk'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_uk']}"
+                word_dict['audio_path_uk'] = f"/wordlists/junior_high/media/{word_dict['audio_path_uk']}"
             else:
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_uk'] = f"/api/tts/{word_dict['spelling']}"
                 
             if word_dict['audio_path_us']:
-                word_dict['audio_path_us'] = f"/wordlists/junior_high/Media/{word_dict['audio_path_us']}"
+                word_dict['audio_path_us'] = f"/wordlists/junior_high/media/{word_dict['audio_path_us']}"
             else:
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_us'] = f"/api/tts/{word_dict['spelling']}"
