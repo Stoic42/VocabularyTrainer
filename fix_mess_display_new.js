@@ -9,11 +9,35 @@ function extractPOSAndMeaning(pos, meaning) {
         return { extractedPos: 'N/A', formattedMeaning: 'N/A' };
     }
     
-    // 先将词性和中文意思连接起来
-    const combinedText = pos && meaning ? pos + ' ' + meaning : (pos || meaning || '');
+    // 检查原始数据是否完整
+    // 如果pos中包含多个词性但meaning中只有部分词性的中文意思，尝试补全
+    let processedMeaning = meaning;
+    if (pos && meaning) {
+        // 从pos中提取所有词性
+        const posRegexForExtract = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|pl|sing|det|modal|inf|prefix|suffix|phrase|idiom)\.\s*(?:&\s*)?/g;
+        const posMatches = [...pos.matchAll(posRegexForExtract)].map(match => match[1] + '.');
+        
+        // 检查meaning中是否包含所有词性的中文意思
+        for (const posTag of posMatches) {
+            // 如果meaning中不包含该词性标签，尝试添加
+            if (!meaning.includes(posTag)) {
+                // 查找meaning中是否有其他词性的中文意思
+                const meaningPosRegex = new RegExp(`\\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|pl|sing|det|modal|inf|prefix|suffix|phrase|idiom)\\.`, 'g');
+                const meaningPosMatches = [...meaning.matchAll(meaningPosRegex)];
+                
+                if (meaningPosMatches.length > 0) {
+                    // 如果meaning中有其他词性的中文意思，在开头添加缺失的词性标签
+                    processedMeaning = posTag + ' ' + meaning;
+                }
+            }
+        }
+    }
     
-    // 这个正则表达式会找到所有的词性标签 (如 n./v./adj. 等)
-    const posRegex = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron)\./g;
+    // 先将词性和中文意思连接起来
+    const combinedText = pos && processedMeaning ? pos + ' ' + processedMeaning : (pos || processedMeaning || '');
+    
+    // 这个正则表达式会找到所有的词性标签 (如 n./v./adj./aux./abbr. 等)
+    const posRegex = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|pl|sing|det|modal|inf|prefix|suffix|phrase|idiom)\./g;
     
     // 提取combinedText中的所有词性
     const posMatches = combinedText ? [...combinedText.matchAll(posRegex)] : [];
@@ -21,7 +45,9 @@ function extractPOSAndMeaning(pos, meaning) {
     
     if (posMatches.length > 0) {
         // 从combinedText中提取所有词性并用&连接，确保每个词性后面有'.'
-        extractedPos = posMatches.map(match => match[1] + '.').join(' & ');
+        // 使用Set去重，避免出现重复的词性
+        const uniquePosSet = new Set(posMatches.map(match => match[1]));
+        extractedPos = Array.from(uniquePosSet).map(pos => pos + '.').join(' & ');
     }
     
     // 如果没有从combinedText中提取到词性，则使用传入的pos
@@ -30,20 +56,24 @@ function extractPOSAndMeaning(pos, meaning) {
     }
     
     // 处理中文意思的换行显示和词性标签添加
-    let formattedMeaning = meaning;
-    if (meaning) {
+    let formattedMeaning = processedMeaning;
+    if (processedMeaning) {
         // 找到所有词性标签的位置和内容
         const posInfo = [];
         let match;
         const regex = new RegExp(posRegex);
-        let meaningCopy = meaning.slice();
+        let meaningCopy = processedMeaning.slice();
         
         while ((match = regex.exec(meaningCopy)) !== null) {
-            posInfo.push({
-                index: match.index,
-                pos: match[1] + '.',
-                length: match[0].length
-            });
+            // 检查是否已经存在相同的词性标签，避免重复
+            const existingPosIndex = posInfo.findIndex(info => info.pos === match[1] + '.');
+            if (existingPosIndex === -1) {
+                posInfo.push({
+                    index: match.index,
+                    pos: match[1] + '.',
+                    length: match[0].length
+                });
+            }
         }
         
         // 如果有词性标签，处理换行和词性标签
@@ -53,19 +83,92 @@ function extractPOSAndMeaning(pos, meaning) {
             
             // 处理多个词性的情况
             if (posInfo.length > 1) {
-                for (let i = 0; i < posInfo.length; i++) {
+                // 检查是否有连续的词性标签（如 v. & aux.）
+                // 通过检查两个词性标签之间的文本是否只包含连接符（如 &）来判断
+                const consecutivePosGroups = [];
+                let currentGroup = [0]; // 从第一个词性开始
+                
+                for (let i = 0; i < posInfo.length - 1; i++) {
                     const currentPos = posInfo[i];
-                    let endIndex = i < posInfo.length - 1 ? posInfo[i + 1].index : meaning.length;
+                    const nextPos = posInfo[i + 1];
+                    const textBetween = processedMeaning.substring(
+                        currentPos.index + currentPos.length, 
+                        nextPos.index
+                    ).trim();
                     
-                    // 提取当前词性后面的文本，直到下一个词性标签
-                    let text = meaning.substring(currentPos.index + currentPos.length, endIndex).trim();
-                    segments.push(currentPos.pos + ' ' + text);
+                    // 如果两个词性之间只有连接符（如 &），则认为它们是连续的
+                    if (textBetween === '&' || textBetween === 'and' || textBetween === '和' || textBetween === '') {
+                        // 当前词性和下一个词性是连续的
+                        if (!currentGroup.includes(i + 1)) {
+                            currentGroup.push(i + 1);
+                        }
+                    } else {
+                        // 当前词性和下一个词性不是连续的，结束当前组
+                        if (currentGroup.length > 0) {
+                            consecutivePosGroups.push([...currentGroup]);
+                            currentGroup = [i + 1];
+                        }
+                    }
+                }
+                
+                // 处理最后一个组
+                if (currentGroup.length > 0) {
+                    consecutivePosGroups.push([...currentGroup]);
+                }
+                
+                // 根据连续词性组处理文本
+                for (let group of consecutivePosGroups) {
+                    // 获取组中最后一个词性的索引
+                    const lastPosIndex = group[group.length - 1];
+                    const lastPos = posInfo[lastPosIndex];
+                    
+                    // 计算组的结束索引
+                    let endIndex = lastPosIndex < posInfo.length - 1 ? 
+                        posInfo[lastPosIndex + 1].index : processedMeaning.length;
+                    
+                    // 提取该组词性后面的文本
+                    let text = processedMeaning.substring(lastPos.index + lastPos.length, endIndex).trim();
+                    
+                    // 如果文本以连接符开头，去掉连接符
+                    if (text.startsWith('&') || text.startsWith('and') || text.startsWith('和')) {
+                        text = text.substring(1).trim();
+                    }
+                    
+                    // 检查文本是否为空，如果为空可能是原始数据中缺少该词性的中文意思
+                    // 在这种情况下，尝试查找是否有其他词性的中文意思可以使用
+                    if (text.trim() === '') {
+                        // 查找其他词性组中是否有非空的中文意思
+                        for (let otherGroup of consecutivePosGroups) {
+                            if (otherGroup !== group) {
+                                const otherLastPosIndex = otherGroup[otherGroup.length - 1];
+                                const otherLastPos = posInfo[otherLastPosIndex];
+                                const otherEndIndex = otherLastPosIndex < posInfo.length - 1 ? 
+                                    posInfo[otherLastPosIndex + 1].index : processedMeaning.length;
+                                const otherText = processedMeaning.substring(otherLastPos.index + otherLastPos.length, otherEndIndex).trim();
+                                
+                                if (otherText && !otherText.startsWith('&') && !otherText.startsWith('and') && !otherText.startsWith('和')) {
+                                    text = otherText;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 构建该组的显示文本
+                    if (group.length === 1) {
+                        // 单个词性
+                        segments.push(posInfo[group[0]].pos + ' ' + text);
+                    } else {
+                        // 连续词性，不添加换行
+                        const groupPosText = group.map(idx => posInfo[idx].pos).join(' & ');
+                        segments.push(groupPosText + ' ' + text);
+                    }
                 }
             } 
             // 处理只有一个词性的情况
             else {
                 const pos = posInfo[0];
-                let text = meaning.substring(pos.index + pos.length).trim();
+                let text = processedMeaning.substring(pos.index + pos.length).trim();
                 segments.push(pos.pos + ' ' + text);
             }
             
