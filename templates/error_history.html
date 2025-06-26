@@ -631,6 +631,7 @@
                     <thead>
                         <tr>
                             <th>单词</th>
+                            <th>词性</th>
                             <th>中文意思</th>
                             <th>列表</th>
                             <th>你的答案</th>
@@ -948,9 +949,15 @@
                     const bookName = getBookName(error.book_id);
                     const listName = getListName(error.list_id);
                     
+                    // 提取词性
+                    const posResult = formatPOSAndMeaning(error.pos, error.meaning_cn);
+                    const extractedPos = posResult.extractedPos || error.pos || '-';
+                    const formattedMeaning = posResult.formattedMeaning || error.meaning_cn || '-';
+                    
                     row.innerHTML = `
                         <td>${error.spelling}</td>
-                        <td>${formatPOSAndMeaning(error.pos, error.meaning_cn) || '-'}</td>
+                        <td>${extractedPos}</td>
+                        <td>${formattedMeaning}</td>
                         <td><span class="list-badge">${bookName} - ${listName}</span></td>
                         <td style="color: var(--error-color);">${error.student_answer}</td>
                         <td>${formatDate(error.error_date, true)}</td>
@@ -993,13 +1000,21 @@
                     const bookName = getBookName(word.book_id);
                     const listName = getListName(word.list_id);
                     
+                    // 提取词性
+                    const posResult = formatPOSAndMeaning(word.pos, word.meaning_cn);
+                    const extractedPos = posResult.extractedPos || word.pos || '-';
+                    const formattedMeaning = posResult.formattedMeaning || word.meaning_cn || '-';
+                    
                     wordCard.innerHTML = `
                         <h3>
                             ${word.spelling}
                             <span class="list-badge">${bookName} - ${listName}</span>
                         </h3>
+                        <div class="pos">
+                            <strong>词性:</strong> ${extractedPos}
+                        </div>
                         <div class="meaning">
-                            <strong>中文意思:</strong> ${formatPOSAndMeaning(word.pos, word.meaning_cn) || '-'}
+                            <strong>中文意思:</strong> ${formattedMeaning}
                         </div>
                         <div class="wrong-answers">
                             <strong>错误次数:</strong> ${word.total_errors}<br>
