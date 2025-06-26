@@ -1545,6 +1545,38 @@
             if (wordDetailsContainer.style.display === 'none') {
                 wordDetailsContainer.style.display = 'block';
                 toggleDetailsBtn.textContent = '隐藏更多详情';
+                
+                // 调试信息：检查详情内容是否为空
+                const detailsContent = [
+                    document.getElementById('question-derivatives').textContent,
+                    document.getElementById('question-root-etymology').textContent,
+                    document.getElementById('question-mnemonic').textContent,
+                    document.getElementById('question-comparison').textContent,
+                    document.getElementById('question-collocation').textContent,
+                    document.getElementById('question-exam-sentence').textContent,
+                    document.getElementById('question-exam-year-source').textContent,
+                    document.getElementById('question-exam-options').textContent,
+                    document.getElementById('question-exam-explanation').textContent,
+                    document.getElementById('question-tips').textContent
+                ];
+                
+                const hasContent = detailsContent.some(text => text.trim() !== '');
+                if (!hasContent) {
+                    // 如果所有详情内容都为空，显示提示信息
+                    const noContentMsg = document.createElement('p');
+                    noContentMsg.id = 'no-details-msg';
+                    noContentMsg.textContent = '当前单词没有更多详细信息';
+                    noContentMsg.style.color = '#888';
+                    noContentMsg.style.fontStyle = 'italic';
+                    noContentMsg.style.textAlign = 'center';
+                    noContentMsg.style.padding = '10px';
+                    
+                    // 清除之前的提示（如果有）
+                    const oldMsg = document.getElementById('no-details-msg');
+                    if (oldMsg) oldMsg.remove();
+                    
+                    wordDetailsContainer.appendChild(noContentMsg);
+                }
             } else {
                 wordDetailsContainer.style.display = 'none';
                 toggleDetailsBtn.textContent = '显示更多详情';
