@@ -48,4 +48,15 @@ assets/video/*
 assets/fonts/*
 
 # 忽略Obsidian配置文件
+.obsidian/
+
+# LumiCamp_for_Alan定制版本处理
+# 默认不忽略LumiCamp_for_Alan目录，但忽略其中的特定文件
+LumiCamp_for_Alan/*.db
+LumiCamp_for_Alan/__pycache__/
+LumiCamp_for_Alan/*.pyc
+LumiCamp_for_Alan/logs/
+# 不忽略标记文件和说明文件
+!LumiCamp_for_Alan/CUSTOM_VERSION.md
+!LumiCamp_for_Alan/README.md
 product_manager/.obsidian/

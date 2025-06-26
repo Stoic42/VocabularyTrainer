@@ -632,6 +632,7 @@
                         <tr>
                             <th>单词</th>
                             <th>中文意思</th>
+                            <th>词性</th>
                             <th>列表</th>
                             <th>你的答案</th>
                             <th>日期</th>
@@ -950,7 +951,8 @@
                     
                     row.innerHTML = `
                         <td>${error.spelling}</td>
-                        <td>${formatPOSAndMeaning(error.pos, error.meaning_cn) || '-'}</td>
+                        <td>${formatMultiMeanings(error.meaning_cn, error.pos) || '-'}</td>
+                        <td>${formatPOS(error.pos) || '-'}</td>
                         <td><span class="list-badge">${bookName} - ${listName}</span></td>
                         <td style="color: var(--error-color);">${error.student_answer}</td>
                         <td>${formatDate(error.error_date, true)}</td>
@@ -961,7 +963,7 @@
             } else {
                 recentErrorsTableEl.innerHTML = `
                     <tr>
-                        <td colspan="6" class="no-data">暂无错误记录</td>
+                        <td colspan="7" class="no-data">暂无错误记录</td>
                     </tr>
                 `;
             }
@@ -999,7 +1001,8 @@
                             <span class="list-badge">${bookName} - ${listName}</span>
                         </h3>
                         <div class="meaning">
-                            <strong>中文意思:</strong> ${formatPOSAndMeaning(word.pos, word.meaning_cn) || '-'}
+                            <strong>词性:</strong> ${formatPOS(word.pos) || '-'}<br>
+                            <strong>中文意思:</strong> ${formatMultiMeanings(word.meaning_cn, word.pos) || '-'}
                         </div>
                         <div class="wrong-answers">
                             <strong>错误次数:</strong> ${word.total_errors}<br>

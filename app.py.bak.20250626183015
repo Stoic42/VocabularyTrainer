@@ -836,12 +836,11 @@ def export_pdf():
         app.logger.error(f"导出PDF时出错: {e}")
         return jsonify({'error': f'导出PDF失败: {str(e)}'}), 500
 
-# --- 提供JS修复脚本 ---
-@app.route('/fix_mess_display_new.js')
-def get_fix_mess_display_new_js():
-    return send_from_directory('.', 'fix_mess_display_new.js')
-
 # --- 启动命令 ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
+
+@app.route('/fix_mess_display_new.js')
+def get_fix_mess_display_new_js():
+    return send_from_directory('.', 'fix_mess_display_new.js')
 
