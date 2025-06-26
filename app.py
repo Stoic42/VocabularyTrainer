@@ -361,15 +361,16 @@ def get_error_history():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 查询错误记录，并关联单词信息
+        # 查询错误记录，并关联单词信息、词书和单元名称
         query = """
         SELECT e.error_id, e.word_id, w.spelling, w.meaning_cn, w.pos, w.list_id, 
                e.student_answer, e.error_type, e.error_date,
                (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = e.word_id AND student_id = e.student_id) as error_count,
-               wl.book_id
+               wl.book_id, b.book_name, wl.list_name
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
         LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE e.student_id = ?
         """
         
@@ -398,10 +399,11 @@ def get_error_history():
         SELECT w.list_id, COUNT(*) as error_count,
                (SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ? AND word_id IN 
                 (SELECT word_id FROM Words WHERE list_id = w.list_id)) as unique_words_count,
-               wl.book_id
+               wl.book_id, b.book_name, wl.list_name
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
         LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE e.student_id = ?
         """
         
@@ -430,10 +432,11 @@ def get_error_history():
                COUNT(*) as total_errors,
                GROUP_CONCAT(e.student_answer, ', ') as wrong_answers,
                GROUP_CONCAT(e.error_date, ', ') as error_dates,
-               wl.book_id
+               wl.book_id, b.book_name, wl.list_name
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
         LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE e.student_id = ?
         """
         

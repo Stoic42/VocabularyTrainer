@@ -889,11 +889,15 @@
                 recentErrorsTableEl.innerHTML = '';
                 data.errors.forEach(error => {
                     const row = document.createElement('tr');
+                    // 获取词书和单元名称
+                    const bookName = getBookName(error.book_id);
+                    const listName = getListName(error.list_id);
+                    
                     row.innerHTML = `
                         <td>${error.spelling}</td>
                         <td>${error.meaning_cn || '-'}</td>
                         <td>${formatPOS(error.pos) || '-'}</td>
-                        <td><span class="list-badge">List ${error.list_id}</span></td>
+                        <td><span class="list-badge">${bookName} - ${listName}</span></td>
                         <td style="color: var(--error-color);">${error.student_answer}</td>
                         <td>${formatDate(error.error_date, true)}</td>
                         <td><span class="error-count">${error.error_count}</span></td>
@@ -924,10 +928,14 @@
                         wrongAnswersHtml += `<span class="wrong-answer" title="${date}">${answer}</span>`;
                     });
                     
+                    // 获取词书和单元名称
+                    const bookName = getBookName(word.book_id);
+                    const listName = getListName(word.list_id);
+                    
                     wordCard.innerHTML = `
                         <h3>
                             ${word.spelling}
-                            <span class="list-badge">List ${word.list_id}</span>
+                            <span class="list-badge">${bookName} - ${listName}</span>
                         </h3>
                         <div class="meaning">
                             <strong>词性:</strong> ${formatPOS(word.pos) || '-'}<br>
@@ -951,8 +959,12 @@
                 listStatsTableEl.innerHTML = '';
                 data.stats.forEach(stat => {
                     const row = document.createElement('tr');
+                    // 获取词书和单元名称
+                    const bookName = getBookName(stat.book_id);
+                    const listName = getListName(stat.list_id);
+                    
                     row.innerHTML = `
-                        <td><span class="list-badge">List ${stat.list_id}</span></td>
+                        <td><span class="list-badge">${bookName} - ${listName}</span></td>
                         <td>${stat.error_count}</td>
                         <td>${stat.unique_words_count}</td>
                     `;
@@ -1051,9 +1063,33 @@
             });
         }
         
+        // 缓存词书和单元数据
+        let booksCache = [];
+        let listsCache = [];
+        
+        // 获取词书名称
+        function getBookName(bookId) {
+            if (!bookId) return '未知词书';
+            
+            const book = booksCache.find(b => b.id === bookId);
+            return book ? book.name : `词书 ${bookId}`;
+        }
+        
+        // 获取单元名称
+        function getListName(listId) {
+            if (!listId) return '未知单元';
+            
+            const list = listsCache.find(l => l.id === listId);
+            return list ? list.name : `List ${listId}`;
+        }
+        
         // 初始化页面
         async function initPage() {
             try {
+                // 获取并缓存词书和单元列表
+                booksCache = await fetchBooks();
+                listsCache = await fetchLists();
+                
                 // 获取错误历史数据
                 const data = await fetchErrorHistory();
                 
@@ -1124,6 +1160,14 @@
                     // 显示加载提示
                     loadingEl.style.display = 'block';
                     contentEl.style.display = 'none';
+                    
+                    // 如果选择了特定词书，更新单元列表缓存
+                    if (selectedBookId !== 'all') {
+                        listsCache = await fetchLists(selectedBookId);
+                    } else {
+                        // 如果选择了所有词书，获取所有单元
+                        listsCache = await fetchLists();
+                    }
                     
                     // 获取筛选后的数据
                     const data = await fetchErrorHistory(selectedBookId, selectedListId);
