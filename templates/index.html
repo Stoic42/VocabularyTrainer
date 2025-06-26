@@ -480,6 +480,15 @@
             </label>
         </div>
 
+        <!-- 添加答题即时反馈开关 -->
+        <div class="feedback-container" style="display: flex; align-items: center; margin-top: 10px;">
+            <label for="instant-feedback-toggle">答题即时反馈: </label>
+            <label class="switch">
+                <input type="checkbox" id="instant-feedback-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
         <div style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 20px;">
             <button id="start-btn">开始测试</button>
             <a href="/error-history" class="btn" style="background-color: #3498db;">查看错误历史</a>
@@ -556,6 +565,7 @@
         let consecutiveCorrect = 0; // 连续正确的次数
         let lumiEnabled = true; // Lumi显示状态
         let autoPlayEnabled = false; // 自动播放状态
+        let instantFeedbackEnabled = false; // 答题即时反馈状态
         let currentUser = null; // 当前登录用户
         const lumiImages = {
             'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
@@ -1171,6 +1181,12 @@
                 }
             });
             
+            // 移除之前的文字反馈提示（如果有）
+            const existingFeedback = document.querySelector('.text-feedback');
+            if (existingFeedback) {
+                existingFeedback.parentNode.removeChild(existingFeedback);
+            }
+            
             if (validSpellings.includes(currentAnswer)) {
                 // 答案正确
                 consecutiveCorrect++; // 连续正确次数+1
@@ -1180,6 +1196,19 @@
                     updateLumiReaction('celebration'); // 连续3次以上正确，使用庆祝表情
                 } else {
                     updateLumiReaction('correct'); // 普通的正确反馈
+                }
+                
+                // 如果启用了即时反馈，显示正确反馈
+                if (instantFeedbackEnabled) {
+                    const feedbackEl = document.createElement('div');
+                    feedbackEl.className = 'text-feedback';
+                    feedbackEl.innerHTML = `<span style="color: #27ae60">✓ 正确!</span>`;
+                    feedbackEl.style.marginTop = '10px';
+                    feedbackEl.style.padding = '8px';
+                    feedbackEl.style.backgroundColor = '#f0fff4';
+                    feedbackEl.style.borderLeft = '4px solid #27ae60';
+                    feedbackEl.style.borderRadius = '4px';
+                    answerInput.parentNode.appendChild(feedbackEl);
                 }
                 
                 // 如果有多种拼写方式，且用户使用了其中一种，提示其他可能的写法
@@ -1222,6 +1251,32 @@
                 // 答案错误
                 consecutiveCorrect = 0; // 重置连续正确次数
                 updateLumiReaction('wrong');
+                
+                // 如果启用了即时反馈，显示错误反馈和正确答案
+                if (instantFeedbackEnabled) {
+                    const feedbackEl = document.createElement('div');
+                    feedbackEl.className = 'text-feedback';
+                    
+                    // 格式化显示所有可能的拼写形式
+                    let formattedSpellings;
+                    if (correctSpelling.includes('/') || correctSpelling.includes(',')) {
+                        // 如果原始拼写包含分隔符，则显示所有有效拼写
+                        formattedSpellings = validSpellings
+                            .map(s => `<span class="spelling-variant">${s}</span>`)
+                            .join(' 或 ');
+                    } else {
+                        // 否则直接显示原始拼写
+                        formattedSpellings = `<strong>${correctSpelling}</strong>`;
+                    }
+                    
+                    feedbackEl.innerHTML = `<span style="color: #c0392b">✗ 错误!</span> 正确拼写: ${formattedSpellings}`;
+                    feedbackEl.style.marginTop = '10px';
+                    feedbackEl.style.padding = '8px';
+                    feedbackEl.style.backgroundColor = '#fff0f0';
+                    feedbackEl.style.borderLeft = '4px solid #c0392b';
+                    feedbackEl.style.borderRadius = '4px';
+                    answerInput.parentNode.appendChild(feedbackEl);
+                }
             }
 
             userAnswers.push({
@@ -1233,6 +1288,12 @@
             answerInput.value = '';
 
             setTimeout(() => {
+                // 移除文字反馈提示（如果有）
+                const textFeedback = document.querySelector('.text-feedback');
+                if (textFeedback) {
+                    textFeedback.parentNode.removeChild(textFeedback);
+                }
+                
                 if (currentQuestionIndex < questions.length) {
                     displayQuestion();
                     updateLumiReaction('thinking');
@@ -1427,10 +1488,19 @@
         // 自动播放开关事件监听
         autoPlayToggle.addEventListener('change', function() {
             autoPlayEnabled = this.checked;
+            // 保存到localStorage
+            localStorage.setItem('autoPlayEnabled', autoPlayEnabled);
             // 如果开启自动播放且当前正在显示问题，则立即播放当前问题的音频
             if (autoPlayEnabled && questions.length > 0 && currentQuestionIndex < questions.length && quizArea.style.display !== 'none') {
                 autoPlayAudios();
             }
+        });
+        
+        // 即时反馈开关事件监听
+        document.getElementById('instant-feedback-toggle').addEventListener('change', function() {
+            instantFeedbackEnabled = this.checked;
+            // 保存到localStorage
+            localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
         });
 
         // 开始按钮

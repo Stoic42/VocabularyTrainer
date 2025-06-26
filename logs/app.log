@@ -63,3 +63,7 @@
 2025-06-26 23:57:28,450 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
 2025-06-26 23:57:44,235 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
 2025-06-26 23:57:45,371 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
+2025-06-27 00:07:51,628 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
+2025-06-27 00:07:52,970 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
+2025-06-27 00:18:27,332 INFO: 已生成TTS音频: micro- -> D:\Projects\VocabularyTrainer\wordlists\tts_cache\f66f890b46a3451efb2d7f87ede83c62.mp3 [in D:\Projects\VocabularyTrainer\app.py:121]
+2025-06-27 00:18:36,212 INFO: 已生成TTS音频: ap- -> D:\Projects\VocabularyTrainer\wordlists\tts_cache\439ef90a0974fb3bff8faeb33bf04805.mp3 [in D:\Projects\VocabularyTrainer\app.py:121]
