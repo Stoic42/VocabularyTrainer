@@ -1074,8 +1074,12 @@
         // 显示问题
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
-            // 显示中文释义，如果有词性信息，确保一起显示
-            questionMeaningEl.textContent = q.meaning_cn || ''; // 中文释义
+            
+            // 使用 formatPOSAndMeaning 函数处理词性和意思
+            const { extractedPos, formattedMeaning } = formatPOSAndMeaning(q.pos, q.meaning_cn);
+            
+            // 显示格式化后的中文释义，包含词性信息
+            questionMeaningEl.innerHTML = formattedMeaning || ''; // 使用 innerHTML 以支持 <br> 标签
             questionIpaEl.textContent = q.ipa ? `/${q.ipa}/` : ''; // 音标
             questionMeaningEnEl.textContent = q.meaning_en || ''; // 英文释义
             questionExampleEnEl.textContent = q.example_en || ''; // 例句英文

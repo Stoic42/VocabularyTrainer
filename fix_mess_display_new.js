@@ -14,7 +14,7 @@ function extractPOSAndMeaning(pos, meaning) {
     let processedMeaning = meaning;
     if (pos && meaning) {
         // 从pos中提取所有词性
-        const posRegexForExtract = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|pl|sing|det|modal|inf|prefix|suffix|phrase|idiom)\.\s*(?:&\s*)?/g;
+        const posRegexForExtract = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|sing|det|modal|inf|prefix|suffix|phrase|idiom)\.\s*(?:&\s*)?/g;
         const posMatches = [...pos.matchAll(posRegexForExtract)].map(match => match[1] + '.');
         
         // 检查meaning中是否包含所有词性的中文意思
@@ -37,7 +37,7 @@ function extractPOSAndMeaning(pos, meaning) {
     const combinedText = pos && processedMeaning ? pos + ' ' + processedMeaning : (pos || processedMeaning || '');
     
     // 这个正则表达式会找到所有的词性标签 (如 n./v./adj./aux./abbr. 等)
-    const posRegex = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|pl|sing|det|modal|inf|prefix|suffix|phrase|idiom)\./g;
+    const posRegex = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|sing|det|modal|inf|prefix|suffix|phrase|idiom)\./g;
     
     // 提取combinedText中的所有词性
     const posMatches = combinedText ? [...combinedText.matchAll(posRegex)] : [];
@@ -58,11 +58,24 @@ function extractPOSAndMeaning(pos, meaning) {
     // 处理中文意思的换行显示和词性标签添加
     let formattedMeaning = processedMeaning;
     if (processedMeaning) {
-        // 找到所有词性标签的位置和内容
+        // 预处理：检查是否有方括号中的词性标签，如 [pl.]，这些不应该导致换行
+        // 将方括号中的内容临时替换为不会被识别为词性标签的内容
+        const bracketRegex = /\[(.*?)\]/g;
+        const bracketContents = [];
+        let bracketMatch;
+        let tempMeaning = processedMeaning;
+        
+        while ((bracketMatch = bracketRegex.exec(processedMeaning)) !== null) {
+            bracketContents.push(bracketMatch[0]);
+            // 替换为一个不会被词性正则匹配的占位符
+            tempMeaning = tempMeaning.replace(bracketMatch[0], `__BRACKET_${bracketContents.length - 1}__`);
+        }
+        
+        // 找到所有词性标签的位置和内容（排除方括号中的内容）
         const posInfo = [];
         let match;
         const regex = new RegExp(posRegex);
-        let meaningCopy = processedMeaning.slice();
+        let meaningCopy = tempMeaning.slice();
         
         while ((match = regex.exec(meaningCopy)) !== null) {
             // 检查是否已经存在相同的词性标签，避免重复
@@ -175,6 +188,12 @@ function extractPOSAndMeaning(pos, meaning) {
             // 用<br>连接所有段落
             formattedMeaning = segments.join('<br>');
         }
+        
+        // 恢复方括号中的内容，不再使用<small>标签包裹
+        for (let i = 0; i < bracketContents.length; i++) {
+            // 直接恢复方括号内容，不添加任何标签
+            formattedMeaning = formattedMeaning.replace(`__BRACKET_${i}__`, bracketContents[i]);
+        }
     }
     
     // 返回提取的词性和格式化后的中文意思
@@ -225,8 +244,7 @@ function fixAssessmentPage() {
     // 例如，修改单词显示、调整样式等
 }
 
-// 将formatPOSAndMeaning函数添加到全局作用域
-window.formatPOSAndMeaning = formatPOSAndMeaning;
+// 注意：formatPOSAndMeaning 函数已在上面定义并添加到全局作用域
 
 // 在页面加载完成后执行修复
 document.addEventListener('DOMContentLoaded', function() {
