@@ -1,0 +1,63 @@
+音频路径更新报告
+===================
+
+生成时间: 2025-06-26 14:45:42
+词书: 初中英语词汇
+音频源文件: wordlists/junior_high/初中 乱序 绿宝书.txt
+
+更新统计
+-----------------
+成功更新: 1816 个单词
+未找到映射: 42 个单词
+
+未找到映射的单词 (最多显示50个):
+  - dentist
+  - two-thirds
+  - essay
+  - negative
+  - recent
+  - poun
+  - especially
+  - symbol
+  - riendship
+  - plain
+  - metal
+  - offend
+  - shell
+  - etiquette
+  - cruel
+  - center/centre
+  - tragedy
+  - yourselves
+  - habitat
+  - theater/theatre
+  - charity
+  - donate
+  - regular
+  - yog(h)urt
+  - deal
+  - supply
+  - author
+  - dialogue
+  - a/an
+  - nature
+  - comedy
+  - even
+  - solid
+  - agent
+  - wheat
+  - assistant
+  - treatment
+  - real
+  - symphony
+  - feature
+  - peel
+  - rural
+
+验证统计
+-----------------
+英音文件存在: 1793 个
+英音文件缺失: 0 个
+美音文件存在: 1782 个
+美音文件缺失: 0 个
+

@@ -1,2 +1,3 @@
-2025-06-26 00:31:20,325 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:57]
-2025-06-26 00:31:21,352 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:57]
+2025-06-26 14:47:59,456 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:68]
+2025-06-26 14:48:00,273 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:68]
+2025-06-26 14:48:30,902 INFO: 已生成TTS音频: ab- -> D:\Projects\VocabularyTrainer\wordlists\tts_cache\2c54cd11d5c3e64a694ef441beeb962d.mp3 [in D:\Projects\VocabularyTrainer\app.py:114]
