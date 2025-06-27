@@ -64,6 +64,7 @@
 2025-06-27 22:38:02,431 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
 2025-06-27 22:38:05,489 INFO: 获取错误历史记录: student_id=3, limit=50, book_id=None, list_id=None, date_from=None, date_to=None, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:384]
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> ed9cf12 (fix(display): improve handling of br tags in POS formatting)
 <<<<<<< HEAD
 =======
@@ -97,3 +98,5 @@
 2025-06-29 00:12:20,806 INFO: 获取错误历史记录: student_id=3, limit=50, book_id=None, list_id=None, date_from=2025-05-29, date_to=2025-06-28, sort_by=error_date, sort_order=asc [in D:\Projects\VocabularyTrainer\app.py:384]
 2025-06-29 00:14:03,405 INFO: 已生成TTS音频: il- -> D:\Projects\VocabularyTrainer\wordlists\tts_cache\75e8153989e19e796424155509b5f92e.mp3 [in D:\Projects\VocabularyTrainer\app.py:121]
 >>>>>>> 77c5783 (style(error_history): improve responsive layout and print styling)
+=======
+>>>>>>> ed9cf12 (fix(display): improve handling of br tags in POS formatting)
