@@ -55,12 +55,29 @@
                 width: 100%;
                 border-collapse: collapse;
                 margin-bottom: 20px;
+                table-layout: fixed; /* 使用固定表格布局以便更好地控制列宽 */
             }
             
             th, td {
                 border: 1px solid #ddd;
                 padding: 8px;
                 text-align: left;
+                word-wrap: break-word; /* 允许长单词换行 */
+            }
+            
+            /* 设置特定列的宽度 */
+            table th:nth-child(1), table td:nth-child(1) { /* 序号列 */
+                width: 5%;
+            }
+            
+            /* 单词列（通常是第2列，但会被隐藏） */
+            table th:nth-child(2), table td:nth-child(2) {
+                width: 15%;
+            }
+            
+            /* 你的答案列（通常是第3列） */
+            table th:nth-child(3), table td:nth-child(3) {
+                width: 20%; /* 为答案列分配更多空间 */
             }
             
             .word-card {
@@ -84,9 +101,29 @@
                 color: #666;
             }
             
-            /* 隐藏单词和答案列 */
+            /* 隐藏单词列 */
             .hide-for-print {
                 display: none !important;
+            }
+            
+            /* 空白答案列样式 */
+            .empty-for-print {
+                height: 40px; /* 增加高度以便学生书写 */
+                min-width: 150px; /* 确保有足够的宽度写完整单词 */
+                border: 1px solid #666 !important; /* 加深边框颜色使其更明显 */
+                background-color: #f9f9f9 !important;
+                padding: 8px 15px !important; /* 增加内边距提供更多书写空间 */
+                position: relative;
+            }
+            
+            /* 添加底部虚线作为书写参考线 */
+            .empty-for-print::after {
+                content: '';
+                position: absolute;
+                bottom: 10px;
+                left: 15px;
+                right: 15px;
+                border-bottom: 1px dashed #aaa;
             }
         }
         
@@ -563,7 +600,7 @@
             <div class="header-actions">
                 <button id="export-btn" class="action-btn" title="导出错误历史"><i class="fas fa-file-export"></i> 导出</button>
                 <button id="print-btn" class="action-btn" title="打印错误历史"><i class="fas fa-print"></i> 打印</button>
-                <button id="print-hide-btn" class="action-btn" title="打印(隐藏单词和答案)"><i class="fas fa-print"></i> 打印(隐藏单词和答案)</button>
+                <button id="print-hide-btn" class="action-btn" title="打印(隐藏单词，保留空白答案栏)"><i class="fas fa-print"></i> 打印(隐藏单词，保留空白答案栏)</button>
                 <button class="back-btn" onclick="window.location.href='/'">返回主页</button>
             </div>
         </header>
@@ -1337,7 +1374,7 @@
             printHeader.style.display = 'block';
             printDate.style.display = 'block';
             
-            // 如果需要隐藏单词和答案列
+            // 如果需要隐藏单词列并清空答案列
             if (hideWordAndAnswer) {
                 // 获取所有表格
                 const tables = document.querySelectorAll('table');
@@ -1357,20 +1394,28 @@
                                 cell.classList.add('hide-for-print');
                             } else if (cell.textContent.trim() === '你的答案') {
                                 answerColIndex = index;
-                                cell.classList.add('hide-for-print');
+                                // 不隐藏答案列的表头
                             }
                         });
                         
-                        // 隐藏数据行中的相应单元格
+                        // 处理数据行
                         if (wordColIndex !== -1 || answerColIndex !== -1) {
                             const rows = table.querySelectorAll('tbody tr');
                             rows.forEach(row => {
                                 const cells = row.querySelectorAll('td');
+                                // 隐藏单词列
                                 if (wordColIndex !== -1 && cells[wordColIndex]) {
                                     cells[wordColIndex].classList.add('hide-for-print');
                                 }
+                                // 清空答案列内容但保留单元格
                                 if (answerColIndex !== -1 && cells[answerColIndex]) {
-                                    cells[answerColIndex].classList.add('hide-for-print');
+                                    // 保存原始内容作为数据属性，以便恢复
+                                    if (!cells[answerColIndex].hasAttribute('data-original-content')) {
+                                        cells[answerColIndex].setAttribute('data-original-content', cells[answerColIndex].innerHTML);
+                                    }
+                                    // 清空内容，保留空白单元格用于书写
+                                    cells[answerColIndex].innerHTML = '&nbsp;';
+                                    cells[answerColIndex].classList.add('empty-for-print');
                                 }
                             });
                         }
@@ -1386,10 +1431,20 @@
                 printHeader.style.display = 'none';
                 printDate.style.display = 'none';
                 
-                // 如果隐藏了单词和答案列，恢复显示
+                // 如果隐藏了单词列并清空了答案列，恢复显示
                 if (hideWordAndAnswer) {
+                    // 恢复隐藏的元素
                     document.querySelectorAll('.hide-for-print').forEach(el => {
                         el.classList.remove('hide-for-print');
+                    });
+                    
+                    // 恢复答案列的原始内容
+                    document.querySelectorAll('.empty-for-print').forEach(el => {
+                        if (el.hasAttribute('data-original-content')) {
+                            el.innerHTML = el.getAttribute('data-original-content');
+                            el.removeAttribute('data-original-content');
+                        }
+                        el.classList.remove('empty-for-print');
                     });
                 }
             }, 1000);
