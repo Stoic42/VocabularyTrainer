@@ -24,14 +24,16 @@ function extractPOSAndMeaning(pos, meaning) {
             const cleanPosPart = posPart.replace(/<br>/g, ' ');
             
             // 保持词性和意思在同一行
-            // 在 formattedMeaning 中保留原始格式，包括可能的 <br> 标签
-            return { extractedPos: cleanPosPart, formattedMeaning: `${posPart} ${meaningPart}` };
+            // 对于所有情况，都使用清理过的词性部分（删除<br>标签）
+            // 这样可以确保紧挨着的词性或者只隔了"/"的情况不会出现<br>标签
+            return { extractedPos: cleanPosPart, formattedMeaning: `${cleanPosPart} ${meaningPart}` };
         }
     }
     
     // 检查原始数据是否完整
     // 如果pos中包含多个词性但meaning中只有部分词性的中文意思，尝试补全
-    let processedMeaning = meaning;
+    // 预处理：将meaning中的<br>标签替换为空格，确保在后续处理中不会出现<br>标签
+    let processedMeaning = meaning ? meaning.replace(/<br>/g, ' ') : meaning;
     if (pos && meaning) {
         // 从pos中提取所有词性
         const posRegexForExtract = /\b(n|v|vt|vi|adj|adv|prep|conj|art|pron|aux|abbr|num|interj|sing|det|modal|inf|prefix|suffix|phrase|idiom)\.\s*(?:&\s*)?/g;
@@ -129,8 +131,12 @@ function extractPOSAndMeaning(pos, meaning) {
                         nextPos.index
                     ).trim();
                     
-                    // 如果两个词性之间只有连接符（如 &），则认为它们是连续的
-                    if (textBetween === '&' || textBetween === 'and' || textBetween === '和' || textBetween === '') {
+                    // 清理textBetween中的<br>标签
+                    const cleanTextBetween = textBetween.replace(/<br>/g, ' ').trim();
+                    // 如果两个词性之间只有连接符（如 &、/）或者是紧挨着的，则认为它们是连续的
+                    if (cleanTextBetween === '&' || cleanTextBetween === 'and' || cleanTextBetween === '和' || 
+                        cleanTextBetween === '/' || cleanTextBetween === '' || 
+                        textBetween.includes('<br>')) {
                         // 当前词性和下一个词性是连续的
                         if (!currentGroup.includes(i + 1)) {
                             currentGroup.push(i + 1);
@@ -316,14 +322,12 @@ function fixAssessmentPage() {
             if (mutation.type === 'childList' || mutation.type === 'characterData') {
                 // 当问题意思元素内容变化时，检查并修复词性显示
                 const content = questionMeaningEl.innerHTML;
-                if (content && content.includes('<br>')) {
-                    // 如果内容中包含 <br> 标签，可能需要修复
-                    // 尝试提取词性和意思
+                if (content) {
+                    // 尝试提取词性和意思，处理所有类型的词性格式
+                    // 包括 "n. & v."、"n. /<br>v." 等
                     const result = extractPOSAndMeaning('', content);
-                    if (result.formattedMeaning !== content) {
-                        // 如果格式化后的内容与原内容不同，更新内容
-                        questionMeaningEl.innerHTML = result.formattedMeaning;
-                    }
+                    // 始终更新内容，确保所有类型的词性格式都能被正确处理
+                    questionMeaningEl.innerHTML = result.formattedMeaning;
                 }
             }
         });

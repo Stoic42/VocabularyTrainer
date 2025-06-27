@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>词性带<br>标签测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .input {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        .output {
+            background-color: #e6f7ff;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .pos {
+            font-weight: bold;
+            color: #1890ff;
+        }
+        .meaning {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>词性带&lt;br&gt;标签测试</h1>
+    <p>这个页面用于测试带有&lt;br&gt;标签的词性格式的处理效果。</p>
+
+    <div class="test-case">
+        <div class="test-title">测试用例1: 带&lt;br&gt;标签的词性 (n. /<br>v.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. / v."<br>
+            meaning: "n. /<br>v. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result1"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例2: 带&lt;br&gt;标签的多词性 (n. /<br>v. /<br>adj.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. / v. / adj."<br>
+            meaning: "n. /<br>v. /<br>adj. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result2"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例3: 表格中的词性显示</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            <table border="1" style="width: 100%;">
+                <tr>
+                    <th>单词</th>
+                    <th>词性</th>
+                    <th>意思</th>
+                </tr>
+                <tr>
+                    <td>answer</td>
+                    <td>n. / v.</td>
+                    <td>n. /<br>v. 回答，答复，以…作答</td>
+                </tr>
+            </table>
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <table border="1" style="width: 100%;" id="test-table">
+                <tr>
+                    <th>单词</th>
+                    <th>词性</th>
+                    <th>意思</th>
+                </tr>
+                <tr>
+                    <td>answer</td>
+                    <td id="pos-cell">n. / v.</td>
+                    <td id="meaning-cell">n. /<br>v. 回答，答复，以…作答</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="fix_mess_display_new.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 测试用例1: 带<br>标签的词性 (n. /<br>v.)
+            const result1 = formatPOSAndMeaning("n. / v.", "n. /<br>v. 回答，答复，以…作答");
+            displayResult('result1', result1);
+
+            // 测试用例2: 带<br>标签的多词性 (n. /<br>v. /<br>adj.)
+            const result2 = formatPOSAndMeaning("n. / v. / adj.", "n. /<br>v. /<br>adj. 回答，答复，以…作答");
+            displayResult('result2', result2);
+
+            // 测试用例3: 表格中的词性显示
+            const posCell = document.getElementById('pos-cell');
+            const meaningCell = document.getElementById('meaning-cell');
+            const originalPos = posCell.textContent.trim();
+            const originalMeaning = meaningCell.innerHTML.trim();
+            const result3 = extractPOSAndMeaning(originalPos, originalMeaning);
+            posCell.textContent = result3.extractedPos;
+            meaningCell.innerHTML = result3.formattedMeaning;
+        });
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <span class="pos">提取的词性: ${result.extractedPos}</span><br>
+                <span class="meaning">格式化的意思: ${result.formattedMeaning}</span>
+            `;
+        }
+    </script>
+</body>
+</html>
