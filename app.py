@@ -533,18 +533,23 @@ def get_error_history():
         stats_list = [dict(stat) for stat in stats]
         word_history_list = [dict(item) for item in word_history]
         
-        # 计算总体正确率（假设每个单词测试一次）
-        total_tested_query = "SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ?"
-        cursor.execute(total_tested_query, (student_id,))
-        total_tested = cursor.fetchone()[0]
+        # 计算总体正确率
+        # 获取错误单词数量
+        total_errors_query = "SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ?"
+        cursor.execute(total_errors_query, (student_id,))
+        total_errors = cursor.fetchone()[0]
         
-        # 假设我们有一个记录总测试单词数的方法，这里简化处理
-        # 实际应用中可能需要一个单独的表来记录每次测试的所有单词
+        # 假设总测试单词数为200（这是一个估计值，实际应用中应该有一个表记录所有测试的单词）
+        estimated_total_words = 200
+        
+        # 计算正确率
         accuracy_rate = 0
-        if total_tested > 0:
-            # 这里的计算是简化的，实际应用中需要更准确的数据
-            # 假设每个单词只测试一次，错误的单词数就是total_tested
-            accuracy_rate = round((1 - total_tested / 100) * 100, 2)  # 假设总共测试了100个单词
+        if estimated_total_words > 0 and total_errors <= estimated_total_words:
+            # 正确率 = (总单词数 - 错误单词数) / 总单词数 * 100%
+            accuracy_rate = round(((estimated_total_words - total_errors) / estimated_total_words) * 100, 2)
+        
+        # 将total_tested重命名为total_errors，使其更准确
+        total_tested = total_errors
         
         conn.close()
         
