@@ -1410,15 +1410,12 @@
                 // 设置默认排序方式
                 sortBySelect.value = 'date-desc';
                 
-                // 获取错误历史数据，传递日期范围和排序参数
-                const todayStr = today.toISOString().split('T')[0];
-                const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
-                
+                // 获取所有历史数据，不传递日期范围参数
                 const data = await fetchErrorHistory(
                     'all',  // 默认所有词书
                     'all',  // 默认所有列表
-                    thirtyDaysAgoStr,
-                    todayStr,
+                    null,   // 不限制开始日期
+                    null,   // 不限制结束日期
                     'date-desc'  // 默认按日期降序排序
                 );
                 console.log('Initial error history data:', data);
@@ -1488,25 +1485,26 @@
                     listsCache = await fetchLists();
                 }
                 
-                // 始终从服务器获取筛选后的数据，传递所有筛选参数
-                const data = await fetchErrorHistory(
-                    selectedBookId, 
-                    selectedListId,
-                    dateFrom,
-                    dateTo,
-                    sortBy
-                );
+                // 使用客户端筛选和排序函数处理数据
+                const data = filterAndSortData();
                 
                 // 隐藏加载提示，显示内容
                 loadingEl.style.display = 'none';
                 contentEl.style.display = 'block';
                 
-                // 渲染数据
-                renderErrorHistory(data);
+                // 检查是否有数据
+                if (data) {
+                    // 渲染数据
+                    renderErrorHistory(data);
+                } else {
+                    console.error("无法应用筛选，因为原始数据不存在。");
+                    errorMessageEl.textContent = '无法应用筛选，请尝试刷新页面。';
+                    errorMessageEl.style.display = 'block';
+                }
             } catch (error) {
                 // 显示错误信息
                 loadingEl.style.display = 'none';
-                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.textContent = `应用筛选失败: ${error.message}`;
                 errorMessageEl.style.display = 'block';
             }
         }
@@ -2172,46 +2170,11 @@
         function showTodayErrorsOnly() {
             // 设置日期筛选器为今天
             const today = new Date();
-            const todayStr = today.toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
             dateFromInput.valueAsDate = today;
             dateToInput.valueAsDate = today;
             
-            // 获取其他筛选条件
-            const selectedBookId = bookFilterSelect.value;
-            const selectedListId = listFilterSelect.value;
-            const sortBy = sortBySelect.value || null;
-            
-            try {
-                // 显示加载提示
-                loadingEl.style.display = 'block';
-                contentEl.style.display = 'none';
-                
-                // 直接从服务器获取今日数据
-                fetchErrorHistory(
-                    selectedBookId,
-                    selectedListId,
-                    todayStr,
-                    todayStr,
-                    sortBy
-                ).then(data => {
-                    // 隐藏加载提示，显示内容
-                    loadingEl.style.display = 'none';
-                    contentEl.style.display = 'block';
-                    
-                    // 渲染数据
-                    renderErrorHistory(data);
-                }).catch(error => {
-                    // 显示错误信息
-                    loadingEl.style.display = 'none';
-                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
-                    errorMessageEl.style.display = 'block';
-                });
-            } catch (error) {
-                // 显示错误信息
-                loadingEl.style.display = 'none';
-                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
-                errorMessageEl.style.display = 'block';
-            }
+            // 直接调用applyFilters函数，它会使用上面设置好的日期进行筛选
+            applyFilters();
         }
         
         // 页面加载完成后初始化
