@@ -70,14 +70,32 @@
                 width: 5%;
             }
             
-            /* 单词列（通常是第2列，但会被隐藏） */
-            table th:nth-child(2), table td:nth-child(2) {
-                width: 15%;
+            /* 单词列（第1列） */
+            table th:first-child, table td:first-child {
+                width: 35%; /* 增加单词列宽度 */
+                white-space: normal; /* 允许单词自动换行 */
+                overflow: visible; /* 确保内容不被截断 */
+                font-size: clamp(0.75rem, 1vw, 1rem); /* 使字体大小在一定范围内自动调整 */
             }
             
-            /* 你的答案列（通常是第3列） */
+            /* 词性列（第2列） */
+            table th:nth-child(2), table td:nth-child(2) {
+                width: 8%; /* 设置词性列为较窄的宽度 */
+            }
+            
+            /* 中文意思列（通常是第3列） */
             table th:nth-child(3), table td:nth-child(3) {
-                width: 20%; /* 为答案列分配更多空间 */
+                width: 20%; /* 适当缩小中文意思列的宽度 */
+            }
+            
+            /* 你的答案列（通常是第4列） */
+            table th:nth-child(4), table td:nth-child(4) {
+                width: 15%; /* 为答案列分配适当空间 */
+            }
+            
+            /* 错误字数列（第7列） */
+            table th:nth-child(7), table td:nth-child(7) {
+                width: 5%; /* 将错误字数列的宽度减半 */
             }
             
             .word-card {
@@ -302,12 +320,34 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+            table-layout: fixed; /* 使用固定表格布局以便更好地控制列宽 */
         }
         
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            word-wrap: break-word; /* 允许长单词换行 */
+            overflow: visible; /* 确保内容不被截断 */
+        }
+        
+        /* 设置特定列的宽度 */
+        #recent-errors-content table td:first-child { /* 单词列 */
+            width: 35%;
+            white-space: normal; /* 允许单词自动换行 */
+            font-size: clamp(0.75rem, 1vw, 1rem); /* 使字体大小在一定范围内自动调整 */
+        }
+        
+        #recent-errors-content table td:nth-child(2) { /* 词性列 */
+            width: 8%; /* 设置词性列为较窄的宽度 */
+        }
+        
+        #recent-errors-content table td:nth-child(3) { /* 中文意思列 */
+            width: 20%; /* 适当缩小中文意思列的宽度 */
+        }
+        
+        #recent-errors-content table td:nth-child(7) { /* 错误字数列 */
+            width: 5%; /* 将错误字数列的宽度减半 */
         }
         
         th {
