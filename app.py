@@ -376,6 +376,12 @@ def get_error_history():
         limit = request.args.get('limit', default=50, type=int)  # 默认最多返回50条记录
         book_id = request.args.get('book_id', default=None, type=int)  # 词书ID筛选
         list_id = request.args.get('list_id', default=None, type=int)  # 列表ID筛选
+        date_from = request.args.get('date_from', default=None, type=str)  # 开始日期筛选
+        date_to = request.args.get('date_to', default=None, type=str)  # 结束日期筛选
+        sort_by = request.args.get('sort_by', default='date', type=str)  # 排序字段，默认按日期
+        sort_order = request.args.get('sort_order', default='desc', type=str)  # 排序方向，默认降序
+        
+        app.logger.info(f"获取错误历史记录: student_id={student_id}, limit={limit}, book_id={book_id}, list_id={list_id}, date_from={date_from}, date_to={date_to}, sort_by={sort_by}, sort_order={sort_order}")
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -405,10 +411,28 @@ def get_error_history():
             query += " AND w.list_id = ?"
             params.append(list_id)
         
-        query += """
-        ORDER BY e.error_date DESC
-        LIMIT ?
-        """
+        # 添加日期范围筛选条件
+        if date_from is not None:
+            query += " AND e.error_date >= ?"
+            params.append(date_from)
+        
+        if date_to is not None:
+            query += " AND e.error_date <= ?"
+            params.append(date_to)
+        
+        # 添加排序逻辑
+        if sort_by == 'error_count':
+            query += " ORDER BY error_count"
+        else:  # 默认按日期排序
+            query += " ORDER BY e.error_date"
+        
+        # 添加排序方向
+        if sort_order.lower() == 'asc':
+            query += " ASC"
+        else:  # 默认降序
+            query += " DESC"
+        
+        query += " LIMIT ?"
         params.append(limit)
         
         cursor.execute(query, params)
@@ -437,6 +461,15 @@ def get_error_history():
         if list_id is not None:
             stats_query += " AND w.list_id = ?"
             stats_params.append(list_id)
+        
+        # 添加日期范围筛选条件
+        if date_from is not None:
+            stats_query += " AND e.error_date >= ?"
+            stats_params.append(date_from)
+        
+        if date_to is not None:
+            stats_query += " AND e.error_date <= ?"
+            stats_params.append(date_to)
         
         stats_query += """
         GROUP BY w.list_id
@@ -471,11 +504,26 @@ def get_error_history():
             word_history_query += " AND w.list_id = ?"
             word_history_params.append(list_id)
         
+        # 添加日期范围筛选条件
+        if date_from is not None:
+            word_history_query += " AND e.error_date >= ?"
+            word_history_params.append(date_from)
+        
+        if date_to is not None:
+            word_history_query += " AND e.error_date <= ?"
+            word_history_params.append(date_to)
+        
         word_history_query += """
         GROUP BY w.word_id
-        ORDER BY total_errors DESC
-        LIMIT 20
         """
+        
+        # 添加排序逻辑
+        if sort_by == 'error_count' and sort_order.lower() == 'asc':
+            word_history_query += " ORDER BY total_errors ASC"
+        else:  # 默认按错误次数降序
+            word_history_query += " ORDER BY total_errors DESC"
+        
+        word_history_query += " LIMIT 20"
         
         cursor.execute(word_history_query, word_history_params)
         word_history = cursor.fetchall()

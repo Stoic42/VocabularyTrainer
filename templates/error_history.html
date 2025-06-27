@@ -805,18 +805,44 @@
         }
         
         // 获取错误历史数据
-        async function fetchErrorHistory(bookId = null, listId = null) {
+        async function fetchErrorHistory(bookId = null, listId = null, dateFrom = null, dateTo = null, sortBy = null, sortOrder = null) {
             try {
                 // 构建URL和查询参数
                 let url = '/api/error-history';
                 const params = new URLSearchParams();
                 
-                if (bookId !== null) {
+                if (bookId !== null && bookId !== 'all') {
                     params.append('book_id', bookId);
                 }
                 
-                if (listId !== null) {
+                if (listId !== null && listId !== 'all') {
                     params.append('list_id', listId);
+                }
+                
+                // 添加日期范围参数
+                if (dateFrom !== null) {
+                    params.append('date_from', dateFrom);
+                }
+                
+                if (dateTo !== null) {
+                    params.append('date_to', dateTo);
+                }
+                
+                // 添加排序参数
+                if (sortBy !== null) {
+                    // 将前端排序值转换为后端API参数
+                    let apiSortBy = 'error_date';
+                    if (sortBy.startsWith('error-')) {
+                        apiSortBy = 'error_count';
+                    }
+                    params.append('sort_by', apiSortBy);
+                    
+                    // 设置排序顺序
+                    let apiSortOrder = 'desc';
+                    if (sortBy.endsWith('-asc')) {
+                        apiSortOrder = 'asc';
+                    }
+                    params.append('sort_order', apiSortOrder);
                 }
                 
                 // 如果有参数，添加到URL
@@ -1229,8 +1255,28 @@
                 await populateBookFilter();
                 await populateListFilter();
                 
-                // 获取错误历史数据
-                const data = await fetchErrorHistory();
+                // 设置日期筛选器的默认值（过去30天）
+                const today = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+                
+                dateToInput.valueAsDate = today;
+                dateFromInput.valueAsDate = thirtyDaysAgo;
+                
+                // 设置默认排序方式
+                sortBySelect.value = 'date-desc';
+                
+                // 获取错误历史数据，传递日期范围和排序参数
+                const todayStr = today.toISOString().split('T')[0];
+                const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+                
+                const data = await fetchErrorHistory(
+                    'all',  // 默认所有词书
+                    'all',  // 默认所有列表
+                    thirtyDaysAgoStr,
+                    todayStr,
+                    'date-desc'  // 默认按日期降序排序
+                );
                 console.log('Initial error history data:', data);
                 
                 if (data) {
@@ -1240,14 +1286,6 @@
                     
                     // 渲染数据
                     renderErrorHistory(data);
-                    
-                    // 设置日期筛选器的默认值（过去30天）
-                    const today = new Date();
-                    const thirtyDaysAgo = new Date();
-                    thirtyDaysAgo.setDate(today.getDate() - 30);
-                    
-                    dateToInput.valueAsDate = today;
-                    dateFromInput.valueAsDate = thirtyDaysAgo;
                 } else {
                     // 如果没有数据，可能是未登录
                     loadingEl.style.display = 'none';
@@ -1289,6 +1327,9 @@
             // 获取筛选条件
             const selectedBookId = bookFilterSelect.value;
             const selectedListId = listFilterSelect.value;
+            const dateFrom = dateFromInput.value || null;
+            const dateTo = dateToInput.value || null;
+            const sortBy = sortBySelect.value || null;
             
             try {
                 // 显示加载提示
@@ -1303,10 +1344,13 @@
                     listsCache = await fetchLists();
                 }
                 
-                // 始终从服务器获取筛选后的数据
+                // 始终从服务器获取筛选后的数据，传递所有筛选参数
                 const data = await fetchErrorHistory(
-                    selectedBookId !== 'all' ? selectedBookId : null, 
-                    selectedListId !== 'all' ? selectedListId : null
+                    selectedBookId, 
+                    selectedListId,
+                    dateFrom,
+                    dateTo,
+                    sortBy
                 );
                 
                 // 隐藏加载提示，显示内容
@@ -1340,8 +1384,41 @@
             // 重置排序
             sortBySelect.value = 'date-desc';
             
-            // 应用重置后的筛选
-            applyFilters();
+            // 获取格式化的日期字符串
+            const todayStr = today.toISOString().split('T')[0];
+            const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+            
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
+                
+                // 直接从服务器获取重置后的数据
+                fetchErrorHistory(
+                    'all',  // 所有词书
+                    'all',  // 所有列表
+                    thirtyDaysAgoStr,
+                    todayStr,
+                    'date-desc'  // 按日期降序排序
+                ).then(data => {
+                    // 隐藏加载提示，显示内容
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+                    
+                    // 渲染数据
+                    renderErrorHistory(data);
+                }).catch(error => {
+                    // 显示错误信息
+                    loadingEl.style.display = 'none';
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                    errorMessageEl.style.display = 'block';
+                });
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
+            }
         }
         
         // 当词书选择变化时，更新列表筛选下拉框
@@ -1351,6 +1428,23 @@
             await populateListFilter(selectedBookId);
             // 重置列表选择为"所有列表"
             listFilterSelect.value = 'all';
+        });
+        
+        // 当排序方式变化时，自动应用筛选
+        sortBySelect.addEventListener('change', () => {
+            console.log('Sort selection changed to:', sortBySelect.value);
+            applyFilters();
+        });
+        
+        // 当日期筛选器变化时，自动应用筛选
+        dateFromInput.addEventListener('change', () => {
+            console.log('Date from changed to:', dateFromInput.value);
+            applyFilters();
+        });
+        
+        dateToInput.addEventListener('change', () => {
+            console.log('Date to changed to:', dateToInput.value);
+            applyFilters();
         });
         
         // 打印功能
@@ -1934,11 +2028,46 @@
         function showTodayErrorsOnly() {
             // 设置日期筛选器为今天
             const today = new Date();
+            const todayStr = today.toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
             dateFromInput.valueAsDate = today;
             dateToInput.valueAsDate = today;
             
-            // 应用筛选
-            applyFilters();
+            // 获取其他筛选条件
+            const selectedBookId = bookFilterSelect.value;
+            const selectedListId = listFilterSelect.value;
+            const sortBy = sortBySelect.value || null;
+            
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
+                
+                // 直接从服务器获取今日数据
+                fetchErrorHistory(
+                    selectedBookId,
+                    selectedListId,
+                    todayStr,
+                    todayStr,
+                    sortBy
+                ).then(data => {
+                    // 隐藏加载提示，显示内容
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+                    
+                    // 渲染数据
+                    renderErrorHistory(data);
+                }).catch(error => {
+                    // 显示错误信息
+                    loadingEl.style.display = 'none';
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                    errorMessageEl.style.display = 'block';
+                });
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
+            }
         }
         
         // 页面加载完成后初始化
