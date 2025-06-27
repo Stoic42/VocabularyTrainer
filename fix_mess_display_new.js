@@ -9,6 +9,26 @@ function extractPOSAndMeaning(pos, meaning) {
         return { extractedPos: 'N/A', formattedMeaning: 'N/A' };
     }
     
+    // 处理中文意思中的词性格式，如 "n. / v. 回答，答复，以…作答"
+    // 支持多种格式："n. / v."、"n./v."、"n. v."、"n. & v."等
+    if (meaning) {
+        // 匹配开头的词性部分，支持多种分隔符
+        // 更健壮的正则表达式，可以匹配各种格式的词性组合
+        // 处理 "n. / v."、"n./v."、"n. v."、"n. & v."、"n. /<br>v." 等格式
+        const posPartMatch = meaning.match(/^([a-z]+\.\s*(?:(?:[\/\s&]+|<br>)\s*[a-z]+\.)+|[a-z]+\.\s*(?:[\/\s&]+|<br>)\s*[a-z]+\.\s*) (.+)$/i);
+        if (posPartMatch) {
+            const posPart = posPartMatch[1];
+            const meaningPart = posPartMatch[2];
+            // 处理 posPart 中可能存在的 <br> 标签
+            // 将 <br> 替换为空格，以便在 extractedPos 中正确显示
+            const cleanPosPart = posPart.replace(/<br>/g, ' ');
+            
+            // 保持词性和意思在同一行
+            // 在 formattedMeaning 中保留原始格式，包括可能的 <br> 标签
+            return { extractedPos: cleanPosPart, formattedMeaning: `${posPart} ${meaningPart}` };
+        }
+    }
+    
     // 检查原始数据是否完整
     // 如果pos中包含多个词性但meaning中只有部分词性的中文意思，尝试补全
     let processedMeaning = meaning;
@@ -232,16 +252,90 @@ function addStyles() {
 function fixErrorHistoryPage() {
     console.log('正在修复错误历史页面...');
     
-    // 在这里添加错误历史页面的修复逻辑
-    // 例如，修改表格渲染、调整样式等
+    // 检查是否已经存在错误历史表格
+    const recentErrorsTable = document.getElementById('recent-errors-table');
+    if (!recentErrorsTable) {
+        console.log('未找到错误历史表格，跳过修复');
+        return;
+    }
+    
+    // 查找所有表格行
+    const rows = recentErrorsTable.querySelectorAll('tr');
+    if (!rows || rows.length === 0) {
+        console.log('错误历史表格为空，跳过修复');
+        return;
+    }
+    
+    // 遍历每一行，修复词性和意思的显示
+    rows.forEach(row => {
+        // 跳过表头行和无数据行
+        if (row.querySelector('th') || row.querySelector('.no-data')) {
+            return;
+        }
+        
+        // 获取词性和意思单元格
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 3) {
+            return;
+        }
+        
+        // 假设第2列是词性，第3列是意思
+        const posCell = cells[1];
+        const meaningCell = cells[2];
+        
+        // 获取原始内容
+        const originalPos = posCell.textContent.trim();
+        const originalMeaning = meaningCell.innerHTML.trim();
+        
+        // 重新格式化
+        const result = extractPOSAndMeaning(originalPos, originalMeaning);
+        
+        // 更新单元格内容
+        posCell.textContent = result.extractedPos;
+        meaningCell.innerHTML = result.formattedMeaning;
+    });
+    
+    console.log('错误历史页面修复完成');
 }
 
 // 修复考核页面
 function fixAssessmentPage() {
     console.log('正在修复考核页面...');
     
-    // 在这里添加考核页面的修复逻辑
-    // 例如，修改单词显示、调整样式等
+    // 检查是否存在问题意思元素
+    const questionMeaningEl = document.getElementById('question-meaning');
+    if (!questionMeaningEl) {
+        console.log('未找到问题意思元素，跳过修复');
+        return;
+    }
+    
+    // 监听 displayQuestion 函数调用
+    // 由于我们不能直接修改 displayQuestion 函数，我们可以通过 MutationObserver 监听 DOM 变化
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                // 当问题意思元素内容变化时，检查并修复词性显示
+                const content = questionMeaningEl.innerHTML;
+                if (content && content.includes('<br>')) {
+                    // 如果内容中包含 <br> 标签，可能需要修复
+                    // 尝试提取词性和意思
+                    const result = extractPOSAndMeaning('', content);
+                    if (result.formattedMeaning !== content) {
+                        // 如果格式化后的内容与原内容不同，更新内容
+                        questionMeaningEl.innerHTML = result.formattedMeaning;
+                    }
+                }
+            }
+        });
+    });
+    
+    // 配置 observer
+    const config = { childList: true, characterData: true, subtree: true };
+    
+    // 开始观察
+    observer.observe(questionMeaningEl, config);
+    
+    console.log('考核页面修复完成');
 }
 
 // 注意：formatPOSAndMeaning 函数已在上面定义并添加到全局作用域

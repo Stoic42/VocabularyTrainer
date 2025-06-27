@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>词性格式测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .input {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        .output {
+            background-color: #e6f7ff;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .pos {
+            font-weight: bold;
+            color: #1890ff;
+        }
+        .meaning {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>词性格式测试</h1>
+    <p>这个页面用于测试不同词性格式的处理效果。</p>
+
+    <div class="test-case">
+        <div class="test-title">测试用例1: 标准格式 (n. / v.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. / v."<br>
+            meaning: "n. / v. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result1"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例2: 无空格格式 (n./v.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n./v."<br>
+            meaning: "n./v. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result2"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例3: 无斜杠格式 (n. v.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. v."<br>
+            meaning: "n. v. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result3"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例4: 使用&符号 (n. & v.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. & v."<br>
+            meaning: "n. & v. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result4"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例5: 带换行符 (n. /<br>v.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. / v."<br>
+            meaning: "n. /<br>v. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result5"></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例6: 多个词性 (n. v. adj.)</div>
+        <div class="input">
+            <strong>输入:</strong><br>
+            pos: "n. v. adj."<br>
+            meaning: "n. v. adj. 回答，答复，以…作答"
+        </div>
+        <div class="output">
+            <strong>输出:</strong><br>
+            <div id="result6"></div>
+        </div>
+    </div>
+
+    <script src="/fix_mess_display_new.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 测试用例1: 标准格式 (n. / v.)
+            const result1 = formatPOSAndMeaning("n. / v.", "n. / v. 回答，答复，以…作答");
+            displayResult('result1', result1);
+
+            // 测试用例2: 无空格格式 (n./v.)
+            const result2 = formatPOSAndMeaning("n./v.", "n./v. 回答，答复，以…作答");
+            displayResult('result2', result2);
+
+            // 测试用例3: 无斜杠格式 (n. v.)
+            const result3 = formatPOSAndMeaning("n. v.", "n. v. 回答，答复，以…作答");
+            displayResult('result3', result3);
+
+            // 测试用例4: 使用&符号 (n. & v.)
+            const result4 = formatPOSAndMeaning("n. & v.", "n. & v. 回答，答复，以…作答");
+            displayResult('result4', result4);
+
+            // 测试用例5: 带换行符 (n. /<br>v.)
+            const result5 = formatPOSAndMeaning("n. / v.", "n. /<br>v. 回答，答复，以…作答");
+            displayResult('result5', result5);
+
+            // 测试用例6: 多个词性 (n. v. adj.)
+            const result6 = formatPOSAndMeaning("n. v. adj.", "n. v. adj. 回答，答复，以…作答");
+            displayResult('result6', result6);
+        });
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <span class="pos">提取的词性: ${result.extractedPos}</span><br>
+                <span class="meaning">格式化的意思: ${result.formattedMeaning}</span>
+            `;
+        }
+    </script>
+</body>
+</html>

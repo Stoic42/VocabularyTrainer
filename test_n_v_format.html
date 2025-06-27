@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 n. / v. 格式词性显示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .input-data {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        .output-result {
+            background-color: #e9f7ef;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .pos-display {
+            margin-top: 5px;
+            color: #666;
+        }
+        small {
+            font-size: 0.85em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>n. / v. 格式词性显示测试</h1>
+    
+    <div class="test-case">
+        <div class="test-title">测试用例1: n. / v. 格式（带空格）</div>
+        <div class="input-data">
+            <div>词性: ""</div>
+            <div>意思: "n. / v. 回答，答复，以…作答"</div>
+        </div>
+        <div class="output-result" id="result1">
+            <div>格式化结果:</div>
+            <div id="formatted1"></div>
+            <div class="pos-display">提取的词性: <span id="pos1"></span></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例2: n./v. 格式（无空格）</div>
+        <div class="input-data">
+            <div>词性: ""</div>
+            <div>意思: "n./v. 回答，答复，以…作答"</div>
+        </div>
+        <div class="output-result" id="result2">
+            <div>格式化结果:</div>
+            <div id="formatted2"></div>
+            <div class="pos-display">提取的词性: <span id="pos2"></span></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例3: n. v. 格式（无斜杠）</div>
+        <div class="input-data">
+            <div>词性: ""</div>
+            <div>意思: "n. v. 回答，答复，以…作答"</div>
+        </div>
+        <div class="output-result" id="result3">
+            <div>格式化结果:</div>
+            <div id="formatted3"></div>
+            <div class="pos-display">提取的词性: <span id="pos3"></span></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例4: n. & v. 格式（使用&符号）</div>
+        <div class="input-data">
+            <div>词性: ""</div>
+            <div>意思: "n. & v. 回答，答复，以…作答"</div>
+        </div>
+        <div class="output-result" id="result4">
+            <div>格式化结果:</div>
+            <div id="formatted4"></div>
+            <div class="pos-display">提取的词性: <span id="pos4"></span></div>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <div class="test-title">测试用例5: 多个词性 n. v. adj. 格式</div>
+        <div class="input-data">
+            <div>词性: ""</div>
+            <div>意思: "n. v. adj. 回答，答复，以…作答"</div>
+        </div>
+        <div class="output-result" id="result5">
+            <div>格式化结果:</div>
+            <div id="formatted5"></div>
+            <div class="pos-display">提取的词性: <span id="pos5"></span></div>
+        </div>
+    </div>
+
+    <script src="fix_mess_display_new.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 测试用例1: n. / v. 格式（带空格）
+            const pos1 = "";
+            const meaning1 = "n. / v. 回答，答复，以…作答";
+            const result1 = extractPOSAndMeaning(pos1, meaning1);
+            document.getElementById('formatted1').innerHTML = result1.formattedMeaning;
+            document.getElementById('pos1').textContent = result1.extractedPos;
+            
+            // 测试用例2: n./v. 格式（无空格）
+            const pos2 = "";
+            const meaning2 = "n./v. 回答，答复，以…作答";
+            const result2 = extractPOSAndMeaning(pos2, meaning2);
+            document.getElementById('formatted2').innerHTML = result2.formattedMeaning;
+            document.getElementById('pos2').textContent = result2.extractedPos;
+            
+            // 测试用例3: n. v. 格式（无斜杠）
+            const pos3 = "";
+            const meaning3 = "n. v. 回答，答复，以…作答";
+            const result3 = extractPOSAndMeaning(pos3, meaning3);
+            document.getElementById('formatted3').innerHTML = result3.formattedMeaning;
+            document.getElementById('pos3').textContent = result3.extractedPos;
+            
+            // 测试用例4: n. & v. 格式（使用&符号）
+            const pos4 = "";
+            const meaning4 = "n. & v. 回答，答复，以…作答";
+            const result4 = extractPOSAndMeaning(pos4, meaning4);
+            document.getElementById('formatted4').innerHTML = result4.formattedMeaning;
+            document.getElementById('pos4').textContent = result4.extractedPos;
+            
+            // 测试用例5: 多个词性 n. v. adj. 格式
+            const pos5 = "";
+            const meaning5 = "n. v. adj. 回答，答复，以…作答";
+            const result5 = extractPOSAndMeaning(pos5, meaning5);
+            document.getElementById('formatted5').innerHTML = result5.formattedMeaning;
+            document.getElementById('pos5').textContent = result5.extractedPos;
+        });
+    </script>
+</body>
+</html>
