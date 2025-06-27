@@ -243,7 +243,7 @@ def submit_answers():
                 # 将错误记录到ErrorLogs表，使用当前用户ID
                 try:
                     cursor.execute(
-                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
+                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now', 'localtime'))",
                         (student_id, word_id, 'spelling_mvp', student_answer)
                     )
                     app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}")
@@ -267,8 +267,8 @@ def submit_answers():
                             app.logger.info("ErrorLogs表已创建")
                             # 重新尝试插入
                             cursor.execute(
-                                "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now'))",
-                                (student_id, word_id, 'spelling_mvp', student_answer)
+                                "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now', 'localtime'))",
+                            (student_id, word_id, 'spelling_mvp', student_answer)
                             )
                         except sqlite3.Error as e2:
                             app.logger.error(f"创建ErrorLogs表并插入数据失败: {e2}")

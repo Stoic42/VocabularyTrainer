@@ -83,6 +83,11 @@
                 font-size: 10pt;
                 color: #666;
             }
+            
+            /* 隐藏单词和答案列 */
+            .hide-for-print {
+                display: none !important;
+            }
         }
         
         * {
@@ -558,6 +563,7 @@
             <div class="header-actions">
                 <button id="export-btn" class="action-btn" title="导出错误历史"><i class="fas fa-file-export"></i> 导出</button>
                 <button id="print-btn" class="action-btn" title="打印错误历史"><i class="fas fa-print"></i> 打印</button>
+                <button id="print-hide-btn" class="action-btn" title="打印(隐藏单词和答案)"><i class="fas fa-print"></i> 打印(隐藏单词和答案)</button>
                 <button class="back-btn" onclick="window.location.href='/'">返回主页</button>
             </div>
         </header>
@@ -599,6 +605,7 @@
                         <option value="error-asc">错误次数 (少到多)</option>
                     </select>
                 </div>
+                <button id="today-only-btn" class="filter-btn">只显示今日错词</button>
                 <button id="apply-filter" class="filter-btn">应用筛选</button>
                 <button id="reset-filter" class="filter-btn">重置筛选</button>
             </div>
@@ -710,9 +717,7 @@
         // 格式化日期
         function formatDate(dateStr, includeTime = false) {
             const date = new Date(dateStr);
-            if (includeTime) {
-                return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-            }
+            // 默认只返回年月日，不包含时分
             return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
         }
         
@@ -769,11 +774,11 @@
                 let url = '/api/error-history';
                 const params = new URLSearchParams();
                 
-                if (bookId && bookId !== 'all') {
+                if (bookId !== null) {
                     params.append('book_id', bookId);
                 }
                 
-                if (listId && listId !== 'all') {
+                if (listId !== null) {
                     params.append('list_id', listId);
                 }
                 
@@ -782,6 +787,7 @@
                     url += `?${params.toString()}`;
                 }
                 
+                console.log('Fetching error history with URL:', url);
                 const response = await fetch(url);
                 
                 // 解析响应数据
@@ -797,6 +803,7 @@
                     }
                 }
                 
+                console.log('Received data:', data);
                 originalData = JSON.parse(JSON.stringify(data)); // 深拷贝保存原始数据
                 filteredData = data;
                 return data;
@@ -1089,17 +1096,20 @@
         async function fetchLists(bookId = null) {
             try {
                 let url = '/api/lists';
-                if (bookId && bookId !== 'all') {
+                if (bookId !== null) {
                     url += `?book_id=${bookId}`;
                 }
                 
+                console.log('Fetching lists with URL:', url);
                 const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error('获取单词列表失败');
                 }
                 
-                return await response.json();
+                const data = await response.json();
+                console.log('Received lists:', data);
+                return data;
             } catch (error) {
                 console.error('获取单词列表时出错:', error);
                 return [];
@@ -1124,18 +1134,27 @@
         
         // 填充列表筛选下拉框
         async function populateListFilter(bookId = null) {
-            const lists = await fetchLists(bookId);
-            
-            // 清空现有选项，保留"所有列表"选项
-            listFilterSelect.innerHTML = '<option value="all">所有列表</option>';
-            
-            // 添加列表选项
-            lists.forEach(list => {
-                const option = document.createElement('option');
-                option.value = list.id;
-                option.textContent = list.name;
-                listFilterSelect.appendChild(option);
-            });
+            try {
+                console.log('Populating list filter with bookId:', bookId);
+                const lists = await fetchLists(bookId !== 'all' ? bookId : null);
+                console.log('Fetched lists:', lists);
+                
+                // 清空现有选项，保留"所有列表"选项
+                listFilterSelect.innerHTML = '<option value="all">所有列表</option>';
+                
+                // 添加列表选项
+                lists.forEach(list => {
+                    const option = document.createElement('option');
+                    option.value = list.id;
+                    option.textContent = list.name;
+                    listFilterSelect.appendChild(option);
+                });
+                
+                // 重置为"所有列表"
+                listFilterSelect.value = 'all';
+            } catch (error) {
+                console.error('填充列表筛选下拉框时出错:', error);
+            }
         }
         
         // 缓存词书和单元数据
@@ -1161,12 +1180,21 @@
         // 初始化页面
         async function initPage() {
             try {
+                console.log('Initializing page...');
                 // 获取并缓存词书和单元列表
                 booksCache = await fetchBooks();
+                console.log('Books cache initialized:', booksCache);
+                
                 listsCache = await fetchLists();
+                console.log('Lists cache initialized:', listsCache);
+                
+                // 填充词书和列表筛选下拉框
+                await populateBookFilter();
+                await populateListFilter();
                 
                 // 获取错误历史数据
                 const data = await fetchErrorHistory();
+                console.log('Initial error history data:', data);
                 
                 if (data) {
                     // 隐藏加载提示，显示内容
@@ -1183,10 +1211,6 @@
                     
                     dateToInput.valueAsDate = today;
                     dateFromInput.valueAsDate = thirtyDaysAgo;
-                    
-                    // 填充词书和列表筛选下拉框
-                    await populateBookFilter();
-                    await populateListFilter();
                 } else {
                     // 如果没有数据，可能是未登录
                     loadingEl.style.display = 'none';
@@ -1229,42 +1253,36 @@
             const selectedBookId = bookFilterSelect.value;
             const selectedListId = listFilterSelect.value;
             
-            // 如果选择了词书或列表筛选，则从服务器重新获取数据
-            if (selectedBookId !== 'all' || selectedListId !== 'all') {
-                try {
-                    // 显示加载提示
-                    loadingEl.style.display = 'block';
-                    contentEl.style.display = 'none';
-                    
-                    // 如果选择了特定词书，更新单元列表缓存
-                    if (selectedBookId !== 'all') {
-                        listsCache = await fetchLists(selectedBookId);
-                    } else {
-                        // 如果选择了所有词书，获取所有单元
-                        listsCache = await fetchLists();
-                    }
-                    
-                    // 获取筛选后的数据
-                    const data = await fetchErrorHistory(selectedBookId, selectedListId);
-                    
-                    // 隐藏加载提示，显示内容
-                    loadingEl.style.display = 'none';
-                    contentEl.style.display = 'block';
-                    
-                    // 渲染数据
-                    renderErrorHistory(data);
-                } catch (error) {
-                    // 显示错误信息
-                    loadingEl.style.display = 'none';
-                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
-                    errorMessageEl.style.display = 'block';
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
+                
+                // 如果选择了特定词书，更新单元列表缓存
+                if (selectedBookId !== 'all') {
+                    listsCache = await fetchLists(selectedBookId);
+                } else {
+                    // 如果选择了所有词书，获取所有单元
+                    listsCache = await fetchLists();
                 }
-            } else {
-                // 如果没有选择词书和列表筛选，则在客户端筛选
-                const filteredData = filterAndSortData();
-                if (filteredData) {
-                    renderErrorHistory(filteredData);
-                }
+                
+                // 始终从服务器获取筛选后的数据
+                const data = await fetchErrorHistory(
+                    selectedBookId !== 'all' ? selectedBookId : null, 
+                    selectedListId !== 'all' ? selectedListId : null
+                );
+                
+                // 隐藏加载提示，显示内容
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+                
+                // 渲染数据
+                renderErrorHistory(data);
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
             }
         }
         
@@ -1292,22 +1310,88 @@
         // 当词书选择变化时，更新列表筛选下拉框
         bookFilterSelect.addEventListener('change', async () => {
             const selectedBookId = bookFilterSelect.value;
+            console.log('Book selection changed to:', selectedBookId);
             await populateListFilter(selectedBookId);
+            // 重置列表选择为"所有列表"
+            listFilterSelect.value = 'all';
         });
         
         // 打印功能
-        function printErrorHistory() {
+        function printErrorHistory(hideWordAndAnswer = false) {
             // 在打印前显示打印标题和日期
-            document.querySelector('.print-header').style.display = 'block';
-            document.querySelector('.print-date').style.display = 'block';
+            const printHeader = document.querySelector('.print-header') || document.createElement('div');
+            const printDate = document.querySelector('.print-date') || document.createElement('div');
+            
+            if (!document.querySelector('.print-header')) {
+                printHeader.className = 'print-header';
+                printHeader.textContent = '词汇训练 - 错误历史记录';
+                document.body.insertBefore(printHeader, document.body.firstChild);
+            }
+            
+            if (!document.querySelector('.print-date')) {
+                printDate.className = 'print-date';
+                printDate.textContent = `打印日期: ${new Date().toLocaleDateString()}`;
+                document.body.insertBefore(printDate, document.body.firstChild.nextSibling);
+            }
+            
+            printHeader.style.display = 'block';
+            printDate.style.display = 'block';
+            
+            // 如果需要隐藏单词和答案列
+            if (hideWordAndAnswer) {
+                // 获取所有表格
+                const tables = document.querySelectorAll('table');
+                tables.forEach(table => {
+                    // 获取表头行
+                    const headerRow = table.querySelector('thead tr');
+                    if (headerRow) {
+                        // 获取所有表头单元格
+                        const headerCells = headerRow.querySelectorAll('th');
+                        // 找到单词和答案列的索引
+                        let wordColIndex = -1;
+                        let answerColIndex = -1;
+                        
+                        headerCells.forEach((cell, index) => {
+                            if (cell.textContent.trim() === '单词') {
+                                wordColIndex = index;
+                                cell.classList.add('hide-for-print');
+                            } else if (cell.textContent.trim() === '你的答案') {
+                                answerColIndex = index;
+                                cell.classList.add('hide-for-print');
+                            }
+                        });
+                        
+                        // 隐藏数据行中的相应单元格
+                        if (wordColIndex !== -1 || answerColIndex !== -1) {
+                            const rows = table.querySelectorAll('tbody tr');
+                            rows.forEach(row => {
+                                const cells = row.querySelectorAll('td');
+                                if (wordColIndex !== -1 && cells[wordColIndex]) {
+                                    cells[wordColIndex].classList.add('hide-for-print');
+                                }
+                                if (answerColIndex !== -1 && cells[answerColIndex]) {
+                                    cells[answerColIndex].classList.add('hide-for-print');
+                                }
+                            });
+                        }
+                    }
+                });
+            }
             
             // 调用打印
             window.print();
             
-            // 打印后隐藏打印标题和日期
+            // 打印后恢复显示
             setTimeout(() => {
-                document.querySelector('.print-header').style.display = 'none';
-                document.querySelector('.print-date').style.display = 'none';
+                printHeader.style.display = 'none';
+                printDate.style.display = 'none';
+                
+                // 如果隐藏了单词和答案列，恢复显示
+                if (hideWordAndAnswer) {
+                    document.querySelectorAll('.hide-for-print').forEach(el => {
+                        el.classList.remove('hide-for-print');
+                    });
+                }
             }, 1000);
         }
         
@@ -1791,21 +1875,45 @@
             }
         }
         
+        // 只显示今日错词
+        function showTodayErrorsOnly() {
+            // 设置日期筛选器为今天
+            const today = new Date();
+            dateFromInput.valueAsDate = today;
+            dateToInput.valueAsDate = today;
+            
+            // 应用筛选
+            applyFilters();
+        }
+        
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             
             // 添加事件监听器
             if (applyFilterBtn) {
-                applyFilterBtn.addEventListener('click', applyFilters);
+                applyFilterBtn.addEventListener('click', () => {
+                    console.log('Apply filter button clicked');
+                    applyFilters();
+                });
             }
             
             if (resetFilterBtn) {
                 resetFilterBtn.addEventListener('click', resetFilters);
             }
             
+            const todayOnlyBtn = document.getElementById('today-only-btn');
+            if (todayOnlyBtn) {
+                todayOnlyBtn.addEventListener('click', showTodayErrorsOnly);
+            }
+            
             if (printBtn) {
-                printBtn.addEventListener('click', printErrorHistory);
+                printBtn.addEventListener('click', () => printErrorHistory(false));
+            }
+            
+            const printHideBtn = document.getElementById('print-hide-btn');
+            if (printHideBtn) {
+                printHideBtn.addEventListener('click', () => printErrorHistory(true));
             }
             
             // 导出按钮事件监听
