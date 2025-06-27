@@ -139,8 +139,11 @@ def get_questions():
     
     conn = get_db_connection()
     
-    # 基础SQL查询
-    sql_query = 'SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us FROM Words WHERE list_id = ? ORDER BY RANDOM()'
+    # 基础SQL查询 - 包含所有详情字段
+    sql_query = '''SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us, 
+               derivatives, root_etymology, mnemonic, comparison, collocation, 
+               exam_sentence, exam_year_source, exam_options, exam_explanation, tips 
+               FROM Words WHERE list_id = ? ORDER BY RANDOM()'''
     params = (list_id,)
 
     # 只有当数量不是'all'时，我们才加上LIMIT子句
@@ -159,10 +162,19 @@ def get_questions():
     words = conn.execute(sql_query, params).fetchall()
     conn.close()
     
-    # --- 数据处理逻辑，根据学习模式决定是否包含音频URL ---
+    # --- 数据处理逻辑，根据学习模式决定是否包含音频URL和详情字段 ---
     word_list = []
     for word in words:
         word_dict = dict(word)
+        
+        # 处理详情字段，确保它们不是None
+        detail_fields = ['derivatives', 'root_etymology', 'mnemonic', 'comparison', 
+                         'collocation', 'exam_sentence', 'exam_year_source', 
+                         'exam_options', 'exam_explanation', 'tips']
+        
+        for field in detail_fields:
+            if field in word_dict and word_dict[field] is None:
+                word_dict[field] = ""
         
         # 根据学习模式决定是否包含音频URL
         if study_mode.lower() != 'dictation':
