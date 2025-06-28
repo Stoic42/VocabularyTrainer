@@ -381,6 +381,27 @@ def get_error_history():
         sort_by = request.args.get('sort_by', default='date', type=str)  # 排序字段，默认按日期
         sort_order = request.args.get('sort_order', default='desc', type=str)  # 排序方向，默认降序
         
+        # 确保日期格式正确
+        if date_from:
+            date_from = date_from.strip()
+            app.logger.info(f"原始开始日期: {date_from}")
+            # 如果日期包含时间部分，只保留日期部分
+            if 'T' in date_from:
+                date_from = date_from.split('T')[0]
+            # 确保开始日期是当天的开始时刻
+            date_from = date_from + ' 00:00:00'
+            app.logger.info(f"处理后的开始日期: {date_from}")
+        
+        if date_to:
+            date_to = date_to.strip()
+            app.logger.info(f"原始结束日期: {date_to}")
+            # 如果日期包含时间部分，只保留日期部分
+            if 'T' in date_to:
+                date_to = date_to.split('T')[0]
+            # 确保结束日期是当天的最后一刻
+            date_to = date_to + ' 23:59:59'
+            app.logger.info(f"处理后的结束日期: {date_to}")
+        
         app.logger.info(f"获取错误历史记录: student_id={student_id}, limit={limit}, book_id={book_id}, list_id={list_id}, date_from={date_from}, date_to={date_to}, sort_by={sort_by}, sort_order={sort_order}")
         
         conn = get_db_connection()
@@ -415,10 +436,12 @@ def get_error_history():
         if date_from is not None:
             query += " AND e.error_date >= ?"
             params.append(date_from)
+            app.logger.info(f"筛选开始日期: {date_from}")
         
         if date_to is not None:
             query += " AND e.error_date <= ?"
             params.append(date_to)
+            app.logger.info(f"筛选结束日期: {date_to}")
         
         # 添加排序逻辑
         if sort_by == 'error_count':
@@ -466,10 +489,12 @@ def get_error_history():
         if date_from is not None:
             stats_query += " AND e.error_date >= ?"
             stats_params.append(date_from)
+            app.logger.info(f"统计查询筛选开始日期: {date_from}")
         
         if date_to is not None:
             stats_query += " AND e.error_date <= ?"
             stats_params.append(date_to)
+            app.logger.info(f"统计查询筛选结束日期: {date_to}")
         
         stats_query += """
         GROUP BY w.list_id
@@ -508,10 +533,12 @@ def get_error_history():
         if date_from is not None:
             word_history_query += " AND e.error_date >= ?"
             word_history_params.append(date_from)
+            app.logger.info(f"单词历史查询筛选开始日期: {date_from}")
         
         if date_to is not None:
             word_history_query += " AND e.error_date <= ?"
             word_history_params.append(date_to)
+            app.logger.info(f"单词历史查询筛选结束日期: {date_to}")
         
         word_history_query += """
         GROUP BY w.word_id

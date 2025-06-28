@@ -741,7 +741,7 @@
             <div class="header-actions">
                 <button id="export-btn" class="action-btn" title="导出错误历史"><i class="fas fa-file-export"></i> 导出</button>
                 <button id="print-btn" class="action-btn" title="打印错误历史"><i class="fas fa-print"></i> 打印</button>
-                <button id="print-hide-btn" class="action-btn" title="打印(隐藏单词，保留空白答案栏)"><i class="fas fa-print"></i> 打印(隐藏单词，保留空白答案栏)</button>
+                <button id="print-hide-btn" class="action-btn" title="打印练习纸"><i class="fas fa-print"></i> 打印练习纸</button>
                 <button class="back-btn" onclick="window.location.href='/'">返回主页</button>
             </div>
         </header>
@@ -893,10 +893,22 @@
         });
         
         // 格式化日期
-        function formatDate(dateStr, includeTime = false) {
-            const date = new Date(dateStr);
-            // 默认只返回年月日，不包含时分
-            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        function formatDate(date, showFullDate = false) {
+            if (!(date instanceof Date)) {
+                console.error('Invalid date object:', date);
+                date = new Date(date);
+            }
+            
+            // 转换为本地时区
+            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            
+            // 如果需要显示完整日期（包括时间），则返回完整的ISO日期字符串
+            if (showFullDate) {
+                return localDate.toISOString();
+            }
+            
+            // 否则只返回日期部分
+            return localDate.toISOString().split('T')[0];
         }
         
         // 格式化词性
@@ -946,7 +958,7 @@
         }
         
         // 获取错误历史数据
-        async function fetchErrorHistory(bookId = null, listId = null, dateFrom = null, dateTo = null, sortBy = null, sortOrder = null) {
+        async function fetchErrorHistory(bookId = null, listId = null, dateFrom = formatDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)), dateTo = formatDate(new Date()), sortBy = null, sortOrder = null) {
             try {
                 // 构建URL和查询参数
                 let url = '/api/error-history';
@@ -962,11 +974,19 @@
                 
                 // 添加日期范围参数
                 if (dateFrom !== null) {
-                    params.append('date_from', dateFrom);
+                    // 确保日期格式正确
+                    const formattedDateFrom = dateFrom.includes('T') ? dateFrom.split('T')[0] : dateFrom;
+                    params.append('date_from', formattedDateFrom);
+                    console.log('Date from (原始):', dateFrom);
+                    console.log('Date from (格式化后):', formattedDateFrom);
                 }
                 
                 if (dateTo !== null) {
-                    params.append('date_to', dateTo);
+                    // 确保日期格式正确
+                    const formattedDateTo = dateTo.includes('T') ? dateTo.split('T')[0] : dateTo;
+                    params.append('date_to', formattedDateTo);
+                    console.log('Date to (原始):', dateTo);
+                    console.log('Date to (格式化后):', formattedDateTo);
                 }
                 
                 // 添加排序参数
@@ -1025,8 +1045,11 @@
             let data = JSON.parse(JSON.stringify(originalData));
             
             // 日期筛选
-            const dateFrom = dateFromInput.value ? new Date(dateFromInput.value) : null;
-            const dateTo = dateToInput.value ? new Date(dateToInput.value + 'T23:59:59') : null;
+            const dateFrom = dateFromInput.value ? new Date(dateFromInput.value + 'T00:00:00') : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            const dateTo = dateToInput.value ? new Date(dateToInput.value + 'T23:59:59') : new Date(Date.now());
+            
+            console.log('筛选日期范围:', formatDate(dateFrom, true), '至', formatDate(dateTo, true));
+            console.log('筛选日期范围(ISO):', dateFrom.toISOString(), '至', dateTo.toISOString());
             
             // 词书和列表筛选
             const selectedBookId = bookFilterSelect.value;
@@ -1038,6 +1061,8 @@
                     data.errors = data.errors.filter(error => {
                         // 日期筛选
                         const errorDate = new Date(error.error_date);
+                        console.log('比较错误日期:', formatDate(errorDate, true), '与范围:', formatDate(dateFrom, true), '-', formatDate(dateTo, true));
+                        console.log('比较错误日期(ISO):', errorDate.toISOString(), '与范围:', dateFrom.toISOString(), '-', dateTo.toISOString());
                         const dateMatch = (!dateFrom || errorDate >= dateFrom) && (!dateTo || errorDate <= dateTo);
                         
                         // 列表筛选
@@ -1069,9 +1094,18 @@
                         // 日期筛选
                         if (dateFrom || dateTo) {
                             const errorDates = word.error_dates ? word.error_dates.split(', ').map(date => new Date(date)) : [];
-                            const filteredDates = errorDates.filter(date => 
-                                (!dateFrom || date >= dateFrom) && (!dateTo || date <= dateTo)
-                            );
+                            console.log('单词历史错误日期:', word.spelling, errorDates.map(d => d.toISOString()));
+                            
+                            const filteredDates = errorDates.filter(date => {
+                                const result = (!dateFrom || date >= dateFrom) && (!dateTo || date <= dateTo);
+                                console.log('日期比较:', date.toISOString(), 
+                                          '在范围内:', result, 
+                                          '>=', dateFrom.toISOString(), ':', !dateFrom || date >= dateFrom,
+                                          '<=', dateTo.toISOString(), ':', !dateTo || date <= dateTo);
+                                return result;
+                            });
+                            
+                            console.log('筛选后的日期数量:', filteredDates.length);
                             
                             if (filteredDates.length > 0) {
                                 // 更新错误日期和错误次数
@@ -1184,7 +1218,7 @@
                             </div>
                         </span></td>
                         <td style="color: var(--error-color);">${error.student_answer}</td>
-                        <td>${formatDate(error.error_date, true)}</td>
+                        <td>${formatDate(new Date(error.error_date), true)}</td>
                         <td><span class="error-count">${error.error_count}</span></td>
                     `;
                     recentErrorsTableEl.appendChild(row);
@@ -1446,12 +1480,18 @@
                 // 设置默认排序方式
                 sortBySelect.value = 'date-desc';
                 
-                // 获取所有历史数据，不传递日期范围参数
+                // 获取所有历史数据，使用默认日期范围参数（过去30天）
+                const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+                const todayStr = today.toISOString().split('T')[0];
+                console.log('初始化页面，日期范围:', thirtyDaysAgoStr, '至', todayStr);
+                console.log('初始化页面，开始日期对象:', new Date(thirtyDaysAgoStr + 'T00:00:00').toISOString());
+                console.log('初始化页面，结束日期对象:', new Date(todayStr + 'T23:59:59').toISOString());
+                
                 const data = await fetchErrorHistory(
                     'all',  // 默认所有词书
                     'all',  // 默认所有列表
-                    null,   // 不限制开始日期
-                    null,   // 不限制结束日期
+                    thirtyDaysAgoStr,   // 过去30天
+                    todayStr,   // 今天
                     'date-desc'  // 默认按日期降序排序
                 );
                 console.log('Initial error history data:', data);
@@ -1507,6 +1547,16 @@
             const dateFrom = dateFromInput.value || null;
             const dateTo = dateToInput.value || null;
             const sortBy = sortBySelect.value || null;
+            
+            console.log('应用筛选，日期范围:', dateFrom, '至', dateTo);
+            
+            // 确保日期格式正确
+            if (dateFrom) {
+                console.log('应用筛选，开始日期对象:', new Date(dateFrom + 'T00:00:00').toISOString());
+            }
+            if (dateTo) {
+                console.log('应用筛选，结束日期对象:', new Date(dateTo + 'T23:59:59').toISOString());
+            }
             
             try {
                 // 显示加载提示
@@ -1572,6 +1622,9 @@
                 contentEl.style.display = 'none';
                 
                 // 直接从服务器获取重置后的数据
+                console.log('重置筛选，日期范围:', thirtyDaysAgoStr, '至', todayStr);
+                console.log('重置筛选，开始日期对象:', new Date(thirtyDaysAgoStr + 'T00:00:00').toISOString());
+                console.log('重置筛选，结束日期对象:', new Date(todayStr + 'T23:59:59').toISOString());
                 fetchErrorHistory(
                     'all',  // 所有词书
                     'all',  // 所有列表
