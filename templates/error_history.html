@@ -784,8 +784,10 @@
                     </select>
                 </div>
                 <button id="today-only-btn" class="filter-btn">只显示今日错词</button>
-                <button id="apply-filter" class="filter-btn">应用筛选</button>
-                <button id="reset-filter" class="filter-btn">重置筛选</button>
+            <button id="last-week-btn" class="filter-btn">显示最近一周错词</button>
+            <button id="test-errors-btn" class="filter-btn">考核错词</button>
+            <button id="apply-filter" class="filter-btn">应用筛选</button>
+            <button id="reset-filter" class="filter-btn">重置筛选</button>
             </div>
 
             <div class="stats-container">
@@ -2266,6 +2268,101 @@
             applyFilters();
         }
         
+        // 显示最近一周错词
+        function showLastWeekErrors() {
+            // 设置日期筛选器为最近一周
+            const today = new Date();
+            const lastWeek = new Date();
+            lastWeek.setDate(today.getDate() - 7);
+            
+            dateFromInput.valueAsDate = lastWeek;
+            dateToInput.valueAsDate = today;
+            
+            // 应用筛选
+            applyFilters();
+        }
+        
+        // 考核错词功能 - 打开日期选择模态框
+        function showTestErrorsModal() {
+            // 创建模态框（如果不存在）
+            let testErrorsModal = document.getElementById('test-errors-modal');
+            
+            if (!testErrorsModal) {
+                testErrorsModal = document.createElement('div');
+                testErrorsModal.id = 'test-errors-modal';
+                testErrorsModal.className = 'modal-overlay';
+                
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.maxWidth = '400px';
+                
+                modalContent.innerHTML = `
+                    <div class="modal-header">
+                        <h2>选择考核日期范围</h2>
+                        <button class="close-modal" onclick="closeTestErrorsModal()">&times;</button>
+                    </div>
+                    <div class="export-options">
+                        <div class="filter-group" style="margin-bottom: 15px;">
+                            <label for="test-date-from">开始日期:</label>
+                            <input type="date" id="test-date-from" class="date-filter" style="width: 100%;">
+                        </div>
+                        <div class="filter-group" style="margin-bottom: 15px;">
+                            <label for="test-date-to">结束日期:</label>
+                            <input type="date" id="test-date-to" class="date-filter" style="width: 100%;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-btn cancel-btn" onclick="closeTestErrorsModal()">取消</button>
+                        <button class="modal-btn export-btn" onclick="applyTestErrorsFilter()">确定</button>
+                    </div>
+                `;
+                
+                testErrorsModal.appendChild(modalContent);
+                document.body.appendChild(testErrorsModal);
+                
+                // 设置默认日期为最近一周
+                const today = new Date();
+                const lastWeek = new Date();
+                lastWeek.setDate(today.getDate() - 7);
+                
+                document.getElementById('test-date-from').valueAsDate = lastWeek;
+                document.getElementById('test-date-to').valueAsDate = today;
+            }
+            
+            // 显示模态框
+            testErrorsModal.style.display = 'flex';
+        }
+        
+        // 关闭考核错词模态框
+        function closeTestErrorsModal() {
+            const modal = document.getElementById('test-errors-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // 应用考核错词筛选
+        function applyTestErrorsFilter() {
+            // 获取用户选择的日期范围
+            const testDateFrom = document.getElementById('test-date-from').value;
+            const testDateTo = document.getElementById('test-date-to').value;
+            
+            // 设置主页面的日期筛选器
+            if (testDateFrom) {
+                dateFromInput.value = testDateFrom;
+            }
+            
+            if (testDateTo) {
+                dateToInput.value = testDateTo;
+            }
+            
+            // 关闭模态框
+            closeTestErrorsModal();
+            
+            // 应用筛选
+            applyFilters();
+        }
+        
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
@@ -2285,6 +2382,16 @@
             const todayOnlyBtn = document.getElementById('today-only-btn');
             if (todayOnlyBtn) {
                 todayOnlyBtn.addEventListener('click', showTodayErrorsOnly);
+            }
+            
+            const lastWeekBtn = document.getElementById('last-week-btn');
+            if (lastWeekBtn) {
+                lastWeekBtn.addEventListener('click', showLastWeekErrors);
+            }
+            
+            const testErrorsBtn = document.getElementById('test-errors-btn');
+            if (testErrorsBtn) {
+                testErrorsBtn.addEventListener('click', showTestErrorsModal);
             }
             
             if (printBtn) {

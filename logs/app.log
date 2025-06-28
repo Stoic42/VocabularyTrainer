@@ -74,3 +74,7 @@
 2025-06-28 12:41:57,752 INFO: 统计查询筛选结束日期: 2025-06-28 23:59:59 [in D:\Projects\VocabularyTrainer\app.py:497]
 2025-06-28 12:41:58,177 INFO: 单词历史查询筛选开始日期: 2025-05-29 00:00:00 [in D:\Projects\VocabularyTrainer\app.py:536]
 2025-06-28 12:41:58,178 INFO: 单词历史查询筛选结束日期: 2025-06-28 23:59:59 [in D:\Projects\VocabularyTrainer\app.py:541]
+2025-06-28 12:49:22,124 INFO: 原始开始日期: 2025-05-29 [in D:\Projects\VocabularyTrainer\app.py:387]
+2025-06-28 12:49:22,124 INFO: 处理后的开始日期: 2025-05-29 00:00:00 [in D:\Projects\VocabularyTrainer\app.py:393]
+2025-06-28 12:49:22,124 INFO: 原始结束日期: 2025-06-28 [in D:\Projects\VocabularyTrainer\app.py:397]
+2025-06-28 12:49:22,124 INFO: 处理后的结束日期: 2025-06-28 23:59:59 [in D:\Projects\VocabularyTrainer\app.py:403]

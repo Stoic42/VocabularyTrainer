@@ -375,6 +375,82 @@
             align-items: center;
             margin-top: 10px;
         }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+        
+        .export-options {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .cancel-btn {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .export-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -385,7 +461,7 @@
             </div>
         </div>
         
-        <div id="login-form" class="auth-form">
+        <form id="login-form" class="auth-form" onsubmit="event.preventDefault(); handleLogin();">
             <h2>用户登录</h2>
             <div style="margin-bottom: 15px;">
                 <label for="login-username">用户名:</label>
@@ -396,11 +472,11 @@
                 <input type="password" id="login-password" placeholder="请输入密码" class="auth-input">
             </div>
             <div id="login-error" class="auth-error"></div>
-            <button id="login-btn" class="auth-button">登录</button>
+            <button type="submit" id="login-btn" class="auth-button">登录</button>
             <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register" class="auth-link">立即注册</a></p>
-        </div>
+        </form>
         
-        <div id="register-form" class="auth-form" style="display: none;">
+        <form id="register-form" class="auth-form" style="display: none;" onsubmit="event.preventDefault(); handleRegister();">
             <h2>用户注册</h2>
             <div style="margin-bottom: 15px;">
                 <label for="register-username">用户名:</label>
@@ -415,9 +491,9 @@
                 <input type="password" id="register-confirm-password" placeholder="请再次输入密码" class="auth-input">
             </div>
             <div id="register-error" class="auth-error"></div>
-            <button id="register-btn" class="auth-button">注册</button>
+            <button type="submit" id="register-btn" class="auth-button">注册</button>
             <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login" class="auth-link">返回登录</a></p>
-        </div>
+        </form>
     </div>
     
     <div id="app-container" style="display: none;">
@@ -459,6 +535,7 @@
                 <select id="study-mode">
                     <option value="standard">标准模式</option>
                     <option value="dictation">默写模式</option>
+                    <option value="error_test">考核错词</option>
                 </select>
             </div>
         </div>
@@ -493,6 +570,8 @@
             <button id="start-btn">开始测试</button>
             <a href="/error-history" class="btn" style="background-color: #3498db;">查看错误历史</a>
         </div>
+        
+
 
         <div id="quiz-area" style="display: none;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -554,6 +633,85 @@
         
         .auth-form.fade-out {
             animation: fadeOut 0.3s ease forwards;
+        }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 90%;
+            max-width: 600px;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .export-options {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .cancel-btn {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .export-btn {
+            background-color: var(--primary-color);
+            color: white;
         }
     </style>
     
@@ -1163,7 +1321,20 @@
 
         // 处理"下一步"逻辑
         function handleNextQuestion() {
+            // 检查是否有题目或者是否已经完成所有题目
+            if (!questions || !questions.length || currentQuestionIndex >= questions.length) {
+                alert('没有可用的题目或已完成所有题目！');
+                return;
+            }
+            
             const currentAnswer = answerInput.value.trim().toLowerCase();
+            // 如果答案为空，提示用户并返回
+            if (!currentAnswer) {
+                alert('请输入答案！');
+                answerInput.focus();
+                return;
+            }
+            
             const correctSpelling = questions[currentQuestionIndex].spelling.trim().toLowerCase();
             
             // 处理斜杠分隔的拼写变体
@@ -1410,6 +1581,7 @@
             
             // 添加认证相关事件监听器
             loginBtn.addEventListener('click', handleLogin);
+            registerBtn.addEventListener('click', handleRegister);
             
             // 添加回车键登录功能
             loginPassword.addEventListener('keypress', function(event) {
@@ -1425,7 +1597,28 @@
                     handleLogin();
                 }
             });
-            registerBtn.addEventListener('click', handleRegister);
+            
+            // 添加回车键注册功能
+            registerPassword.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleRegister();
+                }
+            });
+            
+            registerUsername.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleRegister();
+                }
+            });
+            
+            registerConfirmPassword.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleRegister();
+                }
+            });
             
             // 显示注册表单，隐藏登录表单
             showRegisterLink.addEventListener('click', function(e) {
@@ -1509,34 +1702,106 @@
             const selectedCount = document.getElementById('count-select').value;
             const selectedMode = document.getElementById('study-mode').value;
             
-            if (!selectedListId) {
-                alert('请先选择一个单词列表！');
-                return;
-            }
+            // 重置题目数组
+            questions = [];
 
+            // 重构后的统一try-catch结构，处理所有异步操作和后续逻辑
             try {
-                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${selectedMode}`);
-                if (!response.ok) throw new Error('网络请求失败');
-                questions = await response.json();
-                
+                if (selectedMode === 'error_test') {
+                    // --- 考核错词模式 ---
+                    showLoading();
+                    const today = new Date();
+                    const lastWeek = new Date();
+                    lastWeek.setDate(today.getDate() - 7);
+                    const dateFrom = lastWeek.toISOString().split('T')[0];
+                    const dateTo = today.toISOString().split('T')[0];
+                    
+                    const url = `/api/error-history?date_from=${dateFrom}&date_to=${dateTo}&list_id=${selectedListId}`;
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        if (response.status === 401) alert('请先登录！');
+                        else throw new Error('获取错词数据失败');
+                        hideLoading();
+                        return;
+                    }
+
+                    const data = await response.json();
+                    hideLoading();
+
+                    if (!data.errors || data.errors.length === 0) {
+                        alert('所选词书在最近一周内没有错词记录！');
+                        return;
+                    }
+
+                    // 将错词数据格式化为标准的题目格式，以保证后续函数兼容
+                    questions = data.errors.map(error => ({
+                        word_id: error.word_id,
+                        spelling: error.word,
+                        pos: error.pos,
+                        meaning_cn: error.meaning,
+                        ipa: error.phonetic || '',
+                        meaning_en: error.en_definition || '',
+                        example_en: error.example || '',
+                        example_cn: error.example_cn || '',
+                        derivatives: error.derivatives || '',
+                        root_etymology: error.root_etymology || '',
+                        mnemonic: error.mnemonic || '',
+                        comparison: error.comparison || '',
+                        collocation: error.collocation || '',
+                        exam_sentence: error.exam_sentence || '',
+                        exam_year_source: error.exam_year_source || '',
+                        exam_options: error.exam_options || '',
+                        exam_explanation: error.exam_explanation || '',
+                        tips: error.tips || ''
+                    }));
+                } else {
+                    // --- 标准或默写模式 ---
+                    if (!selectedListId) {
+                        alert('请先选择一个单词列表！');
+                        return;
+                    }
+                    const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${selectedMode}`);
+                    if (!response.ok) throw new Error('网络请求失败');
+                    questions = await response.json();
+                }
+
+                // --- 公共逻辑：开始测试 ---
+                // 这部分代码现在位于正确的位置，在数据获取之后执行
                 if (questions && questions.length > 0) {
+                    // 隐藏设置界面
                     document.querySelector('.list-selector').style.display = 'none';
                     startBtn.style.display = 'none';
                     document.querySelector('a.btn').style.display = 'none';
+                    document.querySelector('.lumi-toggle-container').style.display = 'none';
+                    document.querySelector('.auto-play-container').style.display = 'none';
+                    document.querySelector('.feedback-container').style.display = 'none';
+                    
+                    // 显示答题区
                     quizArea.style.display = 'block';
                     totalQNumEl.textContent = questions.length;
-                    userAnswers = []; // 重置答案
-                    currentQuestionIndex = 0; // 重置索引
+                    
+                    // 重置状态
+                    userAnswers = [];
+                    currentQuestionIndex = 0;
+                    
+                    // 显示第一题
                     displayQuestion();
                     updateLumiReaction('thinking');
                 } else {
-                    alert('无法加载题目或该列表为空！');
+                    // 处理成功获取但内容为空的情况
+                    if (selectedMode !== 'error_test') { // 错词模式的提示已在前面处理
+                         alert('无法加载题目或该列表为空！');
+                    }
                 }
             } catch (error) {
-                console.error("加载题目时出错:", error);
-                alert('加载题目时出错，请检查后端服务。');
-            }
-        });
+                  // 统一的错误处理
+                  console.error("加载题目时出错:", error);
+                  alert('加载题目时出错，请检查后端服务或网络连接。');
+                  hideLoading(); // 确保出错时隐藏加载动画
+              }
+          }
+        );
 
         // 下一步按钮和回车键
         nextBtn.addEventListener('click', handleNextQuestion);
@@ -1588,6 +1853,66 @@
                 handleNextQuestion();
             }
         });
+        
+        // 显示加载提示
+        function showLoading() {
+            let loadingOverlay = document.getElementById('loading-overlay');
+            if (!loadingOverlay) {
+                loadingOverlay = document.createElement('div');
+                loadingOverlay.id = 'loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">加载中...</div>
+                `;
+                loadingOverlay.style.position = 'fixed';
+                loadingOverlay.style.top = '0';
+                loadingOverlay.style.left = '0';
+                loadingOverlay.style.width = '100%';
+                loadingOverlay.style.height = '100%';
+                loadingOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.style.flexDirection = 'column';
+                loadingOverlay.style.justifyContent = 'center';
+                loadingOverlay.style.alignItems = 'center';
+                loadingOverlay.style.zIndex = '9999';
+                
+                const spinner = loadingOverlay.querySelector('.loading-spinner');
+                spinner.style.border = '5px solid #f3f3f3';
+                spinner.style.borderTop = '5px solid var(--primary-color)';
+                spinner.style.borderRadius = '50%';
+                spinner.style.width = '50px';
+                spinner.style.height = '50px';
+                spinner.style.animation = 'spin 1s linear infinite';
+                
+                const loadingText = loadingOverlay.querySelector('.loading-text');
+                loadingText.style.color = 'white';
+                loadingText.style.marginTop = '10px';
+                loadingText.style.fontSize = '16px';
+                
+                // 添加动画样式
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(loadingOverlay);
+            } else {
+                loadingOverlay.style.display = 'flex';
+            }
+        }
+        
+        // 隐藏加载提示
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+    
     </script>
 <script src="/fix_mess_display_new.js"></script>
 </body>
