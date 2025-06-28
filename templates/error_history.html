@@ -904,12 +904,7 @@
             // 转换为本地时区
             const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
             
-            // 如果需要显示完整日期（包括时间），则返回完整的ISO日期字符串
-            if (showFullDate) {
-                return localDate.toISOString();
-            }
-            
-            // 否则只返回日期部分
+            // 始终只返回日期部分，不包含时间
             return localDate.toISOString().split('T')[0];
         }
         
