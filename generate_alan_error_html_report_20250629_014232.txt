@@ -1,0 +1,13 @@
+生成Alan错词HTML页面报告
+===================
+
+查询Alan在2025-06-25的错词记录:
+找到 39 条错词记录
+生成HTML文件: d:\Projects\VocabularyTrainer\Alan\20250628\alan_errors_20250625_20250629_014232.html
+HTML文件已生成: d:\Projects\VocabularyTrainer\Alan\20250628\alan_errors_20250625_20250629_014232.html
+
+总结:
+1. 已查询Alan在2025-06-25的 39 条错词记录
+2. 已生成HTML文件: d:\Projects\VocabularyTrainer\Alan\20250628\alan_errors_20250625_20250629_014232.html
+
+生成完成

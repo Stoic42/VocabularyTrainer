@@ -27,4 +27,7 @@
 2025-06-29 01:39:53,376 INFO: 获取错误历史记录: student_id=3, limit=200, book_id=None, list_id=None, date_from=2025-05-29, date_to=2025-06-28, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:384]
 2025-06-29 01:41:02,370 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
 2025-06-29 01:41:24,102 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
+<<<<<<< HEAD
 2025-06-29 01:45:17,018 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:75]
+=======
+>>>>>>> alan-errors-branch-2

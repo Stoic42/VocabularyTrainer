@@ -1,0 +1,53 @@
+数据库中的表:
+Books
+  表结构:
+    book_id (INTEGER)
+    book_name (TEXT)
+
+sqlite_sequence
+  表结构:
+    name ()
+    seq ()
+
+WordLists
+  表结构:
+    list_id (INTEGER)
+    list_name (TEXT)
+    book_id (INTEGER)
+
+Words
+  表结构:
+    word_id (INTEGER)
+    spelling (TEXT)
+    meaning_cn (TEXT)
+    pos (TEXT)
+    audio_path_uk (TEXT)
+    audio_path_us (TEXT)
+    list_id (INTEGER)
+    derivatives (TEXT)
+    root_etymology (TEXT)
+    mnemonic (TEXT)
+    comparison (TEXT)
+    collocation (TEXT)
+    exam_sentence (TEXT)
+    exam_year_source (TEXT)
+    exam_options (TEXT)
+    exam_explanation (TEXT)
+    tips (TEXT)
+
+ErrorLogs
+  表结构:
+    error_id (INTEGER)
+    student_id (INTEGER)
+    word_id (INTEGER)
+    error_type (TEXT)
+    student_answer (TEXT)
+    error_date (TEXT)
+
+Users
+  表结构:
+    id (INTEGER)
+    username (TEXT)
+    password_hash (TEXT)
+    role (TEXT)
+

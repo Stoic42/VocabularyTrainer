@@ -1008,6 +1008,9 @@
                     params.append('sort_order', apiSortOrder);
                 }
                 
+                // 添加limit参数，确保获取所有记录
+                params.append('limit', 200);
+                
                 // 如果有参数，添加到URL
                 if (params.toString()) {
                     url += `?${params.toString()}`;
@@ -2264,103 +2267,43 @@
             dateFromInput.valueAsDate = today;
             dateToInput.valueAsDate = today;
             
-            // 直接调用applyFilters函数，它会使用上面设置好的日期进行筛选
-            applyFilters();
-        }
-        
-        // 显示最近一周错词
-        function showLastWeekErrors() {
-            // 设置日期筛选器为最近一周
-            const today = new Date();
-            const lastWeek = new Date();
-            lastWeek.setDate(today.getDate() - 7);
+            // 获取其他筛选条件
+            const selectedBookId = bookFilterSelect.value;
+            const selectedListId = listFilterSelect.value;
+            const sortBy = sortBySelect.value || null;
             
-            dateFromInput.valueAsDate = lastWeek;
-            dateToInput.valueAsDate = today;
-            
-            // 应用筛选
-            applyFilters();
-        }
-        
-        // 考核错词功能 - 打开日期选择模态框
-        function showTestErrorsModal() {
-            // 创建模态框（如果不存在）
-            let testErrorsModal = document.getElementById('test-errors-modal');
-            
-            if (!testErrorsModal) {
-                testErrorsModal = document.createElement('div');
-                testErrorsModal.id = 'test-errors-modal';
-                testErrorsModal.className = 'modal-overlay';
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
                 
-                const modalContent = document.createElement('div');
-                modalContent.className = 'modal-content';
-                modalContent.style.maxWidth = '400px';
-                
-                modalContent.innerHTML = `
-                    <div class="modal-header">
-                        <h2>选择考核日期范围</h2>
-                        <button class="close-modal" onclick="closeTestErrorsModal()">&times;</button>
-                    </div>
-                    <div class="export-options">
-                        <div class="filter-group" style="margin-bottom: 15px;">
-                            <label for="test-date-from">开始日期:</label>
-                            <input type="date" id="test-date-from" class="date-filter" style="width: 100%;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 15px;">
-                            <label for="test-date-to">结束日期:</label>
-                            <input type="date" id="test-date-to" class="date-filter" style="width: 100%;">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="modal-btn cancel-btn" onclick="closeTestErrorsModal()">取消</button>
-                        <button class="modal-btn export-btn" onclick="applyTestErrorsFilter()">确定</button>
-                    </div>
-                `;
-                
-                testErrorsModal.appendChild(modalContent);
-                document.body.appendChild(testErrorsModal);
-                
-                // 设置默认日期为最近一周
-                const today = new Date();
-                const lastWeek = new Date();
-                lastWeek.setDate(today.getDate() - 7);
-                
-                document.getElementById('test-date-from').valueAsDate = lastWeek;
-                document.getElementById('test-date-to').valueAsDate = today;
+                // 直接从服务器获取今日数据
+                // 注意：这里不需要额外设置limit参数，因为fetchErrorHistory函数已经添加了limit=200参数
+                fetchErrorHistory(
+                    selectedBookId,
+                    selectedListId,
+                    todayStr,
+                    todayStr,
+                    sortBy
+                ).then(data => {
+                    // 隐藏加载提示，显示内容
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+                    
+                    // 渲染数据
+                    renderErrorHistory(data);
+                }).catch(error => {
+                    // 显示错误信息
+                    loadingEl.style.display = 'none';
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                    errorMessageEl.style.display = 'block';
+                });
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
             }
-            
-            // 显示模态框
-            testErrorsModal.style.display = 'flex';
-        }
-        
-        // 关闭考核错词模态框
-        function closeTestErrorsModal() {
-            const modal = document.getElementById('test-errors-modal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-        
-        // 应用考核错词筛选
-        function applyTestErrorsFilter() {
-            // 获取用户选择的日期范围
-            const testDateFrom = document.getElementById('test-date-from').value;
-            const testDateTo = document.getElementById('test-date-to').value;
-            
-            // 设置主页面的日期筛选器
-            if (testDateFrom) {
-                dateFromInput.value = testDateFrom;
-            }
-            
-            if (testDateTo) {
-                dateToInput.value = testDateTo;
-            }
-            
-            // 关闭模态框
-            closeTestErrorsModal();
-            
-            // 应用筛选
-            applyFilters();
         }
         
         // 页面加载完成后初始化
