@@ -255,6 +255,7 @@
 
 [1]: https://games4esl.com/reading-comprehension-worksheets/football-reading-comprehension-worksheet/?utm_source=chatgpt.com "Football - Reading Comprehension Worksheet - Games4esl"
 [2]: https://www.scribd.com/document/734225156/Reading-Comprehension-Worksheet-Football?utm_source=chatgpt.com "Reading Comprehension Worksheet Football | PDF - Scribd"
+<<<<<<< HEAD
 
 您好！我仔细拜读了您为Alan同学量身定制的这份功能企划书。
 
@@ -381,3 +382,5 @@
 3.  **长期 (产品化阶段)**: 探索**第四个模块**（个人字体生成），这是一个非常独特但技术壁垒极高的功能，可以作为产品的“护城河”来规划。
 
 您拥有一个非常棒的蓝图。现在，让我们先集中精力，完成“周二交付”的多用户和多词书功能，为实现这一切打下最坚实的基础！
+=======
+>>>>>>> 5407329 (feat: 实现表头内联筛选功能 (实验性))
