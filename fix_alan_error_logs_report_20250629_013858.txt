@@ -1,0 +1,102 @@
+修复Alan错词记录报告
+================
+
+备份ErrorLogs表...
+备份完成
+
+查询Alan在2025-06-25的错词记录（修复前）:
+找到 39 条错词记录:
+错误ID: 6, 单词ID: 1186, 错误类型: spelling_mvp, 学生答案: dairy, 日期: 2025-06-25, 单词: 未找到
+错误ID: 7, 单词ID: 1175, 错误类型: spelling_mvp, 学生答案: gule, 日期: 2025-06-25, 单词: 未找到
+错误ID: 8, 单词ID: 1163, 错误类型: spelling_mvp, 学生答案: cutton, 日期: 2025-06-25, 单词: 未找到
+错误ID: 9, 单词ID: 1185, 错误类型: spelling_mvp, 学生答案: unuder, 日期: 2025-06-25, 单词: 未找到
+错误ID: 10, 单词ID: 1180, 错误类型: spelling_mvp, 学生答案: tarible, 日期: 2025-06-25, 单词: 未找到
+错误ID: 11, 单词ID: 1183, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 12, 单词ID: 1197, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 13, 单词ID: 1204, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 14, 单词ID: 1173, 错误类型: spelling_mvp, 学生答案: p\lastic, 日期: 2025-06-25, 单词: 未找到
+错误ID: 15, 单词ID: 1215, 错误类型: spelling_mvp, 学生答案: perpuse, 日期: 2025-06-25, 单词: 未找到
+错误ID: 16, 单词ID: 1208, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 17, 单词ID: 1172, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 18, 单词ID: 1203, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 19, 单词ID: 1217, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 20, 单词ID: 1213, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 21, 单词ID: 1179, 错误类型: spelling_mvp, 学生答案: convient, 日期: 2025-06-25, 单词: 未找到
+错误ID: 22, 单词ID: 1233, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 23, 单词ID: 1222, 错误类型: spelling_mvp, 学生答案: autor, 日期: 2025-06-25, 单词: 未找到
+错误ID: 24, 单词ID: 1256, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 25, 单词ID: 1276, 错误类型: spelling_mvp, 学生答案: natrure, 日期: 2025-06-25, 单词: 未找到
+错误ID: 26, 单词ID: 1228, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 27, 单词ID: 1252, 错误类型: spelling_mvp, 学生答案: gruond, 日期: 2025-06-25, 单词: 未找到
+错误ID: 28, 单词ID: 1238, 错误类型: spelling_mvp, 学生答案: bile, 日期: 2025-06-25, 单词: 未找到
+错误ID: 29, 单词ID: 1225, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 30, 单词ID: 1237, 错误类型: spelling_mvp, 学生答案: painful, 日期: 2025-06-25, 单词: 未找到
+错误ID: 31, 单词ID: 1253, 错误类型: spelling_mvp, 学生答案: cup, 日期: 2025-06-25, 单词: 未找到
+错误ID: 32, 单词ID: 1248, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 33, 单词ID: 1223, 错误类型: spelling_mvp, 学生答案: jule, 日期: 2025-06-25, 单词: 未找到
+错误ID: 34, 单词ID: 1277, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 35, 单词ID: 1234, 错误类型: spelling_mvp, 学生答案: dialog, 日期: 2025-06-25, 单词: 未找到
+错误ID: 36, 单词ID: 1272, 错误类型: spelling_mvp, 学生答案: pe\rject, 日期: 2025-06-25, 单词: 未找到
+错误ID: 37, 单词ID: 1278, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 38, 单词ID: 1261, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 39, 单词ID: 1267, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 40, 单词ID: 1242, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 41, 单词ID: 1239, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 42, 单词ID: 1230, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 43, 单词ID: 1274, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: 未找到
+错误ID: 44, 单词ID: 1264, 错误类型: spelling_mvp, 学生答案: school, 日期: 2025-06-25, 单词: 未找到
+
+更新ErrorLogs表中的word_id...
+更新了 39 条记录
+
+查询Alan在2025-06-25的错词记录（修复后）:
+找到 39 条错词记录:
+错误ID: 6, 单词ID: 18008, 错误类型: spelling_mvp, 学生答案: dairy, 日期: 2025-06-25, 单词: diary
+错误ID: 7, 单词ID: 17997, 错误类型: spelling_mvp, 学生答案: gule, 日期: 2025-06-25, 单词: glue
+错误ID: 8, 单词ID: 17985, 错误类型: spelling_mvp, 学生答案: cutton, 日期: 2025-06-25, 单词: cotton
+错误ID: 9, 单词ID: 18007, 错误类型: spelling_mvp, 学生答案: unuder, 日期: 2025-06-25, 单词: under
+错误ID: 10, 单词ID: 18002, 错误类型: spelling_mvp, 学生答案: tarible, 日期: 2025-06-25, 单词: terrible
+错误ID: 11, 单词ID: 18005, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: careful
+错误ID: 12, 单词ID: 18019, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: several
+错误ID: 13, 单词ID: 18026, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: marathon
+错误ID: 14, 单词ID: 17995, 错误类型: spelling_mvp, 学生答案: p\lastic, 日期: 2025-06-25, 单词: plastic
+错误ID: 15, 单词ID: 18037, 错误类型: spelling_mvp, 学生答案: perpuse, 日期: 2025-06-25, 单词: purpose
+错误ID: 16, 单词ID: 18030, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: discovery
+错误ID: 17, 单词ID: 17994, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: seal
+错误ID: 18, 单词ID: 18025, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: reveal
+错误ID: 19, 单词ID: 18039, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: association
+错误ID: 20, 单词ID: 18035, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: clothes
+错误ID: 21, 单词ID: 18001, 错误类型: spelling_mvp, 学生答案: convient, 日期: 2025-06-25, 单词: convenient
+错误ID: 22, 单词ID: 18055, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: Atlantic
+错误ID: 23, 单词ID: 18044, 错误类型: spelling_mvp, 学生答案: autor, 日期: 2025-06-25, 单词: author
+错误ID: 24, 单词ID: 18078, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: escalator
+错误ID: 25, 单词ID: 18098, 错误类型: spelling_mvp, 学生答案: natrure, 日期: 2025-06-25, 单词: nature
+错误ID: 26, 单词ID: 18050, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: cabbage
+错误ID: 27, 单词ID: 18074, 错误类型: spelling_mvp, 学生答案: gruond, 日期: 2025-06-25, 单词: ground
+错误ID: 28, 单词ID: 18060, 错误类型: spelling_mvp, 学生答案: bile, 日期: 2025-06-25, 单词: bill
+错误ID: 29, 单词ID: 18047, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: globe
+错误ID: 30, 单词ID: 18059, 错误类型: spelling_mvp, 学生答案: painful, 日期: 2025-06-25, 单词: pain
+错误ID: 31, 单词ID: 18075, 错误类型: spelling_mvp, 学生答案: cup, 日期: 2025-06-25, 单词: cap
+错误ID: 32, 单词ID: 18070, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: age
+错误ID: 33, 单词ID: 18045, 错误类型: spelling_mvp, 学生答案: jule, 日期: 2025-06-25, 单词: Jew
+错误ID: 34, 单词ID: 18099, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: vocabulary
+错误ID: 35, 单词ID: 18056, 错误类型: spelling_mvp, 学生答案: dialog, 日期: 2025-06-25, 单词: dialogue
+错误ID: 36, 单词ID: 18094, 错误类型: spelling_mvp, 学生答案: pe\rject, 日期: 2025-06-25, 单词: project
+错误ID: 37, 单词ID: 18100, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: list
+错误ID: 38, 单词ID: 18083, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: weekend
+错误ID: 39, 单词ID: 18089, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: matter
+错误ID: 40, 单词ID: 18064, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: pear
+错误ID: 41, 单词ID: 18061, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: positive
+错误ID: 42, 单词ID: 18052, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: hallway
+错误ID: 43, 单词ID: 18096, 错误类型: spelling_mvp, 学生答案: , 日期: 2025-06-25, 单词: enemy
+错误ID: 44, 单词ID: 18086, 错误类型: spelling_mvp, 学生答案: school, 日期: 2025-06-25, 单词: schoolbag
+
+检查是否还有单词ID不存在于Words表中:
+所有单词ID都存在于Words表中
+
+总结:
+1. 已备份ErrorLogs表到ErrorLogs_Backup
+2. 已更新Alan在2025-06-25的 39 条错词记录的word_id
+3. 所有错词记录现在都可以正确关联到Words表中的单词
+
+修复完成

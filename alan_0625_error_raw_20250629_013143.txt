@@ -1,0 +1,443 @@
+Alan (ID: 3) 在 2025-06-25 的原始错词记录
+================================================================================
+
+共找到 39 条原始错词记录:
+
+列名: error_id, student_id, word_id, error_type, student_answer, error_date
+
+word_id分布统计:
+word_id: 1186, 出现次数: 1
+word_id: 1175, 出现次数: 1
+word_id: 1163, 出现次数: 1
+word_id: 1185, 出现次数: 1
+word_id: 1180, 出现次数: 1
+word_id: 1183, 出现次数: 1
+word_id: 1197, 出现次数: 1
+word_id: 1204, 出现次数: 1
+word_id: 1173, 出现次数: 1
+word_id: 1215, 出现次数: 1
+word_id: 1208, 出现次数: 1
+word_id: 1172, 出现次数: 1
+word_id: 1203, 出现次数: 1
+word_id: 1217, 出现次数: 1
+word_id: 1213, 出现次数: 1
+word_id: 1179, 出现次数: 1
+word_id: 1233, 出现次数: 1
+word_id: 1222, 出现次数: 1
+word_id: 1256, 出现次数: 1
+word_id: 1276, 出现次数: 1
+word_id: 1228, 出现次数: 1
+word_id: 1252, 出现次数: 1
+word_id: 1238, 出现次数: 1
+word_id: 1225, 出现次数: 1
+word_id: 1237, 出现次数: 1
+word_id: 1253, 出现次数: 1
+word_id: 1248, 出现次数: 1
+word_id: 1223, 出现次数: 1
+word_id: 1277, 出现次数: 1
+word_id: 1234, 出现次数: 1
+word_id: 1272, 出现次数: 1
+word_id: 1278, 出现次数: 1
+word_id: 1261, 出现次数: 1
+word_id: 1267, 出现次数: 1
+word_id: 1242, 出现次数: 1
+word_id: 1239, 出现次数: 1
+word_id: 1230, 出现次数: 1
+word_id: 1274, 出现次数: 1
+word_id: 1264, 出现次数: 1
+
+记录 1:
+  error_id: 6
+  student_id: 3
+  word_id: 1186
+  error_type: spelling_mvp
+  student_answer: dairy
+  error_date: 2025-06-25
+
+记录 2:
+  error_id: 7
+  student_id: 3
+  word_id: 1175
+  error_type: spelling_mvp
+  student_answer: gule
+  error_date: 2025-06-25
+
+记录 3:
+  error_id: 8
+  student_id: 3
+  word_id: 1163
+  error_type: spelling_mvp
+  student_answer: cutton
+  error_date: 2025-06-25
+
+记录 4:
+  error_id: 9
+  student_id: 3
+  word_id: 1185
+  error_type: spelling_mvp
+  student_answer: unuder
+  error_date: 2025-06-25
+
+记录 5:
+  error_id: 10
+  student_id: 3
+  word_id: 1180
+  error_type: spelling_mvp
+  student_answer: tarible
+  error_date: 2025-06-25
+
+记录 6:
+  error_id: 11
+  student_id: 3
+  word_id: 1183
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 7:
+  error_id: 12
+  student_id: 3
+  word_id: 1197
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 8:
+  error_id: 13
+  student_id: 3
+  word_id: 1204
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 9:
+  error_id: 14
+  student_id: 3
+  word_id: 1173
+  error_type: spelling_mvp
+  student_answer: p\lastic
+  error_date: 2025-06-25
+
+记录 10:
+  error_id: 15
+  student_id: 3
+  word_id: 1215
+  error_type: spelling_mvp
+  student_answer: perpuse
+  error_date: 2025-06-25
+
+记录 11:
+  error_id: 16
+  student_id: 3
+  word_id: 1208
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 12:
+  error_id: 17
+  student_id: 3
+  word_id: 1172
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 13:
+  error_id: 18
+  student_id: 3
+  word_id: 1203
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 14:
+  error_id: 19
+  student_id: 3
+  word_id: 1217
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 15:
+  error_id: 20
+  student_id: 3
+  word_id: 1213
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 16:
+  error_id: 21
+  student_id: 3
+  word_id: 1179
+  error_type: spelling_mvp
+  student_answer: convient
+  error_date: 2025-06-25
+
+记录 17:
+  error_id: 22
+  student_id: 3
+  word_id: 1233
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 18:
+  error_id: 23
+  student_id: 3
+  word_id: 1222
+  error_type: spelling_mvp
+  student_answer: autor
+  error_date: 2025-06-25
+
+记录 19:
+  error_id: 24
+  student_id: 3
+  word_id: 1256
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 20:
+  error_id: 25
+  student_id: 3
+  word_id: 1276
+  error_type: spelling_mvp
+  student_answer: natrure
+  error_date: 2025-06-25
+
+记录 21:
+  error_id: 26
+  student_id: 3
+  word_id: 1228
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 22:
+  error_id: 27
+  student_id: 3
+  word_id: 1252
+  error_type: spelling_mvp
+  student_answer: gruond
+  error_date: 2025-06-25
+
+记录 23:
+  error_id: 28
+  student_id: 3
+  word_id: 1238
+  error_type: spelling_mvp
+  student_answer: bile
+  error_date: 2025-06-25
+
+记录 24:
+  error_id: 29
+  student_id: 3
+  word_id: 1225
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 25:
+  error_id: 30
+  student_id: 3
+  word_id: 1237
+  error_type: spelling_mvp
+  student_answer: painful
+  error_date: 2025-06-25
+
+记录 26:
+  error_id: 31
+  student_id: 3
+  word_id: 1253
+  error_type: spelling_mvp
+  student_answer: cup
+  error_date: 2025-06-25
+
+记录 27:
+  error_id: 32
+  student_id: 3
+  word_id: 1248
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 28:
+  error_id: 33
+  student_id: 3
+  word_id: 1223
+  error_type: spelling_mvp
+  student_answer: jule
+  error_date: 2025-06-25
+
+记录 29:
+  error_id: 34
+  student_id: 3
+  word_id: 1277
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 30:
+  error_id: 35
+  student_id: 3
+  word_id: 1234
+  error_type: spelling_mvp
+  student_answer: dialog
+  error_date: 2025-06-25
+
+记录 31:
+  error_id: 36
+  student_id: 3
+  word_id: 1272
+  error_type: spelling_mvp
+  student_answer: pe\rject
+  error_date: 2025-06-25
+
+记录 32:
+  error_id: 37
+  student_id: 3
+  word_id: 1278
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 33:
+  error_id: 38
+  student_id: 3
+  word_id: 1261
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 34:
+  error_id: 39
+  student_id: 3
+  word_id: 1267
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 35:
+  error_id: 40
+  student_id: 3
+  word_id: 1242
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 36:
+  error_id: 41
+  student_id: 3
+  word_id: 1239
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 37:
+  error_id: 42
+  student_id: 3
+  word_id: 1230
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 38:
+  error_id: 43
+  student_id: 3
+  word_id: 1274
+  error_type: spelling_mvp
+  student_answer: 
+  error_date: 2025-06-25
+
+记录 39:
+  error_id: 44
+  student_id: 3
+  word_id: 1264
+  error_type: spelling_mvp
+  student_answer: school
+  error_date: 2025-06-25
+
+
+模拟错误历史API查询结果 (使用GROUP BY):
+API查询返回 39 条记录
+1. word_id: 1163, 日期: 2025-06-25, 错误次数: 1
+2. word_id: 1172, 日期: 2025-06-25, 错误次数: 1
+3. word_id: 1173, 日期: 2025-06-25, 错误次数: 1
+4. word_id: 1175, 日期: 2025-06-25, 错误次数: 1
+5. word_id: 1179, 日期: 2025-06-25, 错误次数: 1
+6. word_id: 1180, 日期: 2025-06-25, 错误次数: 1
+7. word_id: 1183, 日期: 2025-06-25, 错误次数: 1
+8. word_id: 1185, 日期: 2025-06-25, 错误次数: 1
+9. word_id: 1186, 日期: 2025-06-25, 错误次数: 1
+10. word_id: 1197, 日期: 2025-06-25, 错误次数: 1
+11. word_id: 1203, 日期: 2025-06-25, 错误次数: 1
+12. word_id: 1204, 日期: 2025-06-25, 错误次数: 1
+13. word_id: 1208, 日期: 2025-06-25, 错误次数: 1
+14. word_id: 1213, 日期: 2025-06-25, 错误次数: 1
+15. word_id: 1215, 日期: 2025-06-25, 错误次数: 1
+16. word_id: 1217, 日期: 2025-06-25, 错误次数: 1
+17. word_id: 1222, 日期: 2025-06-25, 错误次数: 1
+18. word_id: 1223, 日期: 2025-06-25, 错误次数: 1
+19. word_id: 1225, 日期: 2025-06-25, 错误次数: 1
+20. word_id: 1228, 日期: 2025-06-25, 错误次数: 1
+21. word_id: 1230, 日期: 2025-06-25, 错误次数: 1
+22. word_id: 1233, 日期: 2025-06-25, 错误次数: 1
+23. word_id: 1234, 日期: 2025-06-25, 错误次数: 1
+24. word_id: 1237, 日期: 2025-06-25, 错误次数: 1
+25. word_id: 1238, 日期: 2025-06-25, 错误次数: 1
+26. word_id: 1239, 日期: 2025-06-25, 错误次数: 1
+27. word_id: 1242, 日期: 2025-06-25, 错误次数: 1
+28. word_id: 1248, 日期: 2025-06-25, 错误次数: 1
+29. word_id: 1252, 日期: 2025-06-25, 错误次数: 1
+30. word_id: 1253, 日期: 2025-06-25, 错误次数: 1
+31. word_id: 1256, 日期: 2025-06-25, 错误次数: 1
+32. word_id: 1261, 日期: 2025-06-25, 错误次数: 1
+33. word_id: 1264, 日期: 2025-06-25, 错误次数: 1
+34. word_id: 1267, 日期: 2025-06-25, 错误次数: 1
+35. word_id: 1272, 日期: 2025-06-25, 错误次数: 1
+36. word_id: 1274, 日期: 2025-06-25, 错误次数: 1
+37. word_id: 1276, 日期: 2025-06-25, 错误次数: 1
+38. word_id: 1277, 日期: 2025-06-25, 错误次数: 1
+39. word_id: 1278, 日期: 2025-06-25, 错误次数: 1
+
+检查错词记录中的word_id是否存在于Words表中:
+word_id: 1186 - 不存在于Words表中
+word_id: 1175 - 不存在于Words表中
+word_id: 1163 - 不存在于Words表中
+word_id: 1185 - 不存在于Words表中
+word_id: 1180 - 不存在于Words表中
+word_id: 1183 - 不存在于Words表中
+word_id: 1197 - 不存在于Words表中
+word_id: 1204 - 不存在于Words表中
+word_id: 1173 - 不存在于Words表中
+word_id: 1215 - 不存在于Words表中
+word_id: 1208 - 不存在于Words表中
+word_id: 1172 - 不存在于Words表中
+word_id: 1203 - 不存在于Words表中
+word_id: 1217 - 不存在于Words表中
+word_id: 1213 - 不存在于Words表中
+word_id: 1179 - 不存在于Words表中
+word_id: 1233 - 不存在于Words表中
+word_id: 1222 - 不存在于Words表中
+word_id: 1256 - 不存在于Words表中
+word_id: 1276 - 不存在于Words表中
+word_id: 1228 - 不存在于Words表中
+word_id: 1252 - 不存在于Words表中
+word_id: 1238 - 不存在于Words表中
+word_id: 1225 - 不存在于Words表中
+word_id: 1237 - 不存在于Words表中
+word_id: 1253 - 不存在于Words表中
+word_id: 1248 - 不存在于Words表中
+word_id: 1223 - 不存在于Words表中
+word_id: 1277 - 不存在于Words表中
+word_id: 1234 - 不存在于Words表中
+word_id: 1272 - 不存在于Words表中
+word_id: 1278 - 不存在于Words表中
+word_id: 1261 - 不存在于Words表中
+word_id: 1267 - 不存在于Words表中
+word_id: 1242 - 不存在于Words表中
+word_id: 1239 - 不存在于Words表中
+word_id: 1230 - 不存在于Words表中
+word_id: 1274 - 不存在于Words表中
+word_id: 1264 - 不存在于Words表中

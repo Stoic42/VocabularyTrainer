@@ -986,6 +986,9 @@
                     params.append('sort_order', apiSortOrder);
                 }
                 
+                // 添加limit参数，确保获取所有记录
+                params.append('limit', 200);
+                
                 // 如果有参数，添加到URL
                 if (params.toString()) {
                     url += `?${params.toString()}`;
@@ -2223,6 +2226,7 @@
                 contentEl.style.display = 'none';
                 
                 // 直接从服务器获取今日数据
+                // 注意：这里不需要额外设置limit参数，因为fetchErrorHistory函数已经添加了limit=200参数
                 fetchErrorHistory(
                     selectedBookId,
                     selectedListId,
