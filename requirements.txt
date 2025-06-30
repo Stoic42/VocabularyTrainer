@@ -11,5 +11,6 @@ reportlab==4.0.4
 werkzeug==2.3.7
 
 # 其他依赖
+flask-login==0.6.3
 requests==2.31.0
 python-dotenv==1.0.0
