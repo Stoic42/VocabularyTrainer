@@ -3,8 +3,8 @@ import os
 import hashlib
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
-WORDLISTS_BASE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists'
+DATABASE_FILE = 'vocabulary.db'
+WORDLISTS_BASE_DIR = 'wordlists'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE_FILE)

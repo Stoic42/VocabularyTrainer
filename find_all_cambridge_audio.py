@@ -3,7 +3,7 @@ import os
 import re
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = 'vocabulary.db'
 WORDLISTS_BASE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists'
 
 def get_db_connection():

@@ -5,7 +5,7 @@ from gtts import gTTS
 import time
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = 'vocabulary.db'
 WORDLISTS_BASE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists'
 TTS_CACHE_DIR = os.path.join(WORDLISTS_BASE_DIR, 'tts_cache')
 os.makedirs(TTS_CACHE_DIR, exist_ok=True)

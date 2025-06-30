@@ -2,7 +2,7 @@ import sqlite3
 import os
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = 'vocabulary.db'
 TTS_CACHE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists\\tts_cache'
 
 def get_db_connection():

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # 数据库文件路径
-DATABASE_FILE = 'd:/Projects/VocabularyTrainer/vocabulary.db'
+DATABASE_FILE = 'vocabulary.db'
 
 # 获取数据库连接
 def get_db_connection():
