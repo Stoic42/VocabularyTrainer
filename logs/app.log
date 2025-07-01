@@ -45,3 +45,5 @@
 2025-06-30 12:08:47,424 INFO: 统计查询筛选结束日期: 2025-06-30 23:59:59 [in C:\Users\wangq\Documents\VocabularyTrainer\app.py:497]
 2025-06-30 12:08:47,521 INFO: 单词历史查询筛选开始日期: 2025-05-31 00:00:00 [in C:\Users\wangq\Documents\VocabularyTrainer\app.py:536]
 2025-06-30 12:08:47,523 INFO: 单词历史查询筛选结束日期: 2025-06-30 23:59:59 [in C:\Users\wangq\Documents\VocabularyTrainer\app.py:541]
+2025-07-01 10:49:57,137 INFO: 应用启动 [in C:\Users\wangq\Documents\VocabularyTrainer\app.py:75]
+2025-07-01 10:49:57,634 INFO: 应用启动 [in C:\Users\wangq\Documents\VocabularyTrainer\app.py:75]
