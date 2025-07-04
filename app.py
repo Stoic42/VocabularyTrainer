@@ -135,7 +135,7 @@ def get_questions():
     # 新增：从URL获取单词数量, 默认为'10'
     count_str = request.args.get('count', default='10', type=str)
     # 新增：学习模式参数，默认为'standard'
-    study_mode = request.args.get('mode', default='standard', type=str)
+    study_mode = request.args.get('study_mode', default='standard', type=str)
     
     # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
     student_id = session.get('user_id', -1)
@@ -146,10 +146,11 @@ def get_questions():
     if study_mode.lower() == 'error_review':
         # 错误复习模式：只获取该学生在指定列表中犯过错误的单词
         sql_query = '''
-        SELECT DISTINCT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
                w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
                w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
-               COUNT(e.error_id) as error_count, MAX(e.error_date) as last_error_date,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
                wl.list_name, b.book_name
         FROM Words w
         INNER JOIN ErrorLogs e ON w.word_id = e.word_id
@@ -159,7 +160,7 @@ def get_questions():
         GROUP BY w.word_id
         ORDER BY error_count DESC, last_error_date DESC
         '''
-        params = (list_id, student_id)
+        params = (student_id, student_id, list_id, student_id)
     else:
         # 标准模式和默写模式：随机获取单词
         sql_query = '''SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us, 
@@ -168,8 +169,9 @@ def get_questions():
                    FROM Words WHERE list_id = ? ORDER BY RANDOM()'''
         params = (list_id,)
 
-    # 只有当数量不是'all'时，我们才加上LIMIT子句
-    if count_str.lower() != 'all':
+    # 对于错词复习模式，总是获取全部错词，不应用LIMIT
+    # 对于其他模式，只有当数量不是'all'时才加上LIMIT子句
+    if study_mode.lower() != 'error_review' and count_str.lower() != 'all':
         try:
             # 确保count可以被转换为整数
             limit_count = int(count_str)
@@ -181,8 +183,21 @@ def get_questions():
             sql_query += ' LIMIT ?'
             params += (10,)
 
+    # 添加调试日志
+    if study_mode.lower() == 'error_review':
+        app.logger.info(f"错词复习模式SQL: {sql_query}")
+        app.logger.info(f"错词复习模式参数: {params}")
+    
     words = conn.execute(sql_query, params).fetchall()
     conn.close()
+    
+    # 添加调试日志
+    if study_mode.lower() == 'error_review':
+        app.logger.info(f"错词复习模式: 列表ID={list_id}, 学生ID={student_id}, 获取到{len(words)}个错词")
+        if words:
+            app.logger.info(f"错词示例: {[word['spelling'] for word in words[:3]]}")
+        else:
+            app.logger.info(f"错词复习模式: 列表ID={list_id}, 学生ID={student_id}, 没有错词")
     
     # --- 数据处理逻辑，根据学习模式决定是否包含音频URL和详情字段 ---
     word_list = []
@@ -211,8 +226,8 @@ def get_questions():
                 word_dict['book_name'] = ""
         
         # 根据学习模式决定是否包含音频URL
-        if study_mode.lower() not in ['dictation', 'error_review']:
-            # 标准模式：包含音频URL
+        if study_mode.lower() != 'dictation':
+            # 标准模式和错词复习模式：包含音频URL
             if word_dict['audio_path_uk']:
                 word_dict['audio_path_uk'] = f"/wordlists/junior_high/media/{word_dict['audio_path_uk']}"
             else:
@@ -225,7 +240,7 @@ def get_questions():
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_us'] = f"/api/tts/{word_dict['spelling']}"
         else:
-            # 默写模式和错误复习模式：不提供音频
+            # 默写模式：不提供音频
             word_dict['audio_path_uk'] = ""
             word_dict['audio_path_us'] = ""
             
@@ -241,6 +256,11 @@ def submit_answers():
     
     # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
     student_id = session.get('user_id', -1)
+    
+    # 添加调试日志
+    app.logger.info(f"收到答案提交请求: 用户ID={student_id}, 答案数量={len(answers)}")
+    if answers:
+        app.logger.info(f"第一个答案示例: word_id={answers[0].get('word_id')}, answer={answers[0].get('answer')}")
     
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -280,7 +300,7 @@ def submit_answers():
                         "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))",
                         (student_id, word_id, 'spelling_mvp', student_answer)
                     )
-                    app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}")
+                    app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}, 模式=错词复习, 正确拼写={correct_spelling}")
                 except sqlite3.Error as e:
                     app.logger.error(f"记录错误到ErrorLogs表失败: {e}")
                     # 如果表不存在，尝试创建它
@@ -309,6 +329,9 @@ def submit_answers():
 
     conn.commit()
     conn.close()
+    
+    # 添加提交完成日志
+    app.logger.info(f"答案提交完成: 用户ID={student_id}, 错误数量={len(error_details)}")
 
     return jsonify({
         'message': 'Test submitted!',
@@ -522,7 +545,7 @@ def get_error_history():
         
         if date_to is not None:
             query += " AND e.error_date <= ?"
-            params.append(date_to)
+            params.append(date_to + ' 23:59:59')  # 包含当天的所有时间
         
         # 添加排序逻辑
         if sort_by == 'error_count':
@@ -573,7 +596,7 @@ def get_error_history():
         
         if date_to is not None:
             stats_query += " AND e.error_date <= ?"
-            stats_params.append(date_to)
+            stats_params.append(date_to + ' 23:59:59')  # 包含当天的所有时间
         
         stats_query += """
         GROUP BY w.list_id
@@ -615,7 +638,7 @@ def get_error_history():
         
         if date_to is not None:
             word_history_query += " AND e.error_date <= ?"
-            word_history_params.append(date_to)
+            word_history_params.append(date_to + ' 23:59:59')  # 包含当天的所有时间
         
         word_history_query += """
         GROUP BY w.word_id
