@@ -226,7 +226,83 @@
             outline: none; border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(255,179,71,0.1);
         }
-        #quiz-area, #results-area { margin-top: 20px; padding: 20px; border-radius: var(--border-radius); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        #quiz-area, #results-area { 
+            margin-top: 20px; padding: 20px; border-radius: var(--border-radius); 
+            background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+        }
+        #quiz-area {
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 4px 12px rgba(255, 179, 71, 0.2);
+            position: relative;
+        }
+        
+        /* 右下角控制按钮样式 */
+        .quiz-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        .quiz-controls:hover { opacity: 1; }
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .control-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3);
+        }
+        .control-btn:active { transform: scale(0.95); }
+        .control-btn::after {
+            content: attr(title);
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        .control-btn:hover::after { opacity: 1; }
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 4px solid transparent;
+            border-left-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .control-btn:hover::before { opacity: 1; }
         #results-area { display: none; }
         #error-list { list-style-type: none; padding-left: 0; }
         #error-list li { margin: 10px 0; padding: 10px; background: #fff5f5; border-radius: var(--border-radius); border-left: 4px solid var(--error-color); }
@@ -459,7 +535,16 @@
                 <select id="study-mode">
                     <option value="standard">标准模式</option>
                     <option value="dictation">默写模式</option>
+                    <option value="error_review">错词复习模式</option>
                 </select>
+            </div>
+        </div>
+
+        <!-- 错词复习模式统计信息 -->
+        <div id="error-stats-container" style="display: none; margin-top: 15px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+            <h3 style="margin: 0 0 10px 0; color: #856404;">错词复习统计</h3>
+            <div id="error-stats-content">
+                <p>正在加载统计信息...</p>
             </div>
         </div>
 
@@ -489,15 +574,24 @@
             </label>
         </div>
 
+        <!-- 添加错词清零模式开关 -->
+        <div class="error-clear-mode-container" style="display: flex; align-items: center; margin-top: 10px;">
+            <label for="error-clear-mode-toggle">错词清零模式: </label>
+            <label class="switch">
+                <input type="checkbox" id="error-clear-mode-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
         <div style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 20px;">
             <button id="start-btn">开始测试</button>
             <a href="/error-history" class="btn" style="background-color: #3498db;">查看错误历史</a>
         </div>
 
         <div id="quiz-area" style="display: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
                 <h2 id="question-meaning"></h2>
-                <div>
+                <div style="display: flex; gap: 10px;">
                     <button id="play-uk-btn" style="display: none;">英 🔊</button>
                     <button id="play-us-btn" style="display: none;">美 🔊</button>
                 </div>
@@ -524,6 +618,20 @@
             </div>
             <input type="text" id="answer-input" placeholder="输入单词拼写...">
             <button id="next-btn" style="margin-top: 10px;">下一题</button>
+            <!-- 右下角浮动按钮区域 -->
+            <div id="quiz-controls" class="quiz-controls">
+                <button id="back-home-btn" class="control-btn" title="返回主页">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                    </svg>
+                </button>
+                <button id="exit-quiz-btn" class="control-btn" title="退出测试">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <div id="results-area">
@@ -566,7 +674,19 @@
         let lumiEnabled = true; // Lumi显示状态
         let autoPlayEnabled = false; // 自动播放状态
         let instantFeedbackEnabled = false; // 答题即时反馈状态
+        let errorClearModeEnabled = false; // 错词清零模式状态
         let currentUser = null; // 当前登录用户
+        
+        // 错词清零模式相关变量
+        let errorClearModeData = {
+            isActive: false,
+            currentRound: 1,
+            originalQuestions: [],
+            currentQuestions: [],
+            incorrectWords: [],
+            roundResults: []
+        };
+        
         const lumiImages = {
             'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
             'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
@@ -626,8 +746,40 @@
         const lumiImg = document.querySelector('.lumi-reaction');
         const lumiToggle = document.getElementById('lumi-toggle');
         const autoPlayToggle = document.getElementById('auto-play-toggle');
+        const instantFeedbackToggle = document.getElementById('instant-feedback-toggle');
+        const errorClearModeToggle = document.getElementById('error-clear-mode-toggle');
 
         // --- 功能函数 ---
+        
+        // 格式化词性和意思的函数
+        function formatPOSAndMeaning(pos, meaning) {
+            if (!pos || !meaning) {
+                return { extractedPos: pos || '', formattedMeaning: meaning || '' };
+            }
+            
+            // 提取词性信息
+            const posMatch = pos.match(/^([^，。；]*?)(?=[，。；]|$)/);
+            const extractedPos = posMatch ? posMatch[1].trim() : pos;
+            
+            // 格式化意思，将词性信息用斜体显示
+            let formattedMeaning = meaning;
+            if (extractedPos && extractedPos !== pos) {
+                // 如果提取的词性与原始词性不同，说明有多个词性
+                const posParts = pos.split(/[，。；]/);
+                formattedMeaning = posParts.map((part, index) => {
+                    if (index === 0) {
+                        return `<em style="color: #007bff; font-weight: bold;">${part.trim()}</em>`;
+                    } else {
+                        return part.trim();
+                    }
+                }).join('；');
+            } else {
+                // 单个词性
+                formattedMeaning = `<em style="color: #007bff; font-weight: bold;">${extractedPos}</em> ${meaning}`;
+            }
+            
+            return { extractedPos, formattedMeaning };
+        }
         
         // 检查用户登录状态
         function checkLoginStatus() {
@@ -681,6 +833,9 @@
                 }
             }
             
+            // 检查是否有上次的测试进度
+            checkLastQuizProgress();
+            
             // 确保 Lumi 开关状态正确
             lumiEnabled = lumiToggle.checked;
             if (!lumiEnabled) {
@@ -688,6 +843,51 @@
             } else {
                 updateLumiReaction('welcome');
             }
+        }
+
+        // 检查上次测试进度的函数
+        function checkLastQuizProgress() {
+            const savedProgress = localStorage.getItem('quizProgress');
+            if (savedProgress) {
+                try {
+                    const progress = JSON.parse(savedProgress);
+                    const timeDiff = new Date() - new Date(progress.timestamp);
+                    const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
+                    
+                    // 如果进度是24小时内的，显示提示
+                    if (hoursDiff < 24) {
+                        const progressMsg = document.createElement('div');
+                        progressMsg.style.cssText = `
+                            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+                            border: 1px solid #ffc107;
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin: 15px 0;
+                            color: #856404;
+                            font-size: 0.95em;
+                        `;
+                        progressMsg.innerHTML = `
+                            <strong>📚 上次测试进度提醒</strong><br>
+                            你在 ${hoursDiff} 小时前完成了 ${progress.progress_percentage}% 的测试<br>
+                            (${progress.answered_questions}/${progress.total_questions} 题，正确 ${progress.correct_answers} 题)<br>
+                            <button onclick="clearProgress()" style="margin-top: 8px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">清除提醒</button>
+                        `;
+                        
+                        // 插入到开始按钮之前
+                        const startBtn = document.getElementById('start-btn');
+                        startBtn.parentNode.insertBefore(progressMsg, startBtn);
+                    }
+                } catch (error) {
+                    console.error('解析保存的进度时出错:', error);
+                    localStorage.removeItem('quizProgress');
+                }
+            }
+        }
+
+        // 清除进度提醒的函数
+        function clearProgress() {
+            localStorage.removeItem('quizProgress');
+            location.reload();
         }
         
         // 处理登录
@@ -922,7 +1122,7 @@
         function playAudio(audioPath, fallbackText) {
             // 检查当前学习模式，如果是默写模式则不播放
             const studyMode = document.getElementById('study-mode').value;
-            if (studyMode !== 'standard') return;
+            if (studyMode === 'dictation') return;
             
             if (audioPath && audioPath.trim() !== "") {
                 // 尝试使用本地音频文件
@@ -992,7 +1192,7 @@
             
             // 检查当前学习模式，如果是默写模式则不播放
             const studyMode = document.getElementById('study-mode').value;
-            if (studyMode !== 'standard') return;
+            if (studyMode === 'dictation') return;
             
             const q = questions[currentQuestionIndex];
             
@@ -1084,6 +1284,7 @@
         // 显示问题
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
+            const studyMode = document.getElementById('study-mode').value;
             
             // 使用 formatPOSAndMeaning 函数处理词性和意思
             const { extractedPos, formattedMeaning } = formatPOSAndMeaning(q.pos, q.meaning_cn);
@@ -1094,6 +1295,35 @@
             questionMeaningEnEl.textContent = q.meaning_en || ''; // 英文释义
             questionExampleEnEl.textContent = q.example_en || ''; // 例句英文
             questionExampleCnEl.textContent = q.example_cn || ''; // 例句中文
+
+            // 错词复习模式：准备错误统计信息（但不立即显示）
+            let errorInfo = null;
+            if (studyMode === 'error_review' && q.error_count) {
+                errorInfo = document.createElement('div');
+                errorInfo.className = 'error-info';
+                errorInfo.style.cssText = `
+                    background: #fffbe6;
+                    border-left: 3px solid #ffeaa7;
+                    border-radius: 0 6px 6px 0;
+                    padding: 6px 12px;
+                    margin: 8px 0 0 0;
+                    color: #856404;
+                    font-size: 0.85em;
+                    line-height: 1.5;
+                    font-weight: normal;
+                    box-shadow: none;
+                `;
+                errorInfo.innerHTML = `
+                    <span style="font-size:0.95em;">📊 错词统计：</span>
+                    已错误 <strong>${q.error_count}</strong> 次
+                    ${q.last_error_date ? `，最近错误：${q.last_error_date}` : ''}
+                    ${q.book_name && q.list_name ? `，来自：${q.book_name} - ${q.list_name}` : q.list_name ? `，来自：${q.list_name}` : ''}
+                `;
+            }
+            
+            // 移除之前的错误信息（如果有）
+            const existingErrorInfo = document.querySelector('.error-info');
+            if (existingErrorInfo) existingErrorInfo.remove();
 
             // 填充更多详细信息
             questionDerivativesEl.textContent = q.derivatives ? `派生词: ${q.derivatives}` : '';
@@ -1106,11 +1336,15 @@
             questionExamOptionsEl.textContent = q.exam_options ? `选项: ${q.exam_options}` : '';
             questionExamExplanationEl.textContent = q.exam_explanation ? `解析: ${q.exam_explanation}` : '';
             questionTipsEl.textContent = q.tips ? `提示: ${q.tips}` : '';
+            
+            // 如果有错词统计信息，添加到详情容器的最前面
+            if (errorInfo) {
+                wordDetailsContainer.insertBefore(errorInfo, wordDetailsContainer.firstChild);
+            }
 
             // 根据学习模式决定是否默认展开详情
-            const studyMode = document.getElementById('study-mode').value;
-            if (studyMode === 'learning') {
-                // 学习模式下默认展开详情
+            if (studyMode === 'learning' || studyMode === 'error_review') {
+                // 学习模式和错词复习模式下默认展开详情
                 wordDetailsContainer.style.display = 'block';
                 toggleDetailsBtn.textContent = '隐藏更多详情';
             } else {
@@ -1122,7 +1356,7 @@
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
             // 根据学习模式和音频路径决定是否显示音频按钮
-            const showAudio = studyMode === 'standard';
+            const showAudio = studyMode === 'standard' || studyMode === 'error_review';
             
             // 显示TTS按钮，无论是否有本地音频
             const ttsBtn = document.createElement('button');
@@ -1155,7 +1389,7 @@
             nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? '完成并提交' : '下一题';
             answerInput.focus();
             
-            // 如果启用了自动播放且是标准模式，自动播放音频
+            // 如果启用了自动播放且支持音频，自动播放音频
             if (autoPlayEnabled && showAudio) {
                 setTimeout(() => autoPlayAudios(), 500); // 延迟500ms后播放，给页面渲染一些时间
             }
@@ -1300,7 +1534,7 @@
                 } else {
                     submitTest();
                 }
-            }, 700); // 延迟700毫秒，让用户能看到Lumi的反应
+            }, 1500); // 延迟1.5秒，给用户足够时间查看反馈和准备下一题
         }
 
         // 提交测试
@@ -1318,10 +1552,71 @@
 
         // 显示结果
         function displayResults(results) {
+            const studyMode = document.getElementById('study-mode').value;
             resultsArea.style.display = 'block';
             document.getElementById('error-count').textContent = results.error_count;
             const errorListEl = document.getElementById('error-list');
             errorListEl.innerHTML = '';
+
+            // 错词复习模式特殊处理
+            if (studyMode === 'error_review') {
+                const correctCount = questions.length - results.error_count;
+                const accuracyRate = Math.round((correctCount / questions.length) * 100);
+                
+                // 添加错词复习模式的特殊标题
+                const reviewTitle = document.createElement('h3');
+                reviewTitle.style.color = '#856404';
+                reviewTitle.style.marginBottom = '15px';
+                reviewTitle.innerHTML = `📚 错词复习结果`;
+                resultsArea.insertBefore(reviewTitle, resultsArea.firstChild);
+                
+                // 添加统计信息
+                const statsDiv = document.createElement('div');
+                statsDiv.style.cssText = `
+                    background-color: #fff3cd;
+                    border: 1px solid #ffeaa7;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin: 15px 0;
+                    color: #856404;
+                `;
+                statsDiv.innerHTML = `
+                    <p><strong>本次复习统计：</strong></p>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>复习单词数：<strong>${questions.length}</strong> 个</li>
+                        <li>正确数量：<strong>${correctCount}</strong> 个</li>
+                        <li>错误数量：<strong>${results.error_count}</strong> 个</li>
+                        <li>正确率：<strong>${accuracyRate}%</strong></li>
+                    </ul>
+                `;
+                resultsArea.insertBefore(statsDiv, errorListEl);
+                
+                // 根据正确率给出不同的鼓励信息
+                let encouragement = '';
+                if (accuracyRate === 100) {
+                    encouragement = '🎉 完美！你已经完全掌握了这些错词！';
+                } else if (accuracyRate >= 80) {
+                    encouragement = '👍 很好！大部分错词都已经掌握了，继续加油！';
+                } else if (accuracyRate >= 60) {
+                    encouragement = '💪 不错！有进步，但还需要继续练习。';
+                } else {
+                    encouragement = '📖 继续努力！这些单词还需要更多练习。';
+                }
+                
+                const encouragementDiv = document.createElement('div');
+                encouragementDiv.style.cssText = `
+                    background-color: #d4edda;
+                    border: 1px solid #c3e6cb;
+                    border-radius: 8px;
+                    padding: 10px;
+                    margin: 10px 0;
+                    color: #155724;
+                    text-align: center;
+                    font-weight: bold;
+                `;
+                encouragementDiv.textContent = encouragement;
+                resultsArea.insertBefore(encouragementDiv, errorListEl);
+            }
 
             if (results.error_details && results.error_details.length > 0) {
                 results.error_details.forEach(err => {
@@ -1366,9 +1661,16 @@
             if (!document.getElementById('back-btn')) {
                 const backBtn = document.createElement('button');
                 backBtn.id = 'back-btn';
-                backBtn.textContent = '返回开始界面';
+                backBtn.textContent = studyMode === 'error_review' ? '继续复习其他错词' : '返回开始界面';
                 backBtn.style.marginTop = '20px';
-                backBtn.onclick = function() { location.reload(); };
+                backBtn.onclick = function() { 
+                    if (studyMode === 'error_review') {
+                        // 错词复习模式：重新加载错词
+                        location.reload();
+                    } else {
+                        location.reload(); 
+                    }
+                };
                 resultsArea.appendChild(backBtn);
             }
         }
@@ -1381,6 +1683,15 @@
             updateLumiReaction('welcome');
             loadBookLists(); // 加载词书列表，而不是直接加载单词列表
             checkLoginStatus();
+            
+            // 初始化错词复习模式的设置
+            const selectedMode = document.getElementById('study-mode').value;
+            if (selectedMode === 'error_review') {
+                const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)');
+                const countSelect = document.getElementById('count-select');
+                countSelectContainer.style.display = 'none';
+                countSelect.value = 'all';
+            }
             
             // 初始化Lumi开关状态
             lumiEnabled = lumiToggle.checked;
@@ -1397,6 +1708,9 @@
             // 初始化自动播放开关状态
             autoPlayEnabled = autoPlayToggle.checked;
             
+            // 初始化错词清零模式开关状态
+            errorClearModeEnabled = errorClearModeToggle.checked;
+            
             // 添加词书选择变化事件监听器
             document.getElementById('book-select').addEventListener('change', function() {
                 const selectedBookId = this.value;
@@ -1405,6 +1719,13 @@
                 } else {
                     // 如果没有选择词书，清空单元列表
                     document.getElementById('list-select').innerHTML = '<option value="">请先选择词书...</option>';
+                }
+                // 新增：切换词书时，如果是错词复习模式，刷新错词统计区
+                const selectedMode = document.getElementById('study-mode').value;
+                if (selectedMode === 'error_review') {
+                    const errorStatsContent = document.getElementById('error-stats-content');
+                    errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
+                    loadErrorStats();
                 }
             });
             
@@ -1503,6 +1824,650 @@
             localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
         });
 
+        // 错词清零模式开关事件监听
+        document.getElementById('error-clear-mode-toggle').addEventListener('change', function() {
+            errorClearModeEnabled = this.checked;
+            if (errorClearModeEnabled) {
+                // 如果开启错词清零模式，自动切换到错词复习模式
+                document.getElementById('study-mode').value = 'error_review';
+                // 触发学习模式变化事件
+                document.getElementById('study-mode').dispatchEvent(new Event('change'));
+            } else {
+                // 如果关闭错词清零模式，重新加载错词统计以移除特殊提示
+                const selectedMode = document.getElementById('study-mode').value;
+                if (selectedMode === 'error_review') {
+                    loadErrorStats();
+                }
+            }
+        });
+
+        // 学习模式变化事件监听
+        document.getElementById('study-mode').addEventListener('change', function() {
+            const selectedMode = this.value;
+            const errorStatsContainer = document.getElementById('error-stats-container');
+            const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)'); // 数量选择器容器
+            const countSelect = document.getElementById('count-select');
+            
+            if (selectedMode === 'error_review') {
+                // 显示错词统计容器
+                errorStatsContainer.style.display = 'block';
+                // 隐藏数量选择器
+                countSelectContainer.style.display = 'none';
+                // 默认选择全部
+                countSelect.value = 'all';
+                // 加载错词统计信息
+                loadErrorStats();
+                
+                // 如果错词清零模式已开启，显示特殊提示
+                if (errorClearModeEnabled) {
+                    const errorStatsContent = document.getElementById('error-stats-content');
+                    if (errorStatsContent) {
+                        const clearModeNote = document.createElement('div');
+                        clearModeNote.style.cssText = `
+                            background: #e3f2fd;
+                            border: 1px solid #2196f3;
+                            border-radius: 5px;
+                            padding: 10px;
+                            margin-top: 10px;
+                            color: #1976d2;
+                            font-weight: bold;
+                        `;
+                        clearModeNote.innerHTML = '🎯 <strong>错词清零模式已开启</strong> - 将对错词进行循环考核直到100%正确！';
+                        errorStatsContent.appendChild(clearModeNote);
+                    }
+                }
+            } else {
+                // 隐藏错词统计容器
+                errorStatsContainer.style.display = 'none';
+                // 显示数量选择器
+                countSelectContainer.style.display = 'block';
+                
+                // 如果切换到其他模式，关闭错词清零模式
+                if (errorClearModeEnabled) {
+                    errorClearModeToggle.checked = false;
+                    errorClearModeEnabled = false;
+                }
+            }
+        });
+
+        // 单元选择变化事件监听（用于错词复习模式）
+        document.getElementById('list-select').addEventListener('change', function() {
+            const selectedMode = document.getElementById('study-mode').value;
+            if (selectedMode === 'error_review') {
+                // 立即显示加载状态
+                const errorStatsContent = document.getElementById('error-stats-content');
+                errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
+                
+                // 立即加载错词统计信息
+                loadErrorStats();
+            }
+        });
+
+        // 显示错词清零模式界面
+        function showErrorClearModeInterface() {
+            // 创建错词清零模式容器
+            const errorClearContainer = document.createElement('div');
+            errorClearContainer.id = 'error-clear-container';
+            errorClearContainer.style.cssText = `
+                max-width: 800px;
+                margin: 0 auto;
+                background: #ffffff;
+                padding: 20px 40px;
+                border-radius: 8px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            `;
+            
+            // 创建标题
+            const title = document.createElement('h1');
+            title.textContent = '【错词清零模式】历史错词循环考核';
+            title.style.cssText = `
+                color: #b30000;
+                border-bottom: 2px solid #e1e1e1;
+                padding-bottom: 10px;
+                text-align: center;
+            `;
+            
+            // 创建轮次标题
+            const roundTitle = document.createElement('h2');
+            roundTitle.id = 'error-clear-round-title';
+            roundTitle.style.cssText = `
+                color: #b30000;
+                border-bottom: 1px solid #e1e1e1;
+                padding-bottom: 10px;
+                text-align: center;
+            `;
+            
+            // 创建说明
+            const instructions = document.createElement('p');
+            instructions.className = 'instructions';
+            instructions.textContent = '本模式将对错词进行循环考核，直到正确率达到100%！';
+            instructions.style.cssText = `
+                color: var(--text-color);
+                font-size: 1.1em;
+                background-color: var(--bg-color);
+                border-left: 5px solid var(--primary-color);
+                padding: 10px;
+                margin: 20px 0;
+            `;
+            
+            // 创建表单
+            const form = document.createElement('form');
+            form.id = 'error-clear-form';
+            
+            // 创建单词列表容器
+            const wordListContainer = document.createElement('div');
+            wordListContainer.id = 'error-clear-word-list';
+            
+            // 创建提交按钮
+            const submitBtn = document.createElement('button');
+            submitBtn.type = 'submit';
+            submitBtn.textContent = '提交答案并进入下一轮';
+            submitBtn.style.cssText = `
+                margin-top: 20px;
+                padding: 12px 25px;
+                background: var(--primary-color);
+                border: none;
+                color: white;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 5px;
+                font-size: 18px;
+                display: block;
+                width: 100%;
+                transition: background-color 0.2s;
+            `;
+            submitBtn.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'var(--hover-color)';
+            });
+            submitBtn.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = 'var(--primary-color)';
+            });
+            
+            // 创建结果容器
+            const resultContainer = document.createElement('div');
+            resultContainer.id = 'error-clear-result';
+            resultContainer.style.cssText = `
+                margin-top: 30px;
+                padding: 20px;
+                background: var(--bg-color);
+                border: 1px solid var(--primary-color);
+                border-radius: 8px;
+                display: none;
+            `;
+            
+            // 组装界面
+            form.appendChild(wordListContainer);
+            form.appendChild(submitBtn);
+            errorClearContainer.appendChild(title);
+            errorClearContainer.appendChild(roundTitle);
+            errorClearContainer.appendChild(instructions);
+            errorClearContainer.appendChild(form);
+            errorClearContainer.appendChild(resultContainer);
+            
+            // 替换主容器内容
+            const appContainer = document.getElementById('app-container');
+            appContainer.innerHTML = '';
+            appContainer.appendChild(errorClearContainer);
+            
+            // 生成第一轮考核
+            generateErrorClearQuiz();
+            
+            // 添加表单提交事件
+            form.addEventListener('submit', handleErrorClearSubmit);
+        }
+
+        // 生成错词清零模式考核
+        function generateErrorClearQuiz() {
+            const wordListContainer = document.getElementById('error-clear-word-list');
+            const roundTitle = document.getElementById('error-clear-round-title');
+            const resultContainer = document.getElementById('error-clear-result');
+            
+            // 清空容器
+            wordListContainer.innerHTML = '';
+            resultContainer.style.display = 'none';
+            
+            // 更新标题
+            const currentWords = errorClearModeData.currentQuestions;
+            let titleText = `第 ${errorClearModeData.currentRound} 轮考核 (剩余 ${currentWords.length} 词)`;
+            if (errorClearModeData.currentRound === 1) {
+                titleText = `错词清零考核 (共 ${currentWords.length} 词)`;
+            }
+            roundTitle.textContent = titleText;
+            
+            // 生成单词列表
+            currentWords.forEach((word, index) => {
+                const wordBox = document.createElement('div');
+                wordBox.className = 'word-box';
+                wordBox.style.cssText = `
+                    margin-bottom: 18px;
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    padding: 10px 0;
+                    border-bottom: 1px dashed #ccc;
+                `;
+                
+                const inputId = `error-clear-word-${index}`;
+                
+                // 创建标签容器
+                const tagContainer = document.createElement('div');
+                tagContainer.style.cssText = `
+                    display: block;
+                    margin-bottom: 5px;
+                `;
+                
+                // 添加标签
+                const bookTag = document.createElement('span');
+                bookTag.textContent = `词书: ${word.book_name}`;
+                bookTag.style.cssText = `
+                    font-size: 0.8em;
+                    font-weight: bold;
+                    color: #fff;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    margin-right: 6px;
+                    white-space: nowrap;
+                    background-color: #17a2b8;
+                `;
+                
+                const listTag = document.createElement('span');
+                listTag.textContent = `单元: ${word.list_name}`;
+                listTag.style.cssText = `
+                    font-size: 0.8em;
+                    font-weight: bold;
+                    color: #fff;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    margin-right: 6px;
+                    white-space: nowrap;
+                    background-color: #28a745;
+                `;
+                
+                const countTag = document.createElement('span');
+                countTag.textContent = `错过 ${word.error_count} 次`;
+                countTag.style.cssText = `
+                    font-size: 0.8em;
+                    font-weight: bold;
+                    color: #fff;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    margin-right: 6px;
+                    white-space: nowrap;
+                    background-color: #dc3545;
+                `;
+                
+                const dateTag = document.createElement('span');
+                dateTag.textContent = `上次: ${word.last_error_date}`;
+                dateTag.style.cssText = `
+                    font-size: 0.8em;
+                    font-weight: bold;
+                    color: #fff;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    margin-right: 6px;
+                    white-space: nowrap;
+                    background-color: #6c757d;
+                `;
+                
+                tagContainer.appendChild(bookTag);
+                tagContainer.appendChild(listTag);
+                tagContainer.appendChild(countTag);
+                tagContainer.appendChild(dateTag);
+                
+                // 创建标签
+                const label = document.createElement('label');
+                label.htmlFor = inputId;
+                label.style.cssText = `
+                    flex: 1;
+                    min-width: 350px;
+                    margin-right: 15px;
+                    line-height: 1.5;
+                `;
+                
+                const itemNum = document.createElement('span');
+                itemNum.textContent = `${index + 1}. `;
+                itemNum.style.cssText = `
+                    font-weight: bold;
+                    margin-right: 5px;
+                    color: #005a9c;
+                `;
+                
+                const pos = document.createElement('span');
+                pos.textContent = word.pos || '';
+                pos.style.cssText = `
+                    font-style: italic;
+                    color: #007bff;
+                    font-weight: bold;
+                `;
+                
+                const meaning = document.createElement('span');
+                meaning.textContent = ` ${word.meaning_cn || ''}`;
+                
+                const ipa = document.createElement('span');
+                // 优先使用数据库中的IPA字段
+                const ipaText = word.ipa ? `/${word.ipa}/` : '';
+                if (ipaText) {
+                    ipa.textContent = ` [${ipaText}]`;
+                    ipa.style.cssText = `
+                        color: #d35400;
+                        font-family: "Lucida Sans Unicode", sans-serif;
+                        margin-left: 8px;
+                    `;
+                }
+                
+                label.appendChild(itemNum);
+                label.appendChild(tagContainer);
+                label.appendChild(pos);
+                label.appendChild(meaning);
+                label.appendChild(ipa);
+                label.appendChild(document.createTextNode('：'));
+                
+                // 创建输入框
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = inputId;
+                input.autocomplete = 'off';
+                input.style.cssText = `
+                    padding: 10px;
+                    width: 220px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    font-size: 16px;
+                `;
+                
+                // 添加鼠标激活时播放音频的功能
+                input.addEventListener('focus', () => {
+                    if (word.audio_path_us || word.audio_path_uk) {
+                        const audioPath = word.audio_path_us || word.audio_path_uk;
+                        const audio = new Audio(`/wordlists/${audioPath}`);
+                        audio.play().catch(e => {
+                            console.log('音频播放失败:', e);
+                            // TTS fallback
+                            const ttsAudio = new Audio(`/api/tts/${word.spelling}`);
+                            ttsAudio.play().catch(ttsError => console.log('TTS也失败:', ttsError));
+                        });
+                    } else {
+                        // 直接使用TTS
+                        const ttsAudio = new Audio(`/api/tts/${word.spelling}`);
+                        ttsAudio.play().catch(ttsError => console.log('TTS失败:', ttsError));
+                    }
+                });
+                
+                wordBox.appendChild(label);
+                wordBox.appendChild(input);
+                wordListContainer.appendChild(wordBox);
+            });
+            
+            // 聚焦第一个输入框
+            if (wordListContainer.querySelector('input')) {
+                wordListContainer.querySelector('input').focus();
+            }
+        }
+
+        // 处理错词清零模式提交
+        function handleErrorClearSubmit(event) {
+            event.preventDefault();
+            
+            const currentWords = errorClearModeData.currentQuestions;
+            const incorrectWords = [];
+            let correctCount = 0;
+            const resultDetails = [];
+            
+            // 检查每个答案
+            currentWords.forEach((word, index) => {
+                const inputElement = document.getElementById(`error-clear-word-${index}`);
+                const userAnswer = inputElement.value.trim();
+                const correctAnswer = word.spelling;
+                
+                const resultLine = {
+                    word: word.spelling,
+                    userAnswer: userAnswer,
+                    isCorrect: userAnswer.toLowerCase() === correctAnswer.toLowerCase()
+                };
+                
+                if (resultLine.isCorrect) {
+                    correctCount++;
+                } else {
+                    incorrectWords.push(word);
+                    // 记录错误到数据库
+                    recordError(word, userAnswer);
+                }
+                
+                resultDetails.push(resultLine);
+            });
+            
+            // 保存本轮结果
+            errorClearModeData.roundResults.push({
+                round: errorClearModeData.currentRound,
+                totalWords: currentWords.length,
+                correctCount: correctCount,
+                incorrectWords: [...incorrectWords],
+                resultDetails: resultDetails
+            });
+            
+            // 显示本轮结果
+            showErrorClearRoundResult();
+            
+            // 准备下一轮
+            if (incorrectWords.length > 0) {
+                errorClearModeData.currentQuestions = incorrectWords;
+                errorClearModeData.currentRound++;
+                
+                // 延迟显示下一轮，给用户足够时间查看结果
+                setTimeout(() => {
+                    generateErrorClearQuiz();
+                }, 5000); // 增加到5秒
+            } else {
+                // 全部正确，显示完成界面
+                setTimeout(() => {
+                    showErrorClearCompletion();
+                }, 5000); // 增加到5秒
+            }
+        }
+
+        // 显示错词清零模式轮次结果
+        function showErrorClearRoundResult() {
+            const resultContainer = document.getElementById('error-clear-result');
+            const currentRound = errorClearModeData.roundResults[errorClearModeData.roundResults.length - 1];
+            
+            const overallPercentage = Math.round((currentRound.correctCount / currentRound.totalWords) * 100);
+            
+            resultContainer.innerHTML = `
+                <h3 style="color: var(--primary-color); margin-bottom: 15px;">第 ${currentRound.round} 轮结果</h3>
+                <div style="margin-bottom: 15px;">
+                    <p><strong>本轮统计：</strong></p>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>总单词数：<strong>${currentRound.totalWords}</strong> 个</li>
+                        <li>正确数量：<strong>${currentRound.correctCount}</strong> 个</li>
+                        <li>错误数量：<strong>${currentRound.totalWords - currentRound.correctCount}</strong> 个</li>
+                        <li>正确率：<strong>${overallPercentage}%</strong></li>
+                    </ul>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <p><strong>详细结果：</strong></p>
+                    ${currentRound.resultDetails.map(detail => {
+                        if (detail.isCorrect) {
+                            return `<p style="color: var(--primary-color); font-weight: bold;">✔ 正确: ${detail.word}</p>`;
+                        } else {
+                            return `<p>✘ 错误: "${detail.word}" — 你的答案: <span style="color: var(--error-color); text-decoration: line-through;">${detail.userAnswer || '（未填写）'}</span></p>`;
+                        }
+                    }).join('')}
+                </div>
+            `;
+            
+            resultContainer.style.display = 'block';
+        }
+
+        // 显示错词清零模式完成界面
+        function showErrorClearCompletion() {
+            const appContainer = document.getElementById('app-container');
+            const totalRounds = errorClearModeData.roundResults.length;
+            const totalWords = errorClearModeData.originalQuestions.length;
+            
+            appContainer.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; background: var(--bg-color); padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;">
+                    <h1 style="color: var(--primary-color); margin-bottom: 20px;">🎉 恭喜！错词清零完成！</h1>
+                    <div style="background: var(--bg-color); border: 1px solid var(--primary-color); border-radius: 8px; padding: 30px; margin: 20px 0;">
+                        <h2 style="color: var(--text-color); margin-bottom: 15px;">学习成果总结</h2>
+                        <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                            <li>原始错词数量：<strong>${totalWords}</strong> 个</li>
+                            <li>完成轮次：<strong>${totalRounds}</strong> 轮</li>
+                            <li>最终正确率：<strong>100%</strong></li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 15px;">各轮次表现</h3>
+                        ${errorClearModeData.roundResults.map((round, index) => {
+                            const percentage = Math.round((round.correctCount / round.totalWords) * 100);
+                            return `
+                                <div style="background: var(--bg-color); border: 1px solid var(--primary-color); border-radius: 5px; padding: 10px; margin: 10px 0; text-align: left;">
+                                    <strong>第 ${round.round} 轮：</strong> 答对 ${round.correctCount} / ${round.totalWords} 个，正确率 ${percentage}%
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <button onclick="location.reload()" style="margin-right: 15px; padding: 12px 25px; background: var(--primary-color); border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; transition: background-color 0.2s;">
+                            返回开始界面
+                        </button>
+                        <button onclick="handleLogout()" style="padding: 12px 25px; background: var(--accent-color); border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; transition: background-color 0.2s;">
+                            退出登录
+                        </button>
+                    </div>
+                    <div class="quiz-controls" style="position: static; margin-top: 30px; display: flex; justify-content: flex-end;">
+                        <button id="back-home-btn-clear" class="control-btn" title="返回主页">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                            </svg>
+                        </button>
+                        <button id="exit-quiz-btn-clear" class="control-btn" title="退出测试">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 记录错误到数据库的函数
+        async function recordError(word, userAnswer) {
+            try {
+                console.log('正在记录错误:', {
+                    word_id: word.word_id,
+                    word_spelling: word.spelling,
+                    student_answer: userAnswer,
+                    list_id: word.list_id
+                });
+                
+                const response = await fetch('/api/record-error', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        word_id: word.word_id,
+                        student_answer: userAnswer,
+                        list_id: word.list_id
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('记录错误失败:', response.statusText);
+                    const errorData = await response.text();
+                    console.error('错误详情:', errorData);
+                } else {
+                    const result = await response.json();
+                    console.log('错误记录成功:', result);
+                }
+            } catch (error) {
+                console.error('记录错误时出错:', error);
+            }
+        }
+
+        // 保存当前测试进度的函数
+        async function saveQuizProgress() {
+            if (userAnswers.length === 0) return;
+            
+            try {
+                const progress = {
+                    list_id: document.getElementById('list-select').value,
+                    study_mode: document.getElementById('study-mode').value,
+                    total_questions: questions.length,
+                    answered_questions: userAnswers.length,
+                    correct_answers: userAnswers.filter(answer => answer.isCorrect).length,
+                    progress_percentage: Math.round((userAnswers.length / questions.length) * 100),
+                    timestamp: new Date().toISOString()
+                };
+                
+                // 保存到localStorage作为备份
+                localStorage.setItem('quizProgress', JSON.stringify(progress));
+                
+                console.log('测试进度已保存:', progress);
+                
+                // 这里可以添加发送到服务器的逻辑
+                // const response = await fetch('/api/save-progress', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(progress)
+                // });
+                
+            } catch (error) {
+                console.error('保存进度时出错:', error);
+            }
+        }
+
+        // 加载错词统计信息的函数
+        async function loadErrorStats() {
+            const selectedListId = document.getElementById('list-select').value;
+            const errorStatsContent = document.getElementById('error-stats-content');
+            
+            if (!selectedListId) {
+                errorStatsContent.innerHTML = '<p style="color: #856404;">请先选择一个单词列表</p>';
+                return;
+            }
+            
+            // 立即显示加载状态
+            errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
+            
+            try {
+                const response = await fetch(`/api/error-stats?list_id=${selectedListId}`);
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        errorStatsContent.innerHTML = '<p style="color: #dc3545;">请先登录后查看错词统计</p>';
+                    } else {
+                        throw new Error('获取错词统计失败');
+                    }
+                    return;
+                }
+                
+                const stats = await response.json();
+                
+                if (stats.error_words_count === 0) {
+                    errorStatsContent.innerHTML = `
+                        <p style="color: #28a745; font-weight: bold;">🎉 恭喜！</p>
+                        <p style="color: #28a745;">在 <strong>${stats.book_name} - ${stats.list_name}</strong> 中，你还没有犯过任何错误！</p>
+                        <p style="color: #6c757d; font-size: 0.9em;">继续保持，或者尝试其他模式来挑战自己。</p>
+                    `;
+                } else {
+                    errorStatsContent.innerHTML = `
+                        <p style="color: #856404;">在 <strong>${stats.book_name} - ${stats.list_name}</strong> 中：</p>
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li>错词数量：<strong>${stats.error_words_count}</strong> 个</li>
+                            <li>总错误次数：<strong>${stats.total_errors}</strong> 次</li>
+                        </ul>
+                        <p style="color: #856404; font-size: 0.9em; margin-top: 10px;">
+                            错词复习模式将帮助你重点练习这些容易出错的单词，直到完全掌握！
+                        </p>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载错词统计时出错:', error);
+                errorStatsContent.innerHTML = '<p style="color: #dc3545;">加载错词统计时出错，请稍后再试</p>';
+            }
+        }
+
         // 开始按钮
         startBtn.addEventListener('click', async () => {
             const selectedListId = document.getElementById('list-select').value;
@@ -1514,29 +2479,186 @@
                 return;
             }
 
+            // 错词复习模式特殊处理
+            if (selectedMode === 'error_review') {
+                try {
+                    // 先检查错词统计
+                    const statsResponse = await fetch(`/api/error-stats?list_id=${selectedListId}`);
+                    if (!statsResponse.ok) {
+                        if (statsResponse.status === 401) {
+                            alert('请先登录后使用错词复习模式！');
+                            return;
+                        } else {
+                            throw new Error('获取错词统计失败');
+                        }
+                    }
+                    
+                    const stats = await statsResponse.json();
+                    if (stats.error_words_count === 0) {
+                        alert('恭喜！在这个列表中你还没有犯过任何错误。请尝试其他模式或选择其他列表。');
+                        return;
+                    }
+                } catch (error) {
+                    console.error("检查错词统计时出错:", error);
+                    alert('检查错词统计时出错，请稍后再试');
+                    return;
+                }
+            }
+
             try {
-                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${selectedMode}`);
-                if (!response.ok) throw new Error('网络请求失败');
+                // 错词清零模式强制使用错词复习模式
+                const actualStudyMode = errorClearModeEnabled ? 'error_review' : selectedMode;
+                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${actualStudyMode}`);
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        alert('请先登录后使用此功能！');
+                        return;
+                    }
+                    throw new Error('网络请求失败');
+                }
                 questions = await response.json();
                 
                 if (questions && questions.length > 0) {
-                    document.querySelector('.list-selector').style.display = 'none';
-                    startBtn.style.display = 'none';
-                    document.querySelector('a.btn').style.display = 'none';
-                    quizArea.style.display = 'block';
-                    totalQNumEl.textContent = questions.length;
-                    userAnswers = []; // 重置答案
-                    currentQuestionIndex = 0; // 重置索引
-                    displayQuestion();
-                    updateLumiReaction('thinking');
+                    // 错词清零模式特殊处理
+                    if (errorClearModeEnabled) {
+                        // 初始化错词清零模式数据
+                        errorClearModeData = {
+                            isActive: true,
+                            currentRound: 1,
+                            originalQuestions: [...questions],
+                            currentQuestions: [...questions],
+                            incorrectWords: [],
+                            roundResults: []
+                        };
+                        
+                        // 隐藏所有控制元素
+                        document.querySelector('.list-selector').style.display = 'none';
+                        startBtn.style.display = 'none';
+                        document.querySelector('a.btn').style.display = 'none';
+                        document.getElementById('error-stats-container').style.display = 'none';
+                        document.querySelector('.lumi-toggle-container').style.display = 'none';
+                        document.querySelector('.auto-play-container').style.display = 'none';
+                        document.querySelector('.feedback-container').style.display = 'none';
+                        document.querySelector('.error-clear-mode-container').style.display = 'none';
+                        
+                        // 显示错词清零模式界面
+                        showErrorClearModeInterface();
+                    } else {
+                        // 标准模式
+                        document.querySelector('.list-selector').style.display = 'none';
+                        startBtn.style.display = 'none';
+                        document.querySelector('a.btn').style.display = 'none';
+                        document.getElementById('error-stats-container').style.display = 'none';
+                        quizArea.style.display = 'block';
+                        totalQNumEl.textContent = questions.length;
+                        userAnswers = []; // 重置答案
+                        currentQuestionIndex = 0; // 重置索引
+                        displayQuestion();
+                        updateLumiReaction('thinking');
+                    }
                 } else {
-                    alert('无法加载题目或该列表为空！');
+                    if (selectedMode === 'error_review') {
+                        alert('该列表中没有错词需要复习！');
+                    } else {
+                        alert('无法加载题目或该列表为空！');
+                    }
                 }
             } catch (error) {
                 console.error("加载题目时出错:", error);
                 alert('加载题目时出错，请检查后端服务。');
             }
         });
+
+        // 退出测试按钮
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'exit-quiz-btn') {
+                if (confirm('确定要退出当前测试吗？\n\n⚠️ 警告：\n• 当前进度将丢失\n• 已答题目不会保存\n• 需要重新开始测试\n\n是否继续退出？')) {
+                    // 保存当前进度
+                    if (userAnswers.length > 0) {
+                        saveQuizProgress();
+                        console.log('已答题目数量:', userAnswers.length);
+                    }
+                    
+                    // 重置测试状态
+                    resetQuizState();
+                }
+            }
+        });
+
+        // 返回主页按钮
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'back-home-btn' || e.target.id === 'back-home-from-clear-btn') {
+                if (confirm('确定要返回主页吗？\n\n当前测试进度将丢失。')) {
+                    // 保存当前进度
+                    if (userAnswers.length > 0) {
+                        saveQuizProgress();
+                    }
+                    
+                    resetQuizState();
+                }
+            }
+        });
+
+        // 重置测试状态的函数
+        function resetQuizState() {
+            // 重置所有变量
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            consecutiveCorrect = 0;
+            errorClearModeData = {
+                isActive: false,
+                currentRound: 1,
+                originalQuestions: [],
+                currentQuestions: [],
+                incorrectWords: [],
+                roundResults: []
+            };
+            
+            // 显示所有控制元素
+            document.querySelector('.list-selector').style.display = 'flex';
+            startBtn.style.display = 'inline-block';
+            document.querySelector('a.btn').style.display = 'inline-flex';
+            document.getElementById('error-stats-container').style.display = 'block';
+            document.querySelector('.lumi-toggle-container').style.display = 'flex';
+            document.querySelector('.auto-play-container').style.display = 'flex';
+            document.querySelector('.feedback-container').style.display = 'flex';
+            document.querySelector('.error-clear-mode-container').style.display = 'flex';
+            
+            // 隐藏测试区域
+            quizArea.style.display = 'none';
+            resultsArea.style.display = 'none';
+            
+            // 清空输入框和问题显示
+            answerInput.value = '';
+            questionMeaningEl.textContent = '';
+            questionIpaEl.textContent = '';
+            questionMeaningEnEl.textContent = '';
+            questionExampleEnEl.textContent = '';
+            questionExampleCnEl.textContent = '';
+            
+            // 重置详情区域
+            wordDetailsContainer.style.display = 'none';
+            toggleDetailsBtn.textContent = '显示更多详情';
+            
+            // 清空详情内容
+            questionDerivativesEl.textContent = '';
+            questionRootEtymologyEl.textContent = '';
+            questionMnemonicEl.textContent = '';
+            questionComparisonEl.textContent = '';
+            questionCollocationEl.textContent = '';
+            questionExamSentenceEl.textContent = '';
+            questionExamYearSourceEl.textContent = '';
+            questionExamOptionsEl.textContent = '';
+            questionExamExplanationEl.textContent = '';
+            questionTipsEl.textContent = '';
+            
+            // 重置Lumi状态
+            updateLumiReaction('welcome');
+            
+            // 重新加载错词统计
+            loadErrorStats();
+        }
 
         // 下一步按钮和回车键
         nextBtn.addEventListener('click', handleNextQuestion);

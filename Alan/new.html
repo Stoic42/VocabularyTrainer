@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Alan 的今日错词强化考核 (2025-06-28)</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #b30000; /* 醒目的红色系标题 */
+      border-bottom: 2px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+      background-color: #fffbe6;
+      border-left: 5px solid #ffc107;
+      padding: 10px;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+    }
+    label .source-tag {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #007bff;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 5px;
+    }
+    label .pos {
+        font-style: italic;
+        color: #6c757d;
+        font-weight: bold;
+    }
+    label .ipa {
+        color: #d35400;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+        margin-left: 8px;
+    }
+    input {
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #dc3545; /* 红色系按钮 */
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+    }
+    button:hover {
+        background: #c82333;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 8px;
+    }
+    .correct {
+        color: #28a745;
+        font-weight: bold;
+    }
+    .incorrect {
+        color: #dc3545;
+        text-decoration: line-through;
+    }
+    .result-line {
+        padding: 5px 0;
+        font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Alan 的今日错词强化考核</h1>
+    <h2>考核日期: 2025-06-28</h2>
+    <p class="instructions">
+      本测试聚合了今日所有练习中的错词。请根据来源、词性、中文意思等信息，写出正确的单词。
+    </p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">完成强化训练，查看结果</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2>测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    // 聚合今天所有练习中发现的错词
+    const words = [
+        // 来源：6月27日测试 (L25&L26)
+        { source: "27日/L25&26", word: "unimportant", pos: "adj.", ipa: "/ˌʌnɪmˈpɔːrtnt/", meaning: "不重要的" },
+        { source: "27日/L25&26", word: "agent", pos: "n.", ipa: "/ˈeɪdʒənt/", meaning: "代理人,经纪人" },
+        { source: "27日/L25&26", word: "gallery", pos: "n.", ipa: "/ˈɡæləri/", meaning: "画廊,美术馆" },
+        { source: "27日/L25&26", word: "pleasant", pos: "adj.", ipa: "/ˈplɛznt/", meaning: "舒适的,令人愉快的" },
+        { source: "27日/L25&26", word: "original", pos: "adj./n.", ipa: "/əˈrɪdʒənl/", meaning: "最初的,原始的" },
+        { source: "27日/L25&26", word: "discussion", pos: "n.", ipa: "/dɪˈskʌʃn/", meaning: "讨论,谈论" },
+        
+        // 来源：6月25日测试 (L21&L22)
+        { source: "25日/L21&22", word: "seal", pos: "n./v.", ipa: "/siːl/", meaning: "封条;海豹" },
+        { source: "25日/L21&22", word: "convenient", pos: "adj.", ipa: "/kənˈviːniənt/", meaning: "方便的,便利的" },
+        { source: "25日/L21&22", word: "Atlantic", pos: "adj./n.", ipa: "/ətˈlæntɪk/", meaning: "大西洋(的)" },
+        { source: "25日/L21&22", word: "escalator", pos: "n.", ipa: "/ˈɛskəleɪtər/", meaning: "自动扶梯" },
+        { source: "25日/L21&22", word: "nature", pos: "n.", ipa: "/ˈneɪtʃər/", meaning: "大自然,本性" },
+        { source: "25日/L21&22", word: "age", pos: "n./v.", ipa: "/eɪdʒ/", meaning: "年龄;(使)变老" },
+        { source: "25日/L21&22", word: "enemy", pos: "n.", ipa: "/ˈɛnəmi/", meaning: "敌人,仇敌" }
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+
+    words.forEach((item, index) => {
+      const wordBox = document.createElement('div');
+      wordBox.className = 'word-box';
+
+      const label = document.createElement('label');
+      const inputId = `word-${index}`;
+      label.htmlFor = inputId;
+      label.innerHTML = `
+        <span class="source-tag">${item.source}</span>
+        <span class="pos">${item.pos}</span> 
+        ${item.meaning} 
+        <span class="ipa">[${item.ipa}]</span>：
+      `;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.name = inputId;
+      input.autocomplete = 'off';
+
+      wordBox.appendChild(label);
+      wordBox.appendChild(input);
+      wordListContainer.appendChild(wordBox);
+    });
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let correctCount = 0;
+      resultDetails.innerHTML = '';
+
+      words.forEach((item, index) => {
+        const inputId = `word-${index}`;
+        const inputElement = document.getElementById(inputId);
+        const userAnswer = inputElement.value.trim();
+        const correctAnswer = item.word;
+
+        const resultLine = document.createElement('div');
+        resultLine.className = 'result-line';
+        
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+          correctCount++;
+          resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+        } else {
+          resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+        }
+        resultDetails.appendChild(resultLine);
+      });
+
+      const summary = document.createElement('h3');
+      const percentage = Math.round((correctCount / words.length) * 100);
+      summary.textContent = `答对 ${correctCount} / ${words.length} 个单词。 正确率: ${percentage}%`;
+      resultDetails.prepend(summary);
+
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>单词考核 (List 19 & 20) - 增强版</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 {
+      color: #005a9c;
+      border-bottom: 1px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    h1 { border-bottom-width: 2px; }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+    }
+    label .list-tag {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #6c757d;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-right: 8px;
+    }
+    label .pos {
+        font-style: italic;
+        color: #007bff;
+        font-weight: bold;
+    }
+    label .ipa {
+        color: #d35400;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+        margin-left: 8px;
+    }
+    input {
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #28a745;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 8px;
+    }
+    .list-stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 2px solid #91d5ff;
+    }
+    .correct { color: #28a745; font-weight: bold; }
+    .incorrect { color: #dc3545; text-decoration: line-through; }
+    .result-line { padding: 5px 0; font-size: 1.1em; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>单词考核 (增强版)</h1>
+    <h2>考核范围: List 19 & List 20</h2>
+    <p class="instructions">请注意每个单词所属的列表，并根据提示信息写出正确的英文单词。</p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">完成考核，查看结果</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2>测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    const words = [
+      // List 19
+      { list: 19, word: "holy", pos: "adj.", ipa: "/ˈhoʊli/", meaning: "神圣的,圣洁的" },
+      { list: 19, word: "Bible", pos: "n.", ipa: "/ˈbaɪbl/", meaning: "《圣经》" },
+      { list: 19, word: "Christian", pos: "n./adj.", ipa: "/ˈkrɪstʃən/", meaning: "基督徒；基督教的" },
+      { list: 19, word: "classic", pos: "adj./n.", ipa: "/ˈklæsɪk/", meaning: "经典的；古典文学,名著" },
+      { list: 19, word: "classical", pos: "adj.", ipa: "/ˈklæsɪkl/", meaning: "古典的,经典的" },
+      { list: 19, word: "civilization", pos: "n.", ipa: "/ˌsɪvələˈzeɪʃn/", meaning: "文明,教化" },
+      { list: 19, word: "religion", pos: "n.", ipa: "/rɪˈlɪdʒən/", meaning: "宗教" },
+      { list: 19, word: "faith", pos: "n.", ipa: "/feɪθ/", meaning: "信任,信心,信仰" },
+      { list: 19, word: "belief", pos: "n.", ipa: "/bɪˈliːf/", meaning: "信任,信心,信仰" },
+      { list: 19, word: "loyal", pos: "adj.", ipa: "/ˈlɔɪəl/", meaning: "忠诚的,忠贞的" },
+      { list: 19, word: "royalty", pos: "n.", ipa: "/ˈrɔɪəlti/", meaning: "王室,皇族" },
+      { list: 19, word: "emperor", pos: "n.", ipa: "/ˈempərər/", meaning: "皇帝" },
+      { list: 19, word: "empire", pos: "n.", ipa: "/ˈempaɪər/", meaning: "帝国" },
+      { list: 19, word: "kingdom", pos: "n.", ipa: "/ˈkɪŋdəm/", meaning: "王国" },
+      { list: 19, word: "dynasty", pos: "n.", ipa: "/ˈdaɪnəsti/", meaning: "朝代,王朝" },
+      { list: 19, word: "majesty", pos: "n.", ipa: "/ˈmædʒəsti/", meaning: "陛下,威严,雄伟" },
+      { list: 19, word: "empress", pos: "n.", ipa: "/ˈemprəs/", meaning: "女皇,皇后" },
+      { list: 19, word: "queen", pos: "n.", ipa: "/kwiːn/", meaning: "女王,王后" },
+      { list: 19, word: "prince", pos: "n.", ipa: "/prɪns/", meaning: "王子,亲王" },
+      { list: 19, word: "princess", pos: "n.", ipa: "/ˈprɪnses/", meaning: "公主,王妃" },
+      { list: 19, word: "duke", pos: "n.", ipa: "/duːk/", meaning: "公爵" },
+      { list: 19, word: "count", pos: "v./n.", ipa: "/kaʊnt/", meaning: "数数；伯爵" },
+      { list: 19, word: "baron", pos: "n.", ipa: "/ˈbærən/", meaning: "男爵" },
+      { list: 19, word: "lord", pos: "n.", ipa: "/lɔːrd/", meaning: "勋爵,领主,上帝" },
+      { list: 19, word: "lady", pos: "n.", ipa: "/ˈleɪdi/", meaning: "女士,夫人,小姐" },
+      { list: 19, word: "heaven", pos: "n.", ipa: "/ˈhevn/", meaning: "天堂,天空" },
+      { list: 19, word: "paradise", pos: "n.", ipa: "/ˈpærədaɪs/", meaning: "天堂,乐园" },
+      { list: 19, word: "hell", pos: "n.", ipa: "/hel/", meaning: "地狱,苦境" },
+      { list: 19, word: "angel", pos: "n.", ipa: "/ˈeɪndʒl/", meaning: "天使,安琪儿" },
+      { list: 19, word: "ghost", pos: "n.", ipa: "/ɡoʊst/", meaning: "鬼,灵魂" },
+      { list: 19, word: "god", pos: "n.", ipa: "/ɡɑːd/", meaning: "神,上帝" },
+      { list: 19, word: "goddess", pos: "n.", ipa: "/ˈɡɑːdəs/", meaning: "女神" },
+      { list: 19, word: "genius", pos: "n.", ipa: "/ˈdʒiːniəs/", meaning: "天才,天赋" },
+      { list: 19, word: "fairy", pos: "n.", ipa: "/ˈferi/", meaning: "仙女,小精灵" },
+      { list: 19, word: "witch", pos: "n.", ipa: "/wɪtʃ/", meaning: "女巫,巫婆" },
+      { list: 19, word: "monster", pos: "n.", ipa: "/ˈmɒnstər/", meaning: "怪物,妖怪" },
+      { list: 19, word: "myth", pos: "n.", ipa: "/mɪθ/", meaning: "神话" },
+      // List 20
+      { list: 20, word: "legend", pos: "n.", ipa: "/ˈledʒənd/", meaning: "传说,传奇" },
+      { list: 20, word: "philosophy", pos: "n.", ipa: "/fəˈlɒsəfi/", meaning: "哲学,哲理" },
+      { list: 20, word: "photograph", pos: "n./v.", ipa: "/ˈfoʊtəɡræf/", meaning: "照片；拍照" },
+      { list: 20, word: "photo", pos: "n.", ipa: "/ˈfoʊtoʊ/", meaning: "照片" },
+      { list: 20, word: "photography", pos: "n.", ipa: "/fəˈtɒɡrəfi/", meaning: "摄影术" },
+      { list: 20, word: "photographer", pos: "n.", ipa: "/fəˈtɒɡrəfər/", meaning: "摄影师" },
+      { list: 20, word: "geography", pos: "n.", ipa: "/dʒiˈɒɡrəfi/", meaning: "地理" },
+      { list: 20, word: "geology", pos: "n.", ipa: "/dʒiˈɒlədʒi/", meaning: "地质学" },
+      { list: 20, word: "geometry", pos: "n.", ipa: "/dʒiˈɒmətri/", meaning: "几何学" },
+      { list: 20, word: "biology", pos: "n.", ipa: "/baɪˈɒlədʒi/", meaning: "生物学" },
+      { list: 20, word: "biography", pos: "n.", ipa: "/baɪˈɒɡrəfi/", meaning: "传记" },
+      { list: 20, word: "autobiography", pos: "n.", ipa: "/ˌɔːtəbaɪˈɒɡrəfi/", meaning: "自传" },
+      { list: 20, word: "telegraph", pos: "n.", ipa: "/ˈtelɪɡræf/", meaning: "电报" },
+      { list: 20, word: "telegram", pos: "n.", ipa: "/ˈtelɪɡræm/", meaning: "电报" },
+      { list: 20, word: "telescope", pos: "n.", ipa: "/ˈtelɪskoʊp/", meaning: "望远镜" },
+      { list: 20, word: "microscope", pos: "n.", ipa: "/ˈmaɪkrəskoʊp/", meaning: "显微镜" },
+      { list: 20, word: "telephone", pos: "n.", ipa: "/ˈtelɪfoʊn/", meaning: "电话" },
+      { list: 20, word: "mobile", pos: "adj./n.", ipa: "/ˈmoʊbl/", meaning: "可移动的；手机" },
+      { list: 20, word: "phone", pos: "n.", ipa: "/foʊn/", meaning: "电话" },
+      { list: 20, word: "cellphone", pos: "n.", ipa: "/ˈselfoʊn/", meaning: "手机" },
+      { list: 20, word: "microphone", pos: "n.", ipa: "/ˈmaɪkrəfoʊn/", meaning: "麦克风,话筒" },
+      { list: 20, word: "phonetics", pos: "n.", ipa: "/fəˈnetɪks/", meaning: "语音学" },
+      { list: 20, word: "symphony", pos: "n.", ipa: "/ˈsɪmfəni/", meaning: "交响乐" },
+      { list: 20, word: "gram", pos: "n.", ipa: "/ɡræm/", meaning: "克" },
+      { list: 20, word: "kilogram", pos: "n.", ipa: "/ˈkɪləɡræm/", meaning: "千克,公斤" },
+      { list: 20, word: "diagram", pos: "n.", ipa: "/ˈdaɪəɡræm/", meaning: "图表,图解" },
+      { list: 20, word: "program", pos: "n./v.", ipa: "/ˈproʊɡræm/", meaning: "节目,程序；编程" },
+      { list: 20, word: "grammar", pos: "n.", ipa: "/ˈɡræmər/", meaning: "语法" }
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+
+    // 动态生成测试题目
+    words.forEach((item, index) => {
+      const wordBox = document.createElement('div');
+      wordBox.className = 'word-box';
+
+      const label = document.createElement('label');
+      const inputId = `word-${index}`;
+      label.htmlFor = inputId;
+      label.innerHTML = `
+        <span class="list-tag">List ${item.list}</span>
+        <span class="pos">${item.pos}</span> 
+        ${item.meaning} 
+        <span class="ipa">[${item.ipa}]</span>：
+      `;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.name = inputId;
+      input.autocomplete = 'off';
+
+      wordBox.appendChild(label);
+      wordBox.appendChild(input);
+      wordListContainer.appendChild(wordBox);
+    });
+
+    // 处理表单提交
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let correctCount = 0;
+      let listStats = {}; // 用于存储每个list的统计信息
+
+      resultDetails.innerHTML = ''; // 清空之前的结果
+
+      words.forEach((item, index) => {
+        const inputId = `word-${index}`;
+        const inputElement = document.getElementById(inputId);
+        const userAnswer = inputElement.value.trim();
+        const correctAnswer = item.word;
+
+        // 初始化当前list的统计对象
+        if (!listStats[item.list]) {
+          listStats[item.list] = { correct: 0, total: 0 };
+        }
+        listStats[item.list].total++;
+
+        const resultLine = document.createElement('div');
+        resultLine.className = 'result-line';
+        
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+          correctCount++;
+          listStats[item.list].correct++;
+          resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+        } else {
+          resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+        }
+        resultDetails.appendChild(resultLine);
+      });
+
+      // --- 创建并显示结果分析 ---
+      // 1. 总体结果
+      const summary = document.createElement('h3');
+      const overallPercentage = Math.round((correctCount / words.length) * 100);
+      summary.textContent = `总体情况: 答对 ${correctCount} / ${words.length} 个单词，正确率: ${overallPercentage}%`;
+      resultDetails.prepend(summary);
+
+      // 2. 分列表结果
+      const listStatsContainer = document.createElement('div');
+      listStatsContainer.className = 'list-stats';
+      
+      Object.keys(listStats).sort().forEach(listNum => {
+        const stats = listStats[listNum];
+        const percentage = Math.round((stats.correct / stats.total) * 100);
+        const listSummary = document.createElement('p');
+        listSummary.innerHTML = `<b>List ${listNum} 记忆情况:</b> 答对 ${stats.correct} / ${stats.total} 个，正确率: ${percentage}%`;
+        listStatsContainer.appendChild(listSummary);
+      });
+
+      resultDetails.appendChild(listStatsContainer);
+      
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

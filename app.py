@@ -52,24 +52,39 @@ def setup_logger(app):
     if not os.path.exists('logs'):
         os.makedirs('logs')
     
+    # 清除现有的处理器以避免重复
+    for handler in app.logger.handlers[:]:
+        app.logger.removeHandler(handler)
+    
     try:
-        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+        # 使用更安全的日志配置
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=5, delay=True)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
         ))
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
-    except PermissionError:
+    except (PermissionError, OSError) as e:
         # 如果无法访问日志文件，使用带时间戳的新文件名
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_handler = RotatingFileHandler(f'logs/app_{timestamp}.log', maxBytes=10240, backupCount=10)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
-        print(f"警告: 无法访问原始日志文件。已创建新的日志文件: app_{timestamp}.log")
+        try:
+            file_handler = RotatingFileHandler(f'logs/app_{timestamp}.log', maxBytes=10240, backupCount=5, delay=True)
+            file_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+            ))
+            file_handler.setLevel(logging.INFO)
+            app.logger.addHandler(file_handler)
+            print(f"警告: 无法访问原始日志文件。已创建新的日志文件: app_{timestamp}.log")
+        except Exception as fallback_error:
+            # 如果连备用日志文件也无法创建，使用控制台日志
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s'
+            ))
+            console_handler.setLevel(logging.INFO)
+            app.logger.addHandler(console_handler)
+            print(f"警告: 无法创建任何日志文件，将使用控制台日志。错误: {fallback_error}")
     
     app.logger.setLevel(logging.INFO)
     app.logger.info('应用启动')
@@ -135,19 +150,48 @@ def get_questions():
     # 新增：从URL获取单词数量, 默认为'10'
     count_str = request.args.get('count', default='10', type=str)
     # 新增：学习模式参数，默认为'standard'
-    study_mode = request.args.get('mode', default='standard', type=str)
+    study_mode = request.args.get('study_mode', default='standard', type=str)
+    
+    # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+    student_id = session.get('user_id', -1)
     
     conn = get_db_connection()
     
-    # 基础SQL查询 - 包含所有详情字段
-    sql_query = '''SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us, 
-               derivatives, root_etymology, mnemonic, comparison, collocation, 
-               exam_sentence, exam_year_source, exam_options, exam_explanation, tips 
-               FROM Words WHERE list_id = ? ORDER BY RANDOM()'''
-    params = (list_id,)
+    # 根据学习模式选择不同的查询策略
+    if study_mode.lower() == 'error_review':
+        # 错误复习模式：只获取该学生在指定列表中犯过错误的单词
+        sql_query = '''
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
+               wl.list_name, b.book_name
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+        '''
+        params = (student_id, student_id, list_id, student_id)
+    else:
+        # 标准模式和默写模式：随机获取单词
+        sql_query = '''SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us, 
+                   w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation, 
+                   w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+                   b.book_name
+                   FROM Words w
+                   LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+                   LEFT JOIN Books b ON wl.book_id = b.book_id
+                   WHERE w.list_id = ? ORDER BY RANDOM()'''
+        params = (list_id,)
 
-    # 只有当数量不是'all'时，我们才加上LIMIT子句
-    if count_str.lower() != 'all':
+    # 对于错词复习模式，总是获取全部错词，不应用LIMIT
+    # 对于其他模式，只有当数量不是'all'时才加上LIMIT子句
+    if study_mode.lower() != 'error_review' and count_str.lower() != 'all':
         try:
             # 确保count可以被转换为整数
             limit_count = int(count_str)
@@ -159,8 +203,21 @@ def get_questions():
             sql_query += ' LIMIT ?'
             params += (10,)
 
+    # 添加调试日志
+    if study_mode.lower() == 'error_review':
+        app.logger.info(f"错词复习模式SQL: {sql_query}")
+        app.logger.info(f"错词复习模式参数: {params}")
+    
     words = conn.execute(sql_query, params).fetchall()
     conn.close()
+    
+    # 添加调试日志
+    if study_mode.lower() == 'error_review':
+        app.logger.info(f"错词复习模式: 列表ID={list_id}, 学生ID={student_id}, 获取到{len(words)}个错词")
+        if words:
+            app.logger.info(f"错词示例: {[word['spelling'] for word in words[:3]]}")
+        else:
+            app.logger.info(f"错词复习模式: 列表ID={list_id}, 学生ID={student_id}, 没有错词")
     
     # --- 数据处理逻辑，根据学习模式决定是否包含音频URL和详情字段 ---
     word_list = []
@@ -176,17 +233,40 @@ def get_questions():
             if field in word_dict and word_dict[field] is None:
                 word_dict[field] = ""
         
+        # 处理错误复习模式特有的字段
+        if study_mode.lower() == 'error_review':
+            # 确保错误统计字段存在
+            if 'error_count' not in word_dict:
+                word_dict['error_count'] = 0
+            if 'last_error_date' not in word_dict:
+                word_dict['last_error_date'] = ""
+            if 'list_name' not in word_dict:
+                word_dict['list_name'] = ""
+            if 'book_name' not in word_dict:
+                word_dict['book_name'] = ""
+        else:
+            # 标准模式和默写模式：确保book_name字段存在
+            if 'book_name' not in word_dict:
+                word_dict['book_name'] = ""
+        
         # 根据学习模式决定是否包含音频URL
         if study_mode.lower() != 'dictation':
-            # 标准模式：包含音频URL
+            # 标准模式和错词复习模式：包含音频URL
+            # 根据词书类型选择正确的媒体路径
+            book_name = word_dict.get('book_name', '')
+            if '高中' in book_name:
+                media_prefix = "/wordlists/senior_high/media"
+            else:
+                media_prefix = "/wordlists/junior_high/media"
+            
             if word_dict['audio_path_uk']:
-                word_dict['audio_path_uk'] = f"/wordlists/junior_high/media/{word_dict['audio_path_uk']}"
+                word_dict['audio_path_uk'] = f"{media_prefix}/{word_dict['audio_path_uk']}"
             else:
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_uk'] = f"/api/tts/{word_dict['spelling']}"
                 
             if word_dict['audio_path_us']:
-                word_dict['audio_path_us'] = f"/wordlists/junior_high/media/{word_dict['audio_path_us']}"
+                word_dict['audio_path_us'] = f"{media_prefix}/{word_dict['audio_path_us']}"
             else:
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_us'] = f"/api/tts/{word_dict['spelling']}"
@@ -207,6 +287,11 @@ def submit_answers():
     
     # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
     student_id = session.get('user_id', -1)
+    
+    # 添加调试日志
+    app.logger.info(f"收到答案提交请求: 用户ID={student_id}, 答案数量={len(answers)}")
+    if answers:
+        app.logger.info(f"第一个答案示例: word_id={answers[0].get('word_id')}, answer={answers[0].get('answer')}")
     
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -243,10 +328,10 @@ def submit_answers():
                 # 将错误记录到ErrorLogs表，使用当前用户ID
                 try:
                     cursor.execute(
-                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now', 'localtime'))",
+                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))",
                         (student_id, word_id, 'spelling_mvp', student_answer)
                     )
-                    app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}")
+                    app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}, 模式=错词复习, 正确拼写={correct_spelling}")
                 except sqlite3.Error as e:
                     app.logger.error(f"记录错误到ErrorLogs表失败: {e}")
                     # 如果表不存在，尝试创建它
@@ -275,6 +360,9 @@ def submit_answers():
 
     conn.commit()
     conn.close()
+    
+    # 添加提交完成日志
+    app.logger.info(f"答案提交完成: 用户ID={student_id}, 错误数量={len(error_details)}")
 
     return jsonify({
         'message': 'Test submitted!',
@@ -353,6 +441,77 @@ def get_lists():
         if conn:
             conn.close()
 
+# --- API路由：获取错误统计信息 ---
+@app.route('/api/error-stats')
+def get_error_stats():
+    """获取指定列表的错误统计信息"""
+    try:
+        # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+        student_id = session.get('user_id', -1)
+        # 如果用户未登录，返回错误信息
+        if student_id == -1:
+            return jsonify({'error': '请先登录后查看错误统计'}), 401
+            
+        list_id = request.args.get('list_id', type=int)
+        if not list_id:
+            return jsonify({'error': '请提供list_id参数'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 首先获取列表和词书信息（无论是否有错误）
+        list_query = """
+        SELECT wl.list_name, b.book_name
+        FROM WordLists wl
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE wl.list_id = ?
+        """
+        
+        cursor.execute(list_query, (list_id,))
+        list_result = cursor.fetchone()
+        
+        list_name = f'List {list_id}'  # 默认值
+        book_name = 'Unknown Book'     # 默认值
+        
+        if list_result:
+            list_name = list_result[0] or f'List {list_id}'
+            book_name = list_result[1] or 'Unknown Book'
+        
+        # 查询该列表中学生的错误统计
+        error_query = """
+        SELECT 
+            COUNT(DISTINCT e.word_id) as error_words_count,
+            COUNT(e.error_id) as total_errors
+        FROM ErrorLogs e
+        JOIN Words w ON e.word_id = w.word_id
+        WHERE e.student_id = ? AND w.list_id = ?
+        """
+        
+        cursor.execute(error_query, (student_id, list_id))
+        error_result = cursor.fetchone()
+        
+        if error_result:
+            stats = {
+                'error_words_count': error_result[0],
+                'total_errors': error_result[1],
+                'list_name': list_name,
+                'book_name': book_name
+            }
+        else:
+            stats = {
+                'error_words_count': 0,
+                'total_errors': 0,
+                'list_name': list_name,
+                'book_name': book_name
+            }
+        
+        conn.close()
+        return jsonify(stats)
+        
+    except sqlite3.Error as e:
+        app.logger.error(f"获取错误统计时出错: {e}")
+        return jsonify({'error': '获取错误统计失败'}), 500
+
 # --- 页面路由 ---
 @app.route('/')
 def index():
@@ -397,7 +556,6 @@ def get_error_history():
         LEFT JOIN WordLists wl ON w.list_id = wl.list_id
         LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE e.student_id = ?
-        GROUP BY e.word_id, e.error_date
         """
         
         params = [student_id]
@@ -418,7 +576,7 @@ def get_error_history():
         
         if date_to is not None:
             query += " AND e.error_date <= ?"
-            params.append(date_to)
+            params.append(date_to + ' 23:59:59')  # 包含当天的所有时间
         
         # 添加排序逻辑
         if sort_by == 'error_count':
@@ -469,7 +627,7 @@ def get_error_history():
         
         if date_to is not None:
             stats_query += " AND e.error_date <= ?"
-            stats_params.append(date_to)
+            stats_params.append(date_to + ' 23:59:59')  # 包含当天的所有时间
         
         stats_query += """
         GROUP BY w.list_id
@@ -511,7 +669,7 @@ def get_error_history():
         
         if date_to is not None:
             word_history_query += " AND e.error_date <= ?"
-            word_history_params.append(date_to)
+            word_history_params.append(date_to + ' 23:59:59')  # 包含当天的所有时间
         
         word_history_query += """
         GROUP BY w.word_id
@@ -555,6 +713,66 @@ def get_error_history():
             'total_tested': total_tested,
             'accuracy_rate': accuracy_rate
         })
+    except Exception as e:
+        app.logger.error(f"获取错误历史记录时出错: {str(e)}")
+        return jsonify({'error': '获取错误历史记录失败'}), 500
+
+# --- 记录错误API ---
+@app.route('/api/record-error', methods=['POST'])
+def record_error():
+    """记录用户的错误答案"""
+    try:
+        # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+        student_id = session.get('user_id', -1)
+        # 如果用户未登录，返回错误信息
+        if student_id == -1:
+            return jsonify({'error': '请先登录后记录错误'}), 401
+        
+        # 获取请求数据
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '请求数据为空'}), 400
+        
+        word_id = data.get('word_id')
+        student_answer = data.get('student_answer', '')
+        list_id = data.get('list_id')
+        
+        if not word_id:
+            return jsonify({'error': '缺少单词ID'}), 400
+        
+        app.logger.info(f"记录错误: student_id={student_id}, word_id={word_id}, student_answer='{student_answer}', list_id={list_id}")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 检查单词是否存在
+        cursor.execute("SELECT spelling, meaning_cn FROM Words WHERE word_id = ?", (word_id,))
+        word = cursor.fetchone()
+        if not word:
+            conn.close()
+            return jsonify({'error': '单词不存在'}), 404
+        
+        # 记录错误到ErrorLogs表
+        cursor.execute("""
+            INSERT INTO ErrorLogs (student_id, word_id, student_answer, error_type, error_date)
+            VALUES (?, ?, ?, ?, datetime('now'))
+        """, (student_id, word_id, student_answer, 'spelling_error'))
+        
+        conn.commit()
+        conn.close()
+        
+        app.logger.info(f"成功记录错误: student_id={student_id}, word_id={word_id}, word='{word['spelling']}'")
+        
+        return jsonify({
+            'success': True,
+            'message': '错误已记录',
+            'word_id': word_id,
+            'word': word['spelling']
+        })
+        
+    except Exception as e:
+        app.logger.error(f"记录错误时出错: {str(e)}")
+        return jsonify({'error': '记录错误失败'}), 500
         
     except sqlite3.Error as e:
         app.logger.error(f"获取错误历史记录时出错: {e}")

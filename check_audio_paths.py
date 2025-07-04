@@ -101,5 +101,58 @@ def main():
     for i, word in enumerate(missing_us[:10]):
         print(f"{i+1}. {word['spelling']} - 英音: {'有' if word['audio_path_uk'] else '无'}")
 
+def check_audio_paths():
+    conn = sqlite3.connect('vocabulary.db')
+    cursor = conn.cursor()
+    
+    # 检查高中词书的音频路径
+    cursor.execute("""
+        SELECT w.spelling, w.audio_path_uk, w.audio_path_us, b.book_name
+        FROM Words w
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE b.book_name = '高中英语词汇' AND (w.audio_path_uk IS NOT NULL OR w.audio_path_us IS NOT NULL)
+        LIMIT 10
+    """)
+    
+    rows = cursor.fetchall()
+    
+    print("高中词书音频路径检查:")
+    print("=" * 80)
+    
+    for row in rows:
+        spelling, uk_path, us_path, book_name = row
+        print(f"单词: {spelling}")
+        print(f"  英音路径: {uk_path}")
+        print(f"  美音路径: {us_path}")
+        print(f"  词书: {book_name}")
+        print("-" * 40)
+    
+    # 检查路径前缀统计
+    cursor.execute("""
+        SELECT 
+            CASE 
+                WHEN audio_path_uk LIKE 'wordlists/senior_high/media/%' THEN 'senior_high'
+                WHEN audio_path_uk LIKE 'wordlists/junior_high/media/%' THEN 'junior_high'
+                WHEN audio_path_uk IS NULL OR audio_path_uk = '' THEN 'no_audio'
+                ELSE 'other'
+            END as path_type,
+            COUNT(*) as count
+        FROM Words w
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE b.book_name = '高中英语词汇'
+        GROUP BY path_type
+    """)
+    
+    path_stats = cursor.fetchall()
+    
+    print("\n高中词书音频路径统计:")
+    print("=" * 40)
+    for path_type, count in path_stats:
+        print(f"{path_type}: {count}")
+    
+    conn.close()
+
 if __name__ == "__main__":
-    main()
+    check_audio_paths()

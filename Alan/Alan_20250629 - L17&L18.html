@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>单词考核 (List 17 & 18)</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 {
+      color: #005a9c;
+      border-bottom: 1px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    h1 { border-bottom-width: 2px; }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+    }
+    label .list-tag {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #6c757d;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-right: 8px;
+    }
+    label .pos {
+        font-style: italic;
+        color: #007bff;
+        font-weight: bold;
+    }
+    label .ipa {
+        color: #d35400;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+        margin-left: 8px;
+    }
+    input {
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #28a745;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 8px;
+    }
+    .list-stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 2px solid #91d5ff;
+    }
+    .correct { color: #28a745; font-weight: bold; }
+    .incorrect { color: #dc3545; text-decoration: line-through; }
+    .result-line { padding: 5px 0; font-size: 1.1em; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>单词考核</h1>
+    <h2>考核范围: List 17 & List 18</h2>
+    <p class="instructions">请注意每个单词所属的列表，并根据提示信息写出正确的英文单词。</p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">完成考核，查看结果</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2>测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    // 从 senior_high_complete.csv 中提取的 List 17 & 18 的单词
+    const words = [
+        // List 17
+        { list: 17, word: "fragile", pos: "adj.", ipa: "/ˈfrædʒaɪl/", meaning: "易碎的,脆的" },
+        { list: 17, word: "frail", pos: "adj.", ipa: "/freɪl/", meaning: "脆弱的,虚弱的" },
+        { list: 17, word: "fragment", pos: "n.", ipa: "/ˈfræɡmənt/", meaning: "碎片,片段" },
+        { list: 17, word: "fraction", pos: "n.", ipa: "/ˈfrækʃn/", meaning: "小部分,片段,分数" },
+        { list: 17, word: "fracture", pos: "n./v.", ipa: "/ˈfræktʃər/", meaning: "骨折,断裂" },
+        { list: 17, word: "profound", pos: "adj.", ipa: "/prəˈfaʊnd/", meaning: "深刻的,深远的" },
+        { list: 17, "word": "fundamental", "pos": "adj.", "ipa": "/ˌfʌndəˈmentl/", "meaning": "基础的,基本的" },
+        { list: 17, word: "foundation", pos: "n.", ipa: "/faʊnˈdeɪʃn/", meaning: "基础,根本,建立" },
+        { list: 17, word: "fund", pos: "n./v.", ipa: "/fʌnd/", meaning: "资金,基金；拨款" },
+        { list: 17, word: "finance", pos: "n./v.", ipa: "/ˈfaɪnæns/", meaning: "财政,金融；资助" },
+        { list: 17, word: "financial", pos: "adj.", ipa: "/faɪˈnænʃl/", meaning: "财政的,金融的" },
+        { list: 17, word: "refund", pos: "v./n.", ipa: "/ˈriːfʌnd/", meaning: "退款" },
+        { list: 17, word: "garment", pos: "n.", ipa: "/ˈɡɑːrmənt/", meaning: "衣服,外衣" },
+        { list: 17, word: "guarantee", pos: "n./v.", ipa: "/ˌɡærənˈtiː/", meaning: "保证,担保" },
+        { list: 17, word: "guard", pos: "v./n.", ipa: "/ɡɑːrd/", meaning: "保卫,守卫" },
+        { list: 17, word: "guardian", pos: "n.", ipa: "/ˈɡɑːrdiən/", meaning: "监护人,保护人" },
+        { list: 17, word: "gorgeous", pos: "adj.", ipa: "/ˈɡɔːrdʒəs/", meaning: "华丽的,灿烂的" },
+        { list: 17, word: "grand", pos: "adj.", ipa: "/ɡrænd/", meaning: "宏伟的,壮丽的,主要的" },
+        { list: 17, word: "grant", pos: "v./n.", ipa: "/ɡrænt/", meaning: "同意,准予；拨款" },
+        { list: 17, word: "graphic", pos: "adj.", ipa: "/ˈɡræfɪk/", meaning: "图画的,文字的,生动的" },
+        { list: 17, word: "paragraph", pos: "n.", ipa: "/ˈpærəɡræf/", meaning: "段落" },
+        { list: 17, "word": "autograph", "pos": "n./v.", "ipa": "/ˈɔːtəɡræf/", "meaning": "亲笔签名" },
+        { list: 17, "word": "gravity", "pos": "n.", "ipa": "/ˈɡrævəti/", "meaning": "重力,引力,庄重" },
+        { list: 17, "word": "grave", "pos": "n./adj.", "ipa": "/ɡreɪv/", "meaning": "坟墓；严重的" },
+        // List 18
+        { list: 18, word: "greenhouse", pos: "n.", ipa: "/ˈɡriːnhaʊs/", meaning: "温室,暖房" },
+        { list: 18, word: "greet", pos: "v.", ipa: "/ɡriːt/", meaning: "问候,迎接,致敬" },
+        { list: 18, word: "greeting", pos: "n.", ipa: "/ˈɡriːtɪŋ/", meaning: "问候,祝贺" },
+        { list: 18, word: "congratulate", pos: "v.", ipa: "/kənˈɡrætʃəleɪt/", meaning: "祝贺,恭喜" },
+        { list: 18, word: "congratulation", pos: "n.", ipa: "/kənˌɡrætʃəˈleɪʃn/", meaning: "祝贺,贺词" },
+        { list: 18, word: "grace", pos: "n.", ipa: "/ɡreɪs/", meaning: "优美,优雅" },
+        { list: 18, word: "graceful", pos: "adj.", ipa: "/ˈɡreɪsfl/", meaning: "优美的,优雅的" },
+        { list: 18, word: "grateful", pos: "adj.", ipa: "/ˈɡreɪtfl/", meaning: "感激的,感谢的" },
+        { list: 18, word: "gratitude", pos: "n.", ipa: "/ˈɡrætɪtuːd/", meaning: "感激,感谢" },
+        { list: 18, word: "habitat", pos: "n.", ipa: "/ˈhæbɪtæt/", meaning: "栖息地,产地" },
+        { list: 18, "word": "inhabit", "pos": "v.", "ipa": "/ɪnˈhæbɪt/", "meaning": "居住于,栖息于" },
+        { list: 18, "word": "inhabitant", "pos": "n.", "ipa": "/ɪnˈhæbɪtənt/", "meaning": "居民,栖息的动物" },
+        { list: 18, "word": "exhibit", "pos": "v./n.", "ipa": "/ɪɡˈzɪbɪt/", "meaning": "陈列,展览；展览品" },
+        { list: 18, "word": "exhibition", "pos": "n.", "ipa": "/ˌeksɪˈbɪʃn/", "meaning": "展览,展览会" },
+        { list: 18, word: "prohibit", pos: "v.", ipa: "/proʊˈhɪbɪt/", meaning: "禁止,阻止" },
+        { list: 18, word: "inhibit", pos: "v.", ipa: "/ɪnˈhɪbɪt/", meaning: "抑制,约束,使减缓" },
+        { list: 18, word: "handle", pos: "v./n.", ipa: "/ˈhændl/", meaning: "处理,操作；把手" },
+        { list: 18, word: "handsome", pos: "adj.", ipa: "/ˈhænsəm/", meaning: "英俊的,大方的" },
+        { list: 18, word: "handy", pos: "adj.", ipa: "/ˈhændi/", meaning: "手边的,便利的" },
+        { list: 18, word: "handicap", pos: "n.", ipa: "/ˈhændikæp/", meaning: "障碍,不利条件" },
+        { list: 18, word: "handkerchief", pos: "n.", ipa: "/ˈhæŋkərtʃɪf/", meaning: "手帕" },
+        { list: 18, word: "heading", pos: "n.", ipa: "/ˈhedɪŋ/", meaning: "标题" },
+        { list: 18, word: "headline", pos: "n.", ipa: "/ˈhedlaɪn/", meaning: "大字标题,新闻提要" },
+        { list: 18, word: "headache", pos: "n.", ipa: "/ˈhedeɪk/", meaning: "头痛" },
+        { list: 18, word: "headquarters", pos: "n.", ipa: "/ˈhedkwɔːrtərz/", meaning: "总部,司令部" }
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+
+    words.forEach((item, index) => {
+      const wordBox = document.createElement('div');
+      wordBox.className = 'word-box';
+
+      const label = document.createElement('label');
+      const inputId = `word-${index}`;
+      label.htmlFor = inputId;
+      label.innerHTML = `
+        <span class="list-tag">List ${item.list}</span>
+        <span class="pos">${item.pos}</span> 
+        ${item.meaning} 
+        <span class="ipa">[${item.ipa}]</span>：
+      `;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.name = inputId;
+      input.autocomplete = 'off';
+
+      wordBox.appendChild(label);
+      wordBox.appendChild(input);
+      wordListContainer.appendChild(wordBox);
+    });
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let correctCount = 0;
+      let listStats = {}; 
+
+      resultDetails.innerHTML = ''; 
+
+      words.forEach((item, index) => {
+        const inputId = `word-${index}`;
+        const inputElement = document.getElementById(inputId);
+        const userAnswer = inputElement.value.trim();
+        const correctAnswer = item.word;
+
+        if (!listStats[item.list]) {
+          listStats[item.list] = { correct: 0, total: 0 };
+        }
+        listStats[item.list].total++;
+
+        const resultLine = document.createElement('div');
+        resultLine.className = 'result-line';
+        
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+          correctCount++;
+          listStats[item.list].correct++;
+          resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+        } else {
+          resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+        }
+        resultDetails.appendChild(resultLine);
+      });
+
+      const summary = document.createElement('h3');
+      const overallPercentage = Math.round((correctCount / words.length) * 100);
+      summary.textContent = `总体情况: 答对 ${correctCount} / ${words.length} 个单词，正确率: ${overallPercentage}%`;
+      resultDetails.prepend(summary);
+
+      const listStatsContainer = document.createElement('div');
+      listStatsContainer.className = 'list-stats';
+      
+      Object.keys(listStats).sort().forEach(listNum => {
+        const stats = listStats[listNum];
+        const percentage = Math.round((stats.correct / stats.total) * 100);
+        const listSummary = document.createElement('p');
+        listSummary.innerHTML = `<b>List ${listNum} 记忆情况:</b> 答对 ${stats.correct} / ${stats.total} 个，正确率: ${percentage}%`;
+        listStatsContainer.appendChild(listSummary);
+      });
+
+      resultDetails.appendChild(listStatsContainer);
+      
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

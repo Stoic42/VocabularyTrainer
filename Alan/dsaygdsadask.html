@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Alan 的综合错词强化总复习</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #b30000;
+      border-bottom: 2px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+      background-color: #fffbe6;
+      border-left: 5px solid #ffc107;
+      padding: 10px;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+    }
+    label .tag {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-right: 6px;
+    }
+    .date-tag { background-color: #6c757d; }
+    .count-tag { background-color: #dc3545; }
+    
+    label .pos {
+        font-style: italic;
+        color: #007bff;
+        font-weight: bold;
+    }
+    label .ipa {
+        color: #d35400;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+        margin-left: 8px;
+    }
+    input {
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #dc3545;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 8px;
+    }
+    .correct { color: #28a745; font-weight: bold; }
+    .incorrect { color: #dc3545; text-decoration: line-through; }
+    .result-line { padding: 5px 0; font-size: 1.1em; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Alan 的综合错词强化总复习</h1>
+    <p class="instructions">
+      本测试包含全部历史错词，已按错误次数排序。请注意每个单词的标签信息，完成最终考核！
+    </p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">完成总复习，查看最终结果</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2>测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    const words = [
+      // 错误次数 3 次
+      { date: "2025-06-27", errorCount: 3, word: "original", pos: "adj. & n.", ipa: "/əˈrɪdʒənl/", meaning: "最初的, 原始的; 原件" },
+      { date: "2025-06-25", errorCount: 3, word: "convenient", pos: "adj.", ipa: "/kənˈviːniənt/", meaning: "方便的, 便利的" },
+      { date: "2025-06-25", errorCount: 3, word: "escalator", pos: "n.", ipa: "/ˈɛskəleɪtər/", meaning: "自动扶梯" },
+      { date: "2025-06-25", errorCount: 3, word: "nature", pos: "n.", ipa: "/ˈneɪtʃər/", meaning: "大自然, 本性" },
+      // 错误次数 2 次
+      { date: "2025-06-27", errorCount: 2, word: "unimportant", pos: "adj.", ipa: "/ˌʌnɪmˈpɔːrtnt/", meaning: "不重要的, 琐碎的" },
+      { date: "2025-06-25", errorCount: 2, word: "seal", pos: "n. & v.", ipa: "/siːl/", meaning: "封条, 海豹; 密封" },
+      { date: "2025-06-25", errorCount: 2, word: "Atlantic", pos: "adj. & n.", ipa: "/ətˈlæntɪk/", meaning: "大西洋的; 大西洋" },
+      { date: "2025-06-25", errorCount: 2, word: "age", pos: "v.", ipa: "/eɪdʒ/", meaning: "(使)变老, 成熟" },
+      { date: "2025-06-25", errorCount: 2, word: "enemy", pos: "n.", ipa: "/ˈɛnəmi/", meaning: "敌人, 仇敌" },
+      // 错误次数 1 次
+      { date: "2025-06-28", errorCount: 1, word: "pleasant", pos: "adj.", ipa: "/ˈplɛznt/", meaning: "令人愉快的, 舒适的" },
+      { date: "2025-06-28", errorCount: 1, word: "agent", pos: "n.", ipa: "/ˈeɪdʒənt/", meaning: "代理商" },
+      { date: "2025-06-28", errorCount: 1, word: "gallery", pos: "n.", ipa: "/ˈɡæləri/", meaning: "画廊, 美术品陈列室" },
+      { date: "2025-06-28", errorCount: 1, word: "discussion", pos: "n.", ipa: "/dɪˈskʌʃn/", meaning: "讨论, 辩论" },
+      { date: "2025-06-27", errorCount: 1, word: "lend", pos: "v.", ipa: "/lɛnd/", meaning: "把…借给, 出借" },
+      { date: "2025-06-27", errorCount: 1, word: "reply", pos: "n. & v.", ipa: "/rɪˈplaɪ/", meaning: "回答, 答复" },
+      { date: "2025-06-27", errorCount: 1, word: "honor", pos: "n. & v.", ipa: "/ˈɒnər/", meaning: "尊敬, 荣誉" },
+      { date: "2025-06-27", errorCount: 1, word: "sixteen", pos: "num.", ipa: "/sɪkˈstiːn/", meaning: "十六" },
+      { date: "2025-06-27", errorCount: 1, word: "thirteenth", pos: "num. & n.", ipa: "/θɜːrˈtiːnθ/", meaning: "第十三" },
+      { date: "2025-06-27", errorCount: 1, word: "towards", pos: "prep.", ipa: "/təˈwɔːrdz/", meaning: "向, 朝" },
+      { date: "2025-06-27", errorCount: 1, word: "two-thirds", pos: "n.", ipa: "/ˌtuːˈθɜːrdz/", meaning: "三分之二" },
+      { date: "2025-06-27", errorCount: 1, word: "newspaper", pos: "n.", ipa: "/ˈnuːzpeɪpər/", meaning: "报纸" },
+      { date: "2025-06-27", errorCount: 1, word: "volleyball", pos: "n.", ipa: "/ˈvɒlibɔːl/", meaning: "排球" },
+      { date: "2025-06-27", errorCount: 1, word: "strategy", pos: "n.", ipa: "/ˈstrætədʒi/", meaning: "谋略, 战略" },
+      { date: "2025-06-27", errorCount: 1, word: "restaurant", pos: "n.", ipa: "/ˈrɛstərɒnt/", meaning: "餐馆, 饭店" },
+      { date: "2025-06-27", errorCount: 1, word: "cigarette", pos: "n.", ipa: "/ˈsɪɡərɛt/", meaning: "香烟" },
+      { date: "2025-06-27", errorCount: 1, word: "thirtieth", pos: "num. & n.", ipa: "/ˈθɜːrtiɪθ/", meaning: "第三十" },
+      { date: "2025-06-27", errorCount: 1, word: "is", pos: "v.", ipa: "/ɪz/", meaning: "是" },
+      { date: "2025-06-27", errorCount: 1, word: "correct", pos: "adj. & v.", ipa: "/kəˈrɛkt/", meaning: "正确的; 改正" },
+      { date: "2025-06-27", errorCount: 1, word: "board", pos: "v.", ipa: "/bɔːrd/", meaning: "登机, 上船" },
+      { date: "2025-06-27", errorCount: 1, word: "everywhere", pos: "adv.", ipa: "/ˈɛvriwer/", meaning: "到处, 各处" },
+      { date: "2025-06-27", errorCount: 1, word: "topic", pos: "n.", ipa: "/ˈtɒpɪk/", meaning: "题目, 话题" },
+      { date: "2025-06-27", errorCount: 1, word: "size", pos: "n. & v.", ipa: "/saɪz/", meaning: "大小, 尺寸" },
+      { date: "2025-06-27", errorCount: 1, word: "bicycle", pos: "n. & v.", ipa: "/ˈbaɪsɪkl/", meaning: "自行车" },
+      { date: "2025-06-27", errorCount: 1, word: "university", pos: "n.", ipa: "/ˌjuːnɪˈvɜːrsəti/", meaning: "大学" },
+      { date: "2025-06-27", errorCount: 1, word: "parent", pos: "n.", ipa: "/ˈperənt/", meaning: "父亲(或母亲)" },
+      { date: "2025-06-27", errorCount: 1, word: "march", pos: "v. & n.", ipa: "/mɑːrtʃ/", meaning: "行军, 前进" },
+      { date: "2025-06-27", errorCount: 1, word: "represent", pos: "v.", ipa: "/ˌrɛprɪˈzɛnt/", meaning: "作为...的代表" },
+      { date: "2025-06-27", errorCount: 1, word: "everyday", pos: "adj.", ipa: "/ˈɛvrideɪ/", meaning: "每天的, 日常的" },
+      { date: "2025-06-27", errorCount: 1, word: "Sunday", pos: "n.", ipa: "/ˈsʌndeɪ/", meaning: "星期日" },
+      { date: "2025-06-27", errorCount: 1, word: "upstairs", pos: "adv. & adj. & n.", ipa: "/ʌpˈsterz/", meaning: "在楼上" },
+      { date: "2025-06-27", errorCount: 1, word: "legend", pos: "n.", ipa: "/ˈlɛdʒənd/", meaning: "传说, 传奇人物" },
+      { date: "2025-06-27", errorCount: 1, word: "guard", pos: "n. & v.", ipa: "/ɡɑːrd/", meaning: "警戒, 守卫" },
+      { date: "2025-06-27", errorCount: 1, word: "front", pos: "n. & adj.", ipa: "/frʌnt/", meaning: "前面, 正面" },
+      { date: "2025-06-27", errorCount: 1, word: "confident", pos: "adj.", ipa: "/ˈkɒnfɪdənt/", meaning: "确信的, 自信的" },
+      { date: "2025-06-27", errorCount: 1, word: "foreign", pos: "adj.", ipa: "/ˈfɔːrən/", meaning: "外国的" },
+      { date: "2025-06-27", errorCount: 1, word: "passenger", pos: "n.", ipa: "/ˈpæsɪndʒər/", meaning: "乘客, 旅客" },
+      { date: "2025-06-27", errorCount: 1, word: "beyond", pos: "adv.", ipa: "/biˈɒnd/", meaning: "在更远处" },
+      { date: "2025-06-27", errorCount: 1, word: "kangaroo", pos: "n.", ipa: "/ˌkæŋɡəˈruː/", meaning: "袋鼠" },
+      { date: "2025-06-27", errorCount: 1, word: "opportunity", pos: "n.", ipa: "/ˌɒpərˈtuːnəti/", meaning: "机会, 良机" },
+      { date: "2025-06-27", errorCount: 1, word: "chopsticks", pos: "n.", ipa: "/ˈtʃɒpstɪks/", meaning: "筷子" },
+      { date: "2025-06-27", errorCount: 1, word: "picnic", pos: "n. & v.", ipa: "/ˈpɪknɪk/", meaning: "野餐" },
+      { date: "2025-06-27", errorCount: 1, word: "marry", pos: "v.", ipa: "/ˈmæri/", meaning: "娶, 嫁" },
+      { date: "2025-06-27", errorCount: 1, word: "purse", pos: "n.", ipa: "/pɜːrs/", meaning: "钱包" },
+      { date: "2025-06-27", errorCount: 1, word: "bow", pos: "n.", ipa: "/boʊ/", meaning: "弓, 蝴蝶结" },
+      { date: "2025-06-27", errorCount: 1, word: "bow", pos: "n. & v.", ipa: "/baʊ/", meaning: "鞠躬, 低头" },
+      { date: "2025-06-27", errorCount: 1, word: "ninety", pos: "num.", ipa: "/ˈnaɪnti/", meaning: "九十" },
+      { date: "2025-06-27", errorCount: 1, word: "sauce", pos: "n.", ipa: "/sɔːs/", meaning: "调味汁, 酱汁" },
+      { date: "2025-06-27", errorCount: 1, word: "deaf", pos: "adj.", ipa: "/dɛf/", meaning: "聋的" },
+      { date: "2025-06-27", errorCount: 1, word: "thought", pos: "n.", ipa: "/θɔːt/", meaning: "想法, 思考" },
+      { date: "2025-06-27", errorCount: 1, word: "fetch", pos: "v.", ipa: "/fɛtʃ/", meaning: "(去)拿来" },
+      { date: "2025-06-27", errorCount: 1, word: "calculator", pos: "n.", ipa: "/ˈkælkjəleɪtər/", meaning: "计算器" },
+      { date: "2025-06-27", errorCount: 1, word: "October", pos: "n.", ipa: "/ɒkˈtoʊbər/", meaning: "十月" },
+      { date: "2025-06-27", errorCount: 1, word: "zebra", pos: "n.", ipa: "/ˈziːbrə/", meaning: "斑马" },
+      { date: "2025-06-27", errorCount: 1, word: "forty", pos: "num.", ipa: "/ˈfɔːrti/", meaning: "四十" },
+      { date: "2025-06-27", errorCount: 1, word: "criticize", pos: "v.", ipa: "/ˈkrɪtɪsaɪz/", meaning: "批评, 评论" },
+      { date: "2025-06-27", errorCount: 1, word: "court", pos: "n. & v.", ipa: "/kɔːrt/", meaning: "法庭, 球场" },
+      { date: "2025-06-27", errorCount: 1, word: "row", pos: "n. & v.", ipa: "/roʊ/", meaning: "(一)排, 划船" },
+      { date: "2025-06-27", errorCount: 1, word: "row", pos: "n. & v.", ipa: "/raʊ/", meaning: "争吵, 斥责" },
+      { date: "2025-06-27", errorCount: 1, word: "wrong", pos: "adj. & n.", ipa: "/rɔːŋ/", meaning: "错误的" },
+      { date: "2025-06-27", errorCount: 1, word: "exhibition", pos: "n.", ipa: "/ˌɛksəˈbɪʃn/", meaning: "展览(会)" },
+      { date: "2025-06-27", errorCount: 1, word: "awful", pos: "adj.", ipa: "/ˈɔːfl/", meaning: "极坏的, 糟糕的" },
+      { date: "2025-06-26", errorCount: 1, word: "comma", pos: "n.", ipa: "/ˈkɒmə/", meaning: "逗号" },
+      { date: "2025-06-26", errorCount: 1, word: "quality", pos: "n. & adj.", ipa: "/ˈkwɒləti/", meaning: "质量, 品质" },
+      { date: "2025-06-26", errorCount: 1, word: "furniture", pos: "n.", ipa: "/ˈfɜːrnɪtʃər/", meaning: "家具" },
+      { date: "2025-06-26", errorCount: 1, word: "Christmas", pos: "n.", ipa: "/ˈkrɪsməs/", meaning: "圣诞节" },
+      { date: "2025-06-26", errorCount: 1, word: "president", pos: "n.", ipa: "/ˈprɛzɪdənt/", meaning: "总统, 校长" },
+      { date: "2025-06-26", errorCount: 1, word: "tale", pos: "n.", ipa: "/teɪl/", meaning: "故事, 传说" },
+      { date: "2025-06-26", errorCount: 1, word: "invent", pos: "v.", ipa: "/ɪnˈvɛnt/", meaning: "发明, 创造" },
+      { date: "2025-06-26", errorCount: 1, word: "population", pos: "n.", ipa: "/ˌpɒpjuˈleɪʃn/", meaning: "人口" },
+      { date: "2025-06-26", errorCount: 1, word: "usual", pos: "adj.", ipa: "/ˈjuːʒuəl/", meaning: "通常的, 惯常的" },
+      { date: "2025-06-26", errorCount: 1, word: "jazz", pos: "n. & adj.", ipa: "/dʒæz/", meaning: "爵士乐" },
+      { date: "2025-06-26", errorCount: 1, word: "wolf", pos: "n.", ipa: "/wʊlf/", meaning: "狼" },
+      { date: "2025-06-26", errorCount: 1, word: "province", pos: "n.", ipa: "/ˈprɒvɪns/", meaning: "省, 领域" },
+      { date: "2025-06-26", errorCount: 1, word: "instrument", pos: "n.", ipa: "/ˈɪnstrəmənt/", meaning: "乐器, 仪器" },
+      { date: "2025-06-26", errorCount: 1, word: "elementary", pos: "adj.", ipa: "/ˌɛlɪˈmɛntəri/", meaning: "基本的, 初级的" },
+      { date: "2025-06-26", errorCount: 1, word: "talented", pos: "adj.", ipa: "/ˈtæləntɪd/", meaning: "有才能的" },
+      { date: "2025-06-26", errorCount: 1, word: "duty", pos: "n.", ipa: "/ˈduːti/", meaning: "责任, 义务" },
+      { date: "2025-06-26", errorCount: 1, word: "below", pos: "adv.", ipa: "/bɪˈloʊ/", meaning: "在下面" },
+      { date: "2025-06-26", errorCount: 1, word: "final", pos: "adj. & n.", ipa: "/ˈfaɪnl/", meaning: "最后的, 决赛" },
+      { date: "2025-06-26", errorCount: 1, word: "insist", pos: "v.", ipa: "/ɪnˈsɪst/", meaning: "坚持要求" },
+      { date: "2025-06-26", errorCount: 1, word: "opinion", pos: "n.", ipa: "/əˈpɪnjən/", meaning: "意见, 主张" },
+      { date: "2025-06-26", errorCount: 1, word: "pool", pos: "n.", ipa: "/puːl/", meaning: "水池, 游泳池" },
+      { date: "2025-06-26", errorCount: 1, word: "nineteen", pos: "num.", ipa: "/ˌnaɪnˈtiːn/", meaning: "十九" },
+      { date: "2025-06-26", errorCount: 1, word: "watermelon", pos: "n.", ipa: "/ˈwɔːtərmelən/", meaning: "西瓜" },
+      { date: "2025-06-26", errorCount: 1, word: "birth", pos: "n.", ipa: "/bɜːrθ/", meaning: "出生, 分娩" },
+      { date: "2025-06-26", errorCount: 1, word: "praise", pos: "v. & n.", ipa: "/preɪz/", meaning: "赞扬, 表扬" },
+      { date: "2025-06-26", errorCount: 1, word: "farm", pos: "n. & v.", ipa: "/fɑːrm/", meaning: "农场, 耕作" },
+      { date: "2025-06-26", errorCount: 1, word: "thirsty", pos: "adj.", ipa: "/ˈθɜːrsti/", meaning: "口渴的" },
+      { date: "2025-06-26", errorCount: 1, word: "mess", pos: "n. & v.", ipa: "/mɛs/", meaning: "凌乱, 弄糟" },
+      { date: "2025-06-25", errorCount: 1, word: "cotton", pos: "n.", ipa: "/ˈkɒtn/", meaning: "棉, 棉花" },
+      { date: "2025-06-25", errorCount: 1, word: "plastic", pos: "adj. & n.", ipa: "/ˈplæstɪk/", meaning: "塑料(的)" },
+      { date: "2025-06-25", errorCount: 1, word: "glue", pos: "n. & v.", ipa: "/ɡluː/", meaning: "胶水, 粘贴" },
+      { date: "2025-06-25", errorCount: 1, word: "terrible", pos: "adj.", ipa: "/ˈtɛrəbl/", meaning: "可怕的, 很糟的" },
+      { date: "2025-06-25", errorCount: 1, word: "careful", pos: "adj.", ipa: "/ˈkerfl/", meaning: "小心的, 仔细的" },
+      { date: "2025-06-25", errorCount: 1, word: "under", pos: "adv.", ipa: "/ˈʌndər/", meaning: "在下面" },
+      { date: "2025-06-25", errorCount: 1, word: "diary", pos: "n.", ipa: "/ˈdaɪəri/", meaning: "日记簿, 日记" },
+      { date: "2025-06-25", errorCount: 1, word: "several", pos: "adj.", ipa: "/ˈsɛvrəl/", meaning: "几个, 若干" },
+      { date: "2025-06-25", errorCount: 1, word: "reveal", pos: "v.", ipa: "/rɪˈviːl/", meaning: "揭露, 泄露" },
+      { date: "2025-06-25", errorCount: 1, word: "marathon", pos: "n. & adj. & v.", ipa: "/ˈmærəθɒn/", meaning: "马拉松" },
+      { date: "2025-06-25", errorCount: 1, word: "discovery", pos: "n.", ipa: "/dɪˈskʌvəri/", meaning: "发现, 发觉" },
+      { date: "2025-06-25", errorCount: 1, word: "clothes", pos: "n.", ipa: "/kloʊðz/", meaning: "衣服, 服装" },
+      { date: "2025-06-25", errorCount: 1, word: "purpose", pos: "n.", ipa: "/ˈpɜːrpəs/", meaning: "目的, 意图" },
+      { date: "2025-06-25", errorCount: 1, word: "association", pos: "n.", ipa: "/əˌsoʊsiˈeɪʃn/", meaning: "协会, 社团" },
+      { date: "2025-06-25", errorCount: 1, word: "author", pos: "n.", ipa: "/ˈɔːθər/", meaning: "作家, 作者" },
+      { date: "2025-06-25", errorCount: 1, word: "Jew", pos: "n.", ipa: "/dʒuː/", meaning: "犹太人" },
+      { date: "2025-06-25", errorCount: 1, word: "globe", pos: "n.", ipa: "/ɡloʊb/", meaning: "地球, 世界" },
+      { date: "2025-06-25", errorCount: 1, word: "cabbage", pos: "n.", ipa: "/ˈkæbɪdʒ/", meaning: "卷心菜, 洋白菜" },
+      { date: "2025-06-25", errorCount: 1, word: "hallway", pos: "n.", ipa: "/ˈhɔːlweɪ/", meaning: "走廊, 门厅" },
+      { date: "2025-06-25", errorCount: 1, word: "dialogue", pos: "n.", ipa: "/ˈdaɪəlɒɡ/", meaning: "对话" },
+      { date: "2025-06-25", errorCount: 1, word: "pain", pos: "n. & v.", ipa: "/peɪn/", meaning: "痛, 疼痛" },
+      { date: "2025-06-25", errorCount: 1, word: "bill", pos: "v.", ipa: "/bɪl/", meaning: "给…开账单" },
+      { date: "2025-06-25", errorCount: 1, word: "positive", pos: "adj. & n.", ipa: "/ˈpɒzətɪv/", meaning: "积极的, 正面的" },
+      { date: "2025-06-25", errorCount: 1, word: "pear", pos: "n.", ipa: "/per/", meaning: "梨(树)" },
+      { date: "2025-06-25", errorCount: 1, word: "ground", pos: "n.", ipa: "/ɡraʊnd/", meaning: "地, 地面" },
+      { date: "2025-06-25", errorCount: 1, word: "cap", pos: "n. & v.", ipa: "/kæp/", meaning: "帽子, 覆盖" },
+      { date: "2025-06-25", errorCount: 1, word: "weekend", pos: "n. & adj.", ipa: "/ˈwiːkɛnd/", meaning: "周末" },
+      { date: "2025-06-25", errorCount: 1, word: "schoolbag", pos: "n.", ipa: "/ˈskuːlbæɡ/", meaning: "书包" },
+      { date: "2025-06-25", errorCount: 1, word: "matter", pos: "n. & v.", ipa: "/ˈmætər/", meaning: "事情, 要紧" },
+      { date: "2025-06-25", errorCount: 1, word: "project", pos: "n.", ipa: "/ˈprɒdʒɛkt/", meaning: "方案, 项目" },
+      { date: "2025-06-25", errorCount: 1, word: "vocabulary", pos: "n.", ipa: "/vəˈkæbjəˌlɛri/", meaning: "词汇, 词汇量" },
+      { date: "2025-06-25", errorCount: 1, word: "list", pos: "n. & v.", ipa: "/lɪst/", meaning: "表, 目录" },
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+
+    words.forEach((item, index) => {
+      const wordBox = document.createElement('div');
+      wordBox.className = 'word-box';
+
+      const label = document.createElement('label');
+      const inputId = `word-${index}`;
+      label.htmlFor = inputId;
+      label.innerHTML = `
+        <span class="tag date-tag">日期: ${item.date}</span>
+        <span class="tag count-tag">错过 ${item.errorCount} 次</span>
+        <span class="pos">${item.pos}</span> 
+        ${item.meaning} 
+        <span class="ipa">[${item.ipa}]</span>：
+      `;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.name = inputId;
+      input.autocomplete = 'off';
+
+      wordBox.appendChild(label);
+      wordBox.appendChild(input);
+      wordListContainer.appendChild(wordBox);
+    });
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let correctCount = 0;
+      resultDetails.innerHTML = '';
+
+      words.forEach((item, index) => {
+        const inputId = `word-${index}`;
+        const inputElement = document.getElementById(inputId);
+        const userAnswer = inputElement.value.trim();
+        const correctAnswer = item.word;
+
+        const resultLine = document.createElement('div');
+        resultLine.className = 'result-line';
+        
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+          correctCount++;
+          resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+        } else {
+          resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+        }
+        resultDetails.appendChild(resultLine);
+      });
+
+      const summary = document.createElement('h3');
+      const percentage = Math.round((correctCount / words.length) * 100);
+      summary.textContent = `答对 ${correctCount} / ${words.length} 个单词。 正确率: ${percentage}%`;
+      resultDetails.prepend(summary);
+
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

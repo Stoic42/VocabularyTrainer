@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>错词清零模式测试</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            padding: 20px;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #b30000;
+            border-bottom: 1px solid #e1e1e1;
+            padding-bottom: 10px;
+        }
+        h1 { border-bottom-width: 2px; }
+        .instructions {
+            color: #555;
+            font-size: 1.1em;
+            background-color: #fffbe6;
+            border-left: 5px solid #ffc107;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .word-box {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        .word-box label {
+            flex: 1;
+            min-width: 350px;
+            margin-right: 15px;
+            line-height: 1.5;
+        }
+        .tag-container {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .tag {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+        .book-tag { background-color: #17a2b8; }
+        .list-tag { background-color: #28a745; }
+        .count-tag { background-color: #dc3545; }
+        .date-tag { background-color: #6c757d; }
+        
+        .pos { font-style: italic; color: #007bff; font-weight: bold; }
+        .ipa { color: #d35400; font-family: "Lucida Sans Unicode", sans-serif; margin-left: 8px; }
+        
+        input { padding: 10px; width: 220px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        
+        button {
+            margin-top: 20px; padding: 12px 25px; background: #007bff; border: none;
+            color: white; font-weight: bold; cursor: pointer; border-radius: 5px;
+            font-size: 18px; display: block; width: 100%; transition: background-color 0.2s;
+        }
+        button:hover { background: #0056b3; }
+
+        .result { margin-top: 30px; padding: 20px; background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 8px; }
+        .final-congrats {
+            margin-top: 30px; padding: 30px; background: #d4edda;
+            border: 1px solid #c3e6cb; border-radius: 8px; text-align: center;
+        }
+        .correct { color: #28a745; font-weight: bold; }
+        .incorrect { color: #dc3545; text-decoration: line-through; }
+        .result-line { padding: 5px 0; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>【错词清零模式】历史错词循环考核</h1>
+        <h2 id="quiz-title">错词清零考核 (共 5 词)</h2>
+        <p class="instructions">
+            本模式将对错词进行循环考核，直到正确率达到100%！
+        </p>
+        
+        <form id="quizForm">
+            <div id="wordList"></div>
+            <button type="submit">提交答案并进入下一轮</button>
+        </form>
+    
+        <div class="result" id="result" style="display:none;">
+            <h2 id="result-title">测试结果分析</h2>
+            <div id="result-details"></div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟错词数据
+        let currentWords = [
+            { book_name: "初中英语词汇", list_name: "Unit 26", error_count: 3, last_error_date: "2025-06-27", spelling: "original", pos: "adj. & n.", meaning_cn: "最初的, 原始的; 原件" },
+            { book_name: "初中英语词汇", list_name: "Unit 21", error_count: 3, last_error_date: "2025-06-25", spelling: "convenient", pos: "adj.", meaning_cn: "方便的, 便利的" },
+            { book_name: "初中英语词汇", list_name: "Unit 22", error_count: 3, last_error_date: "2025-06-25", spelling: "escalator", pos: "n.", meaning_cn: "自动扶梯" },
+            { book_name: "初中英语词汇", list_name: "Unit 22", error_count: 3, last_error_date: "2025-06-25", spelling: "nature", pos: "n.", meaning_cn: "大自然, 本性" },
+            { book_name: "初中英语词汇", list_name: "Unit 25", error_count: 2, last_error_date: "2025-06-27", spelling: "unimportant", pos: "adj.", meaning_cn: "不重要的, 琐碎的" }
+        ];
+
+        const wordListContainer = document.getElementById('wordList');
+        const form = document.getElementById('quizForm');
+        const resultContainer = document.getElementById('result');
+        const resultDetails = document.getElementById('result-details');
+        const quizTitle = document.getElementById('quiz-title');
+        let round = 1;
+
+        function generateQuiz(words) {
+            wordListContainer.innerHTML = '';
+            resultContainer.style.display = 'none';
+            
+            let titleText = `第 ${round} 轮考核 (剩余 ${words.length} 词)`;
+            if(round === 1) {
+                titleText = `错词清零考核 (共 ${words.length} 词)`;
+            }
+            quizTitle.textContent = titleText;
+
+            words.forEach((item, index) => {
+                const wordBox = document.createElement('div');
+                wordBox.className = 'word-box';
+                const inputId = `word-${index}`;
+                wordBox.innerHTML = `
+                    <label for="${inputId}">
+                        <span class="item-num">${index + 1}.</span>
+                        <div class="tag-container">
+                            <span class="tag book-tag">词书: ${item.book_name}</span>
+                            <span class="tag list-tag">单元: ${item.list_name}</span>
+                            <span class="tag count-tag">错过 ${item.error_count} 次</span>
+                            <span class="tag date-tag">上次: ${item.last_error_date}</span>
+                        </div>
+                        <span class="pos">${item.pos}</span> 
+                        ${item.meaning_cn}：
+                    </label>
+                    <input type="text" id="${inputId}" autocomplete="off">
+                `;
+                wordListContainer.appendChild(wordBox);
+            });
+            if(wordListContainer.querySelector('input')) {
+                wordListContainer.querySelector('input').focus();
+            }
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const incorrectWords = [];
+            let correctCount = 0;
+
+            resultDetails.innerHTML = '';
+
+            currentWords.forEach((item, index) => {
+                const inputElement = document.getElementById(`word-${index}`);
+                const userAnswer = inputElement.value.trim();
+                const correctAnswer = item.spelling;
+
+                const resultLine = document.createElement('div');
+                resultLine.className = 'result-line';
+                
+                if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                    correctCount++;
+                    resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+                } else {
+                    incorrectWords.push(item);
+                    resultLine.innerHTML = `✘ 错误: "${correctAnswer}" — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+                }
+                resultDetails.appendChild(resultLine);
+            });
+
+            // 显示结果分析
+            const summary = document.createElement('h3');
+            const overallPercentage = Math.round((correctCount / currentWords.length) * 100);
+            summary.textContent = `第 ${round} 轮总结: 答对 ${correctCount} / ${currentWords.length} 个单词，正确率: ${overallPercentage}%`;
+            resultDetails.prepend(summary);
+            
+            resultContainer.style.display = 'block';
+
+            // 准备下一轮
+            if (incorrectWords.length > 0) {
+                currentWords = incorrectWords;
+                round++;
+                setTimeout(() => {
+                    generateQuiz(currentWords);
+                }, 3000);
+            } else {
+                setTimeout(() => {
+                    wordListContainer.innerHTML = `
+                        <div class="final-congrats">
+                            <h1>🎉 恭喜！</h1>
+                            <p>所有错词已全部掌握，本次学习任务完成！</p>
+                            <p>共完成 ${round} 轮考核</p>
+                        </div>`;
+                    form.style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        // 初始生成第一轮考核
+        generateQuiz(currentWords);
+    </script>
+</body>
+</html> 
