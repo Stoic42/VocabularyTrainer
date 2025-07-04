@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Alan 的最终错词攻克考核 (2025-06-28)</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #b30000;
+      border-bottom: 2px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+      background-color: #fffbe6;
+      border-left: 5px solid #ffc107;
+      padding: 10px;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+    }
+    label .source-tag {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #007bff;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 5px;
+    }
+    label .pos {
+        font-style: italic;
+        color: #6c757d;
+        font-weight: bold;
+    }
+    label .ipa {
+        color: #d35400;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+        margin-left: 8px;
+    }
+    input {
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #dc3545;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+    }
+    button:hover {
+        background: #c82333;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 8px;
+    }
+    .correct {
+        color: #28a745;
+        font-weight: bold;
+    }
+    .incorrect {
+        color: #dc3545;
+        text-decoration: line-through;
+    }
+    .result-line {
+        padding: 5px 0;
+        font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Alan 的最终错词攻克考核</h1>
+    <h2>考核日期: 2025-06-28</h2>
+    <p class="instructions">
+      这是上一轮练习中最后的错词。请集中精力，完成本次最终考核！
+    </p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">完成最终考核，查看结果</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2>测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    // 聚合今天强化考核中最后的4个错词
+    const words = [
+        { source: "27日/L25&26", word: "original", pos: "adj./n.", ipa: "/əˈrɪdʒənl/", meaning: "最初的,原始的" },
+        { source: "25日/L21&22", word: "convenient", pos: "adj.", ipa: "/kənˈviːniənt/", meaning: "方便的,便利的" },
+        { source: "25日/L21&22", word: "escalator", pos: "n.", ipa: "/ˈɛskəleɪtər/", meaning: "自动扶梯" },
+        { source: "25日/L21&22", word: "nature", pos: "n.", ipa: "/ˈneɪtʃər/", meaning: "大自然,本性" }
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+
+    words.forEach((item, index) => {
+      const wordBox = document.createElement('div');
+      wordBox.className = 'word-box';
+
+      const label = document.createElement('label');
+      const inputId = `word-${index}`;
+      label.htmlFor = inputId;
+      label.innerHTML = `
+        <span class="source-tag">${item.source}</span>
+        <span class="pos">${item.pos}</span> 
+        ${item.meaning} 
+        <span class="ipa">[${item.ipa}]</span>：
+      `;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.name = inputId;
+      input.autocomplete = 'off';
+
+      wordBox.appendChild(label);
+      wordBox.appendChild(input);
+      wordListContainer.appendChild(wordBox);
+    });
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let correctCount = 0;
+      resultDetails.innerHTML = '';
+
+      words.forEach((item, index) => {
+        const inputId = `word-${index}`;
+        const inputElement = document.getElementById(inputId);
+        const userAnswer = inputElement.value.trim();
+        const correctAnswer = item.word;
+
+        const resultLine = document.createElement('div');
+        resultLine.className = 'result-line';
+        
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+          correctCount++;
+          resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+        } else {
+          resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+        }
+        resultDetails.appendChild(resultLine);
+      });
+
+      const summary = document.createElement('h3');
+      const percentage = Math.round((correctCount / words.length) * 100);
+      summary.textContent = `答对 ${correctCount} / ${words.length} 个单词。 正确率: ${percentage}%`;
+      resultDetails.prepend(summary);
+
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

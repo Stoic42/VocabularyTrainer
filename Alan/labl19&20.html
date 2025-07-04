@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>【学习循环版】单词考核 (List 19 & 20)</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 {
+      color: #005a9c;
+      border-bottom: 1px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    h1 { border-bottom-width: 2px; }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    label { flex: 1; min-width: 350px; margin-right: 15px; }
+    .tag {
+        font-size: 0.8em; font-weight: bold; color: #fff;
+        padding: 2px 8px; border-radius: 10px; margin-right: 8px;
+    }
+    .list-tag { background-color: #6c757d; }
+    .pos { font-style: italic; color: #007bff; font-weight: bold; }
+    .ipa { color: #d35400; font-family: "Lucida Sans Unicode", sans-serif; margin-left: 8px; }
+    input { padding: 10px; width: 220px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+    button {
+        margin-top: 20px; padding: 12px 25px; background: #28a745; border: none;
+        color: white; font-weight: bold; cursor: pointer; border-radius: 5px;
+        font-size: 18px; display: block; width: 100%;
+    }
+    .result {
+      margin-top: 30px; padding: 20px; background: #e6f7ff;
+      border: 1px solid #91d5ff; border-radius: 8px;
+    }
+    .final-congrats {
+        margin-top: 30px; padding: 30px; background: #d4edda;
+        border: 1px solid #c3e6cb; border-radius: 8px; text-align: center;
+    }
+    .list-stats { margin-top: 20px; padding-top: 15px; border-top: 2px solid #91d5ff; }
+    .correct { color: #28a745; font-weight: bold; }
+    .incorrect { color: #dc3545; text-decoration: line-through; }
+    .result-line { padding: 5px 0; font-size: 1.1em; }
+
+    @media print {
+        body, .container { background: #fff; box-shadow: none; margin: 0; padding: 0; }
+        .instructions, form, button { display: none; }
+        .result { border: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>【学习循环版】单词考核</h1>
+    <h2 id="quiz-title">考核范围: List 19 & 20</h2>
+    <p class="instructions">提交答案后将自动打印结果，并对错词进行下一轮考核，直至全部掌握！</p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">提交答案并进入下一轮</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2 id="result-title">测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    // 初始单词列表
+    let currentWords = [
+        // List 19
+        { list: 19, word: "importance", pos: "n.", ipa: "/ɪmˈpɔːtns/", meaning: "重要（性）" },
+        { list: 19, word: "stress", pos: "n./v.", ipa: "/stres/", meaning: "压力,紧张；强调" },
+        { list: 19, word: "fever", pos: "n.", ipa: "/ˈfiːvə(r)/", meaning: "发热,发烧；狂热" },
+        { list: 19, word: "island", pos: "n.", ipa: "/ˈaɪlənd/", meaning: "岛,岛屿" },
+        { list: 19, word: "energy", pos: "n.", ipa: "/ˈenədʒi/", meaning: "精力；能量；能源" },
+        { list: 19, word: "provide", pos: "v.", ipa: "/prəˈvaɪd/", meaning: "供应,提供" },
+        { list: 19, word: "ourselves", pos: "pron.", ipa: "/ˌaʊəˈselvz/", meaning: "我们自己；我们亲自" },
+        { list: 19, word: "bowl", pos: "n.", ipa: "/bəʊl/", meaning: "碗,钵" },
+        { list: 19, word: "carrot", pos: "n.", ipa: "/ˈkærət/", meaning: "胡萝卜" },
+        { list: 19, word: "reach", pos: "n./v.", ipa: "/riːtʃ/", meaning: "范围；到达" },
+        { list: 19, word: "partner", pos: "n./v.", ipa: "/ˈpɑːtnə(r)/", meaning: "配偶,搭档；伙伴" },
+        { list: 19, word: "strict", pos: "adj.", ipa: "/strɪkt/", meaning: "严格的,严厉的" },
+        { list: 19, word: "ready", pos: "adj.", ipa: "/ˈredi/", meaning: "准备好的,现成的" },
+        { list: 19, word: "fence", pos: "n./v.", ipa: "/fens/", meaning: "栅栏,篱笆；围住" },
+        { list: 19, word: "entertainment", pos: "n.", ipa: "/ˌentəˈteɪnmənt/", meaning: "娱乐；招待" },
+        { list: 19, word: "chalk", pos: "n.", ipa: "/tʃɔːk/", meaning: "粉笔" },
+        { list: 19, word: "desk", pos: "n.", ipa: "/desk/", meaning: "书桌,办公桌" },
+        { list: 19, word: "sport", pos: "n./v.", ipa: "/spɔːt/", meaning: "运动；炫耀" },
+        { list: 19, word: "print", pos: "n./v.", ipa: "/prɪnt/", meaning: "字体；印刷" },
+        { list: 19, word: "tell", pos: "v.", ipa: "/tel/", meaning: "讲,告诉；分辨" },
+        { list: 19, word: "attitude", pos: "n.", ipa: "/ˈætɪtjuːd/", meaning: "态度；看法" },
+        { list: 19, word: "spell", pos: "v.", ipa: "/spel/", meaning: "拼写；意味着" },
+        { list: 19, word: "king", pos: "n.", ipa: "/kɪŋ/", meaning: "君主,国王" },
+        { list: 19, word: "juice", pos: "n.", ipa: "/dʒuːs/", meaning: "汁,液" },
+        { list: 19, word: "notebook", pos: "n.", ipa: "/ˈnəʊtbʊk/", meaning: "笔记本" },
+        { list: 19, word: "before", pos: "adv./prep./conj.", ipa: "/bɪˈfɔː(r)/", meaning: "以前；在...之前" },
+        { list: 19, word: "test", pos: "n./v.", ipa: "/test/", meaning: "试验,测试" },
+        { list: 19, word: "pass", pos: "n./v.", ipa: "/pɑːs/", meaning: "通行证；通过" },
+        { list: 19, word: "balance", pos: "n./v.", ipa: "/ˈbæləns/", meaning: "天平；使平衡" },
+        { list: 19, word: "crowd", pos: "n./v.", ipa: "/kraʊd/", meaning: "人群；聚集" },
+        { list: 19, word: "robot", pos: "n.", ipa: "/ˈrəʊbɒt/", meaning: "机器人" },
+        { list: 19, word: "seat", pos: "n./v.", ipa: "/siːt/", meaning: "座位；使坐下" },
+        { list: 19, word: "creative", pos: "adj.", ipa: "/kriˈeɪtɪv/", meaning: "创造性的" },
+        { list: 19, word: "time", pos: "n./v.", ipa: "/taɪm/", meaning: "时间；为…定时" },
+        { list: 19, word: "soccer", pos: "n.", ipa: "/ˈsɒkə(r)/", meaning: "足球" },
+        { list: 19, word: "thirty", pos: "num.", ipa: "/ˈθɜːti/", meaning: "三十" },
+        { list: 19, word: "glad", pos: "adj.", ipa: "/ɡlæd/", meaning: "高兴的,快活的" },
+        { list: 19, word: "crazy", pos: "adj.", ipa: "/ˈkreɪzi/", meaning: "疯狂的；迷恋的" },
+        { list: 19, word: "monster", pos: "n.", ipa: "/ˈmɒnstə(r)/", meaning: "怪物；妖怪" },
+        { list: 19, word: "interview", pos: "n./v.", ipa: "/ˈɪntəvjuː/", meaning: "面试；采访" },
+        { list: 19, word: "compare", pos: "n./v.", ipa: "/kəmˈpeə(r)/", meaning: "比较；比喻" },
+        { list: 19, word: "sea", pos: "n.", ipa: "/siː/", meaning: "海,海洋" },
+        { list: 19, word: "use", pos: "v./n.", ipa: "/juːz/", meaning: "用,使用" },
+        { list: 19, word: "spotlight", pos: "n./v.", ipa: "/ˈspɒtlaɪt/", meaning: "聚光灯；关注" },
+        { list: 19, word: "album", pos: "n.", ipa: "/ˈælbəm/", meaning: "相册；专辑" },
+        { list: 19, word: "inside", pos: "prep./adv.", ipa: "/ɪnˈsaɪd/", meaning: "在…里面" },
+        { list: 19, word: "fourteen", pos: "num.", ipa: "/ˌfɔːˈtiːn/", meaning: "十四" },
+        { list: 19, word: "whole", pos: "adj./n.", ipa: "/həʊl/", meaning: "全部的；整体" },
+        { list: 19, word: "thick", pos: "adj.", ipa: "/θɪk/", meaning: "厚的,粗的；浓的" },
+        { list: 19, word: "share", pos: "v./n.", ipa: "/ʃeə(r)/", meaning: "分享；股份" },
+        { list: 19, word: "online", pos: "adj./adv.", ipa: "/ˌɒnˈlaɪn/", meaning: "在线的" },
+        { list: 19, word: "garage", pos: "n.", ipa: "/ˈɡærɑːʒ/", meaning: "车库；汽车修理行" },
+        { list: 19, word: "big", pos: "adj.", ipa: "/bɪɡ/", meaning: "大的,巨大的" },
+        { list: 19, word: "somebody", pos: "pron.", ipa: "/ˈsʌmbədi/", meaning: "某人,有人" },
+        { list: 19, word: "mouth", pos: "n.", ipa: "/maʊθ/", meaning: "嘴,口" },
+        { list: 19, word: "noon", pos: "n.", ipa: "/nuːn/", meaning: "正午,中午" },
+        { list: 19, word: "prison", pos: "n.", ipa: "/prɪzn/", meaning: "监狱" },
+        // List 20
+        { list: 20, word: "enter", pos: "v.", ipa: "/ˈentə(r)/", meaning: "进入；参加" },
+        { list: 20, word: "chemistry", pos: "n.", ipa: "/ˈkemɪstri/", meaning: "化学" },
+        { list: 20, word: "storm", pos: "n./v.", ipa: "/stɔːm/", meaning: "暴风雨；猛攻" },
+        { list: 20, word: "challenge", pos: "n./v.", ipa: "/ˈtʃæləndʒ/", meaning: "挑战；质疑" },
+        { list: 20, word: "specifically", pos: "adv.", ipa: "/spəˈsɪfɪkli/", meaning: "明确地,具体地" },
+        { list: 20, word: "interest", pos: "n./v.", ipa: "/ˈɪntrəst/", meaning: "兴趣；利益；使感兴趣" },
+        { list: 20, word: "cola", pos: "n.", ipa: "/ˈkəʊlə/", meaning: "可乐饮料" },
+        { list: 20, word: "golden", pos: "adj.", ipa: "/ˈɡəʊldən/", meaning: "黄金的；珍贵的" },
+        { list: 20, word: "put", pos: "v.", ipa: "/pʊt/", meaning: "放,摆；说,表达" },
+        { list: 20, word: "net", pos: "n./adj.", ipa: "/net/", meaning: "网；净的" },
+        { list: 20, word: "show", pos: "v./n.", ipa: "/ʃəʊ/", meaning: "表明；显示；演出" },
+        { list: 20, word: "treasure", pos: "n./v.", ipa: "/ˈtreʒə(r)/", meaning: "财宝；珍爱" },
+        { list: 20, word: "basket", pos: "n.", ipa: "/ˈbɑːskɪt/", meaning: "篮,篓,筐" },
+        { list: 20, word: "high", pos: "adj./adv.", ipa: "/haɪ/", meaning: "高的；高级的" },
+        { list: 20, word: "deal", pos: "v./n.", ipa: "/diːl/", meaning: "处理；交易" },
+        { list: 20, word: "why", pos: "adv./int.", ipa: "/waɪ/", meaning: "为什么；哎呀" },
+        { list: 20, word: "saying", pos: "n.", ipa: "/ˈseɪɪŋ/", meaning: "话；俗话,谚语" },
+        { list: 20, word: "apple", pos: "n.", ipa: "/ˈæpl/", meaning: "苹果" },
+        { list: 20, word: "sometimes", pos: "adv.", ipa: "/ˈsʌmtaɪmz/", meaning: "有时,间或" },
+        { list: 20, word: "dark", pos: "adj./n.", ipa: "/dɑːk/", meaning: "暗的；黑暗" },
+        { list: 20, word: "sun", pos: "n.", ipa: "/sʌn/", meaning: "太阳,日" },
+        { list: 20, word: "firm", pos: "n./adj.", ipa: "/fɜːm/", meaning: "公司；坚实的" },
+        { list: 20, word: "coat", pos: "n./v.", ipa: "/kəʊt/", meaning: "上衣；涂上" },
+        { list: 20, word: "suitable", pos: "adj.", ipa: "/ˈsuːtəbl/", meaning: "适当的,合适的" },
+        { list: 20, word: "mouse", pos: "n.", ipa: "/maʊs/", meaning: "鼠；鼠标" },
+        { list: 20, word: "beauty", pos: "n.", ipa: "/ˈbjuːti/", meaning: "美,美丽；美人" },
+        { list: 20, word: "excuse", pos: "n./v.", ipa: "/ɪkˈskjuːz/", meaning: "借口；原谅" },
+        { list: 20, word: "choose", pos: "v.", ipa: "/tʃuːz/", meaning: "选择,挑选" },
+        { list: 20, word: "bulb", pos: "n.", ipa: "/bʌlb/", meaning: "球茎；灯泡" },
+        { list: 20, word: "secret", pos: "adj./n.", ipa: "/ˈsiːkrət/", meaning: "秘密的；秘密" },
+        { list: 20, word: "job", pos: "n.", ipa: "/dʒɒb/", meaning: "职业,工作" },
+        { list: 20, word: "lead", pos: "v./n.", ipa: "/liːd/", meaning: "领导；榜样" },
+        { list: 20, word: "lead", pos: "n.", ipa: "/led/", meaning: "铅" },
+        { list: 20, word: "once", pos: "adv./conj.", ipa: "/wʌns/", meaning: "一次；一旦…就…" },
+        { list: 20, word: "by", pos: "prep./adv.", ipa: "/baɪ/", meaning: "被；凭借；在…旁" },
+        { list: 20, word: "evening", pos: "n.", ipa: "/ˈiːvnɪŋ/", meaning: "傍晚,晚上" },
+        { list: 20, word: "clap", pos: "n./v.", ipa: "/klæp/", meaning: "拍手,鼓掌" },
+        { list: 20, word: "gift", pos: "n.", ipa: "/ɡɪft/", meaning: "礼物；天赋" },
+        { list: 20, word: "add", pos: "v.", ipa: "/æd/", meaning: "添加,增加" },
+        { list: 20, word: "luck", pos: "n.", ipa: "/lʌk/", meaning: "运气；好运" },
+        { list: 20, word: "accident", pos: "n.", ipa: "/ˈæksɪdənt/", meaning: "意外,事故" },
+        { list: 20, word: "talk", pos: "n./v.", ipa: "/tɔːk/", meaning: "谈话；演讲" },
+        { list: 20, word: "count", pos: "v./n.", ipa: "/kaʊnt/", meaning: "计数；总数" },
+        { list: 20, word: "permission", pos: "n.", ipa: "/pəˈmɪʃn/", meaning: "许可,允许" },
+        { list: 20, word: "rope", pos: "n./v.", ipa: "/rəʊp/", meaning: "绳索；捆" },
+        { list: 20, word: "act", pos: "n./v.", ipa: "/ækt/", meaning: "行为；法令；行动" },
+        { list: 20, word: "honey", pos: "n.", ipa: "/ˈhʌni/", meaning: "蜂蜜；宝贝儿" },
+        { list: 20, word: "kid", pos: "n./v.", ipa: "/kɪd/", meaning: "小孩；开玩笑" },
+        { list: 20, word: "increase", pos: "v.", ipa: "/ɪnˈkriːs/", meaning: "增加,增强" },
+        { list: 20, word: "increase", pos: "n.", ipa: "/ˈɪnkriːs/", meaning: "增加,增强" },
+        { list: 20, word: "hometown", pos: "n./adj.", ipa: "/ˈhəʊmˈtaʊn/", meaning: "家乡；家乡的" },
+        { list: 20, word: "documentary", pos: "adj./n.", ipa: "/ˌdɒkjuˈmentri/", meaning: "文件的；纪录片" },
+        { list: 20, word: "shampoo", pos: "n./vt.", ipa: "/ʃæmˈpuː/", meaning: "洗发剂；用洗发剂洗" },
+        { list: 20, word: "prize", pos: "n./v.", ipa: "/praɪz/", meaning: "奖赏；珍视" },
+        { list: 20, word: "better", pos: "adj./adv.", ipa: "/ˈbetə(r)/", meaning: "更好的；更好地" },
+        { list: 20, word: "sort", pos: "n./v.", ipa: "/sɔːt/", meaning: "种类；分类" },
+        { list: 20, word: "teenager", pos: "n.", ipa: "/ˈtiːneɪdʒə(r)/", meaning: "十几岁的青少年" },
+        { list: 20, word: "but", pos: "conj./prep.", ipa: "/bʌt/", meaning: "但是；除…以外" },
+        { list: 20, word: "follow", pos: "v./n.", ipa: "/ˈfɒləʊ/", meaning: "跟随；遵照" },
+        { list: 20, word: "else", pos: "adv.", ipa: "/els/", meaning: "其他,另外" }
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+    const quizTitle = document.getElementById('quiz-title');
+    let round = 1;
+
+    function generateQuiz(words) {
+        wordListContainer.innerHTML = ''; // 清空列表
+        resultContainer.style.display = 'none'; // 隐藏结果区
+        quizTitle.textContent = `第 ${round} 轮考核 (剩余 ${words.length} 词)`;
+        
+        words.forEach((item, index) => {
+            const wordBox = document.createElement('div');
+            wordBox.className = 'word-box';
+            const inputId = `word-${index}`;
+            wordBox.innerHTML = `
+                <label for="${inputId}">
+                    <span class="tag list-tag">List ${item.list}</span>
+                    <span class="pos">${item.pos}</span>
+                    ${item.meaning}
+                    <span class="ipa">[${item.ipa}]</span>：
+                </label>
+                <input type="text" id="${inputId}" autocomplete="off">
+            `;
+            wordListContainer.appendChild(wordBox);
+        });
+        // 让第一个输入框自动获得焦点
+        if(wordListContainer.querySelector('input')) {
+            wordListContainer.querySelector('input').focus();
+        }
+    }
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const incorrectWords = [];
+        let correctCount = 0;
+        let listStats = {};
+
+        resultDetails.innerHTML = '';
+
+        currentWords.forEach((item, index) => {
+            const inputElement = document.getElementById(`word-${index}`);
+            const userAnswer = inputElement.value.trim();
+            const correctAnswer = item.word;
+
+            if (!listStats[item.list]) {
+                listStats[item.list] = { correct: 0, total: 0 };
+            }
+            listStats[item.list].total++;
+
+            const resultLine = document.createElement('div');
+            resultLine.className = 'result-line';
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                correctCount++;
+                listStats[item.list].correct++;
+                resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+            } else {
+                incorrectWords.push(item); // 将错词对象加入数组
+                resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+            }
+            resultDetails.appendChild(resultLine);
+        });
+
+        // --- 显示结果分析 ---
+        const summary = document.createElement('h3');
+        const overallPercentage = Math.round((correctCount / currentWords.length) * 100);
+        summary.textContent = `第 ${round} 轮总结: 答对 ${correctCount} / ${currentWords.length} 个单词，正确率: ${overallPercentage}%`;
+        resultDetails.prepend(summary);
+
+        const listStatsContainer = document.createElement('div');
+        listStatsContainer.className = 'list-stats';
+        Object.keys(listStats).sort().forEach(listNum => {
+            const stats = listStats[listNum];
+            const percentage = Math.round((stats.correct / stats.total) * 100);
+            listStatsContainer.innerHTML += `<p><b>List ${listNum} 记忆情况:</b> 答对 ${stats.correct} / ${stats.total} 个，正确率: ${percentage}%</p>`;
+        });
+        resultDetails.appendChild(listStatsContainer);
+        
+        resultContainer.style.display = 'block';
+
+        // --- 自动打印并准备下一轮 ---
+        setTimeout(() => {
+            // 1. 自动打印
+            document.getElementById('result-title').textContent = `第 ${round} 轮测试结果分析`;
+            window.print();
+
+            // 2. 准备下一轮或结束
+            if (incorrectWords.length > 0) {
+                currentWords = incorrectWords; // 更新要考核的单词列表为上一轮的错词
+                round++;
+                generateQuiz(currentWords);
+            } else {
+                wordListContainer.innerHTML = `
+                    <div class="final-congrats">
+                        <h1>🎉 恭喜！</h1>
+                        <p>所有单词已全部掌握，本次学习任务完成！</p>
+                    </div>
+                `;
+                form.style.display = 'none'; // 隐藏表单
+            }
+        }, 1000); // 延迟1秒执行，确保结果可见
+    });
+
+    // 初始生成第一轮考核
+    generateQuiz(currentWords);
+  </script>
+
+</body>
+</html>

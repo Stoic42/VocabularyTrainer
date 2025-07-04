@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>【终极版】Alan 历史错词清零考核</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 {
+      color: #b30000;
+      border-bottom: 1px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    h1 { border-bottom-width: 2px; }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+      background-color: #fffbe6;
+      border-left: 5px solid #ffc107;
+      padding: 10px;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px 0;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+      line-height: 1.5;
+    }
+    label .tag-container {
+        display: block;
+        margin-bottom: 5px;
+    }
+    label .tag {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-right: 6px;
+        white-space: nowrap;
+    }
+    .item-num { font-weight: bold; margin-right: 5px; color: #005a9c; }
+    .book-tag { background-color: #17a2b8; }
+    .list-tag { background-color: #28a745; }
+    .count-tag { background-color: #dc3545; }
+    .date-tag { background-color: #6c757d; }
+    
+    label .pos { font-style: italic; color: #007bff; font-weight: bold; }
+    label .ipa { color: #d35400; font-family: "Lucida Sans Unicode", sans-serif; margin-left: 8px; }
+    
+    input { padding: 10px; width: 220px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+    
+    button {
+        margin-top: 20px; padding: 12px 25px; background: #007bff; border: none;
+        color: white; font-weight: bold; cursor: pointer; border-radius: 5px;
+        font-size: 18px; display: block; width: 100%; transition: background-color 0.2s;
+    }
+    button:hover { background: #0056b3; }
+
+    .result { margin-top: 30px; padding: 20px; background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 8px; }
+    .final-congrats {
+        margin-top: 30px; padding: 30px; background: #d4edda;
+        border: 1px solid #c3e6cb; border-radius: 8px; text-align: center;
+    }
+    .list-stats { margin-top: 20px; padding-top: 15px; border-top: 2px solid #91d5ff; }
+    .correct { color: #28a745; font-weight: bold; }
+    .incorrect { color: #dc3545; text-decoration: line-through; }
+    .result-line { padding: 5px 0; font-size: 1.1em; }
+
+    @media print {
+        body, .container { background: #fff; box-shadow: none; margin: 0; padding: 0; }
+        .instructions, form, button, .final-congrats { display: none; }
+        .result { border: none; margin-top: 0; }
+        .container { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>【终极版】历史错词清零考核</h1>
+    <h2 id="quiz-title"></h2>
+    <p class="instructions">
+      本测试聚合了全部历史错词。提交后将自动打印，并对错词进行循环考核，直至全部掌握！
+    </p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">提交答案并进入下一轮</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2 id="result-title">测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentWords = [
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 3, lastErrorDate: "2025-06-27", word: "original", pos: "adj. & n.", ipa: "/əˈrɪdʒənl/", meaning: "最初的, 原始的; 原件" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 3, lastErrorDate: "2025-06-25", word: "convenient", pos: "adj.", ipa: "/kənˈviːniənt/", meaning: "方便的, 便利的" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 3, lastErrorDate: "2025-06-25", word: "escalator", pos: "n.", ipa: "/ˈɛskəleɪtər/", meaning: "自动扶梯" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 3, lastErrorDate: "2025-06-25", word: "nature", pos: "n.", ipa: "/ˈneɪtʃər/", meaning: "大自然, 本性" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 2, lastErrorDate: "2025-06-27", word: "unimportant", pos: "adj.", ipa: "/ˌʌnɪmˈpɔːrtnt/", meaning: "不重要的, 琐碎的" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 2, lastErrorDate: "2025-06-25", word: "seal", pos: "n. & v.", ipa: "/siːl/", meaning: "封条, 海豹; 密封" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 2, lastErrorDate: "2025-06-25", word: "Atlantic", pos: "adj. & n.", ipa: "/ətˈlæntɪk/", meaning: "大西洋(的)" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 2, lastErrorDate: "2025-06-25", word: "age", pos: "v.", ipa: "/eɪdʒ/", meaning: "(使)变老, 成熟" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 2, lastErrorDate: "2025-06-25", word: "enemy", pos: "n.", ipa: "/ˈɛnəmi/", meaning: "敌人, 仇敌" },
+        { book: "高中英语词汇", listName: "Unit 11", errorCount: 1, lastErrorDate: "2025-06-28", word: "pleasant", pos: "adj.", ipa: "/ˈplɛznt/", meaning: "令人愉快的, 舒适的" },
+        { book: "高中英语词汇", listName: "Unit 40", errorCount: 1, lastErrorDate: "2025-06-28", word: "agent", pos: "n.", ipa: "/ˈeɪdʒənt/", meaning: "代理商" },
+        { book: "高中英语词汇", listName: "Unit 40", errorCount: 1, lastErrorDate: "2025-06-28", word: "gallery", pos: "n.", ipa: "/ˈɡæləri/", meaning: "画廊, 美术品陈列室" },
+        { book: "高中英语词汇", listName: "简单单词", errorCount: 1, lastErrorDate: "2025-06-28", word: "discussion", pos: "n.", ipa: "/dɪˈskʌʃn/", meaning: "讨论, 辩论" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "lend", pos: "v.", ipa: "/lɛnd/", meaning: "把…借给, 出借" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "reply", pos: "n. & v.", ipa: "/rɪˈplaɪ/", meaning: "回答, 答复" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "honor", pos: "n. & v.", ipa: "/ˈɒnər/", meaning: "尊敬, 荣誉" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "sixteen", pos: "num.", ipa: "/sɪkˈstiːn/", meaning: "十六" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "thirteenth", pos: "num. & n.", ipa: "/θɜːrˈtiːnθ/", meaning: "第十三" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "towards", pos: "prep.", ipa: "/təˈwɔːrdz/", meaning: "向, 朝" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "two-thirds", pos: "n.", ipa: "/ˌtuːˈθɜːrdz/", meaning: "三分之二" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "newspaper", pos: "n.", ipa: "/ˈnuːzpeɪpər/", meaning: "报纸" },
+        { book: "初中英语词汇", listName: "Unit 1", errorCount: 1, lastErrorDate: "2025-06-27", word: "volleyball", pos: "n.", ipa: "/ˈvɒlibɔːl/", meaning: "排球" },
+        { book: "初中英语词汇", listName: "Unit 2", errorCount: 1, lastErrorDate: "2025-06-27", word: "strategy", pos: "n.", ipa: "/ˈstrætədʒi/", meaning: "谋略, 战略" },
+        { book: "初中英语词汇", listName: "Unit 2", errorCount: 1, lastErrorDate: "2025-06-27", word: "restaurant", pos: "n.", ipa: "/ˈrɛstərɒnt/", meaning: "餐馆, 饭店" },
+        { book: "初中英语词汇", listName: "Unit 2", errorCount: 1, lastErrorDate: "2025-06-27", word: "cigarette", pos: "n.", ipa: "/ˈsɪɡərɛt/", meaning: "香烟" },
+        { book: "初中英语词汇", listName: "Unit 2", errorCount: 1, lastErrorDate: "2025-06-27", word: "thirtieth", pos: "num. & n.", ipa: "/ˈθɜːrtiɪθ/", meaning: "第三十" },
+        { book: "初中英语词汇", listName: "Unit 2", errorCount: 1, lastErrorDate: "2025-06-27", word: "is", pos: "v.", ipa: "/ɪz/", meaning: "是" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "correct", pos: "adj. & v.", ipa: "/kəˈrɛkt/", meaning: "正确的; 改正" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "board", pos: "v.", ipa: "/bɔːrd/", meaning: "登机, 上船" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "everywhere", pos: "adv.", ipa: "/ˈɛvriwer/", meaning: "到处, 各处" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "topic", pos: "n.", ipa: "/ˈtɒpɪk/", meaning: "题目, 话题" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "size", pos: "n. & v.", ipa: "/saɪz/", meaning: "大小, 尺寸" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "bicycle", pos: "n. & v.", ipa: "/ˈbaɪsɪkl/", meaning: "自行车" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "university", pos: "n.", ipa: "/ˌjuːnɪˈvɜːrsəti/", meaning: "大学" },
+        { book: "初中英语词汇", listName: "Unit 3", errorCount: 1, lastErrorDate: "2025-06-27", word: "parent", pos: "n.", ipa: "/ˈperənt/", meaning: "父亲(或母亲)" },
+        { book: "初中英语词汇", listName: "Unit 4", errorCount: 1, lastErrorDate: "2025-06-27", word: "march", pos: "v. & n.", ipa: "/mɑːrtʃ/", meaning: "行军, 前进" },
+        { book: "初中英语词汇", listName: "Unit 4", errorCount: 1, lastErrorDate: "2025-06-27", word: "represent", pos: "v.", ipa: "/ˌrɛprɪˈzɛnt/", meaning: "作为...的代表" },
+        { book: "初中英语词汇", listName: "Unit 4", errorCount: 1, lastErrorDate: "2025-06-27", word: "everyday", pos: "adj.", ipa: "/ˈɛvrideɪ/", meaning: "每天的, 日常的" },
+        { book: "初中英语词汇", listName: "Unit 4", errorCount: 1, lastErrorDate: "2025-06-27", word: "Sunday", pos: "n.", ipa: "/ˈsʌndeɪ/", meaning: "星期日" },
+        { book: "初中英语词汇", listName: "Unit 4", errorCount: 1, lastErrorDate: "2025-06-27", word: "upstairs", pos: "adv. & adj. & n.", ipa: "/ʌpˈsterz/", meaning: "在楼上, 楼上的" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "legend", pos: "n.", ipa: "/ˈlɛdʒənd/", meaning: "传说, 传奇人物" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "guard", pos: "n. & v.", ipa: "/ɡɑːrd/", meaning: "警戒, 守卫" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "front", pos: "n. & adj.", ipa: "/frʌnt/", meaning: "前面, 正面" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "confident", pos: "adj.", ipa: "/ˈkɒnfɪdənt/", meaning: "确信的, 自信的" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "foreign", pos: "adj.", ipa: "/ˈfɔːrən/", meaning: "外国的" },
+        { book: "高中英语词汇", listName: "简单单词", errorCount: 1, lastErrorDate: "2025-06-29", word: "passenger", pos: "n.", ipa: "/ˈpæsɪndʒər/", meaning: "乘客, 旅客" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "beyond", pos: "adv.", ipa: "/biˈɒnd/", meaning: "在更远处" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "kangaroo", pos: "n.", ipa: "/ˌkæŋɡəˈruː/", meaning: "袋鼠" },
+        { book: "初中英语词汇", listName: "Unit 25", errorCount: 1, lastErrorDate: "2025-06-27", word: "opportunity", pos: "n.", ipa: "/ˌɒpərˈtuːnəti/", meaning: "机会, 良机" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "chopsticks", pos: "n.", ipa: "/ˈtʃɒpstɪks/", meaning: "筷子" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "picnic", pos: "n. & v.", ipa: "/ˈpɪknɪk/", meaning: "野餐" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "marry", pos: "v.", ipa: "/ˈmæri/", meaning: "娶, 嫁" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "purse", pos: "n.", ipa: "/pɜːrs/", meaning: "钱包" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "bow", pos: "n.", ipa: "/boʊ/", meaning: "弓, 蝴蝶结" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "bow", pos: "n. & v.", ipa: "/baʊ/", meaning: "鞠躬, 低头" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "ninety", pos: "num.", ipa: "/ˈnaɪnti/", meaning: "九十" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "sauce", pos: "n.", ipa: "/sɔːs/", meaning: "调味汁, 酱汁" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "deaf", pos: "adj.", ipa: "/dɛf/", meaning: "聋的" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "thought", pos: "n.", ipa: "/θɔːt/", meaning: "想法, 思考" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "calculator", pos: "n.", ipa: "/ˈkælkjəleɪtər/", meaning: "计算器" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "October", pos: "n.", ipa: "/ɒkˈtoʊbər/", meaning: "十月" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "zebra", pos: "n.", ipa: "/ˈziːbrə/", meaning: "斑马" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "forty", pos: "num.", ipa: "/ˈfɔːrti/", meaning: "四十" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "court", pos: "n. & v.", ipa: "/kɔːrt/", meaning: "法庭, 球场" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "row", pos: "n. & v.", ipa: "/roʊ/", meaning: "(一)排, 划船" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "row", pos: "n. & v.", ipa: "/raʊ/", meaning: "争吵, 斥责" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "wrong", pos: "adj. & n.", ipa: "/rɔːŋ/", meaning: "错误的" },
+        { book: "初中英语词汇", listName: "Unit 26", errorCount: 1, lastErrorDate: "2025-06-27", word: "awful", pos: "adj.", ipa: "/ˈɔːfl/", meaning: "极坏的, 糟糕的" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "comma", pos: "n.", ipa: "/ˈkɒmə/", meaning: "逗号" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "quality", pos: "n. & adj.", ipa: "/ˈkwɒləti/", meaning: "质量, 品质" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "furniture", pos: "n.", ipa: "/ˈfɜːrnɪtʃər/", meaning: "家具" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "Christmas", pos: "n.", ipa: "/ˈkrɪsməs/", meaning: "圣诞节" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "president", pos: "n.", ipa: "/ˈprɛzɪdənt/", meaning: "总统, 校长" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "tale", pos: "n.", ipa: "/teɪl/", meaning: "故事, 传说" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "invent", pos: "v.", ipa: "/ɪnˈvɛnt/", meaning: "发明, 创造" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "population", pos: "n.", ipa: "/ˌpɒpjuˈleɪʃn/", meaning: "人口" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "jazz", pos: "n. & adj.", ipa: "/dʒæz/", meaning: "爵士乐" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "wolf", pos: "n.", ipa: "/wʊlf/", meaning: "狼" },
+        { book: "初中英语词汇", listName: "Unit 23", errorCount: 1, lastErrorDate: "2025-06-26", word: "province", pos: "n.", ipa: "/ˈprɒvɪns/", meaning: "省, 领域" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "instrument", pos: "n.", ipa: "/ˈɪnstrəmənt/", meaning: "乐器, 仪器" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "talented", pos: "adj.", ipa: "/ˈtæləntɪd/", meaning: "有才能的" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "duty", pos: "n.", ipa: "/ˈduːti/", meaning: "责任, 义务" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "below", pos: "adv.", ipa: "/bɪˈloʊ/", meaning: "在下面" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "final", pos: "adj. & n.", ipa: "/ˈfaɪnl/", meaning: "最后的, 决赛" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "insist", pos: "v.", ipa: "/ɪnˈsɪst/", meaning: "坚持要求" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "opinion", pos: "n.", ipa: "/əˈpɪnjən/", meaning: "意见, 主张" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "pool", pos: "n.", ipa: "/puːl/", meaning: "水池, 游泳池" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "nineteen", pos: "num.", ipa: "/ˌnaɪnˈtiːn/", meaning: "十九" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "watermelon", pos: "n.", ipa: "/ˈwɔːtərmelən/", meaning: "西瓜" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "birth", pos: "n.", ipa: "/bɜːrθ/", meaning: "出生, 分娩" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "praise", pos: "v. & n.", ipa: "/preɪz/", meaning: "赞扬, 表扬" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "farm", pos: "n. & v.", ipa: "/fɑːrm/", meaning: "农场, 耕作" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "thirsty", pos: "adj.", ipa: "/ˈθɜːrsti/", meaning: "口渴的" },
+        { book: "初中英语词汇", listName: "Unit 24", errorCount: 1, lastErrorDate: "2025-06-26", word: "mess", pos: "n. & v.", ipa: "/mɛs/", meaning: "凌乱, 弄糟" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "cotton", pos: "n.", ipa: "/ˈkɒtn/", meaning: "棉, 棉花" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "plastic", pos: "adj. & n.", ipa: "/ˈplæstɪk/", meaning: "塑料(的)" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "glue", pos: "n. & v.", ipa: "/ɡluː/", meaning: "胶水, 粘贴" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "terrible", pos: "adj.", ipa: "/ˈtɛrəbl/", meaning: "可怕的, 很糟的" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "careful", pos: "adj.", ipa: "/ˈkerfl/", meaning: "小心的, 仔细的" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "under", pos: "adv.", ipa: "/ˈʌndər/", meaning: "在下面" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "several", pos: "adj.", ipa: "/ˈsɛvrəl/", meaning: "几个, 若干" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "reveal", pos: "v.", ipa: "/rɪˈviːl/", meaning: "揭露, 泄露" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "marathon", pos: "n. & adj. & v.", ipa: "/ˈmærəθɒn/", meaning: "马拉松" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "discovery", pos: "n.", ipa: "/dɪˈskʌvəri/", meaning: "发现, 发觉" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "clothes", pos: "n.", ipa: "/kloʊðz/", meaning: "衣服, 服装" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "purpose", pos: "n.", ipa: "/ˈpɜːrpəs/", meaning: "目的, 意图" },
+        { book: "初中英语词汇", listName: "Unit 21", errorCount: 1, lastErrorDate: "2025-06-25", word: "association", pos: "n.", ipa: "/əˌsoʊsiˈeɪʃn/", meaning: "协会, 社团" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "author", pos: "n.", ipa: "/ˈɔːθər/", meaning: "作家, 作者" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "Jew", pos: "n.", ipa: "/dʒuː/", meaning: "犹太人" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "globe", pos: "n.", ipa: "/ɡloʊb/", meaning: "地球, 世界" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "cabbage", pos: "n.", ipa: "/ˈkæbɪdʒ/", meaning: "卷心菜, 洋白菜" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "dialogue", pos: "n.", ipa: "/ˈdaɪəlɒɡ/", meaning: "对话" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "pain", pos: "n. & v.", ipa: "/peɪn/", meaning: "痛, 疼痛" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "bill", pos: "v.", ipa: "/bɪl/", meaning: "给…开账单" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "positive", pos: "adj. & n.", ipa: "/ˈpɒzətɪv/", meaning: "积极的, 正面的" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "pear", pos: "n.", ipa: "/per/", meaning: "梨(树)" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "ground", pos: "n.", ipa: "/ɡraʊnd/", meaning: "地, 地面" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "weekend", pos: "n. & adj.", ipa: "/ˈwiːkɛnd/", meaning: "周末" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "schoolbag", pos: "n.", ipa: "/ˈskuːlbæɡ/", meaning: "书包" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "matter", pos: "n. & v.", ipa: "/ˈmætər/", meaning: "事情, 要紧" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "project", pos: "n.", ipa: "/ˈprɒdʒɛkt/", meaning: "方案, 项目" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "vocabulary", pos: "n.", ipa: "/vəˈkæbjəˌlɛri/", meaning: "词汇, 词汇量" },
+        { book: "初中英语词汇", listName: "Unit 22", errorCount: 1, lastErrorDate: "2025-06-25", word: "list", pos: "n. & v.", ipa: "/lɪst/", meaning: "表, 目录" }
+    ];
+
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+    const quizTitle = document.getElementById('quiz-title');
+    let round = 1;
+
+    function generateQuiz(words) {
+        wordListContainer.innerHTML = '';
+        resultContainer.style.display = 'none';
+        
+        let titleText = `第 ${round} 轮考核 (剩余 ${words.length} 词)`;
+        if(round === 1) {
+            titleText = `历史错词总复习 (共 ${words.length} 词)`;
+        }
+        quizTitle.textContent = titleText;
+
+        words.forEach((item, index) => {
+            const wordBox = document.createElement('div');
+            wordBox.className = 'word-box';
+            const inputId = `word-${index}`;
+            wordBox.innerHTML = `
+                <label for="${inputId}">
+                    <span class="item-num">${index + 1}.</span>
+                    <div class="tag-container">
+                        <span class="tag book-tag">词书: ${item.book}</span>
+                        <span class="tag list-tag">单元: ${item.listName}</span>
+                        <span class="tag count-tag">错过 ${item.errorCount} 次</span>
+                        <span class="tag date-tag">上次: ${item.lastErrorDate}</span>
+                    </div>
+                    <span class="pos">${item.pos}</span> 
+                    ${item.meaning} 
+                    <span class="ipa">[${item.ipa}]</span>：
+                </label>
+                <input type="text" id="${inputId}" autocomplete="off">
+            `;
+            wordListContainer.appendChild(wordBox);
+        });
+        if(wordListContainer.querySelector('input')) {
+            wordListContainer.querySelector('input').focus();
+        }
+    }
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const incorrectWords = [];
+        let correctCount = 0;
+        let listStats = {};
+
+        resultDetails.innerHTML = '';
+
+        currentWords.forEach((item, index) => {
+            const inputElement = document.getElementById(`word-${index}`);
+            const userAnswer = inputElement.value.trim();
+            const correctAnswer = item.word;
+
+            // 分列表统计逻辑
+            const listKey = `${item.book} - ${item.listName}`;
+            if (!listStats[listKey]) {
+                listStats[listKey] = { correct: 0, total: 0 };
+            }
+            listStats[listKey].total++;
+
+            const resultLine = document.createElement('div');
+            resultLine.className = 'result-line';
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                correctCount++;
+                listStats[listKey].correct++;
+                resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+            } else {
+                incorrectWords.push(item);
+                resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+            }
+            resultDetails.appendChild(resultLine);
+        });
+
+        // --- 显示结果分析 ---
+        const summary = document.createElement('h3');
+        const overallPercentage = Math.round((correctCount / currentWords.length) * 100);
+        summary.textContent = `第 ${round} 轮总结: 答对 ${correctCount} / ${currentWords.length} 个单词，正确率: ${overallPercentage}%`;
+        resultDetails.prepend(summary);
+
+        const listStatsContainer = document.createElement('div');
+        listStatsContainer.className = 'list-stats';
+        Object.keys(listStats).sort().forEach(listKey => {
+            const stats = listStats[listKey];
+            const percentage = Math.round((stats.correct / stats.total) * 100);
+            listStatsContainer.innerHTML += `<p><b>${listKey} 记忆情况:</b> 答对 ${stats.correct} / ${stats.total} 个，正确率: ${percentage}%</p>`;
+        });
+        resultDetails.appendChild(listStatsContainer);
+        
+        resultContainer.style.display = 'block';
+
+        // --- 自动打印并准备下一轮 ---
+        setTimeout(() => {
+            document.getElementById('result-title').textContent = `第 ${round} 轮测试结果分析`;
+            window.print();
+
+            if (incorrectWords.length > 0) {
+                currentWords = incorrectWords;
+                round++;
+                generateQuiz(currentWords);
+            } else {
+                wordListContainer.innerHTML = `
+                    <div class="final-congrats">
+                        <h1>🎉 恭喜！</h1>
+                        <p>所有历史错词已全部掌握，本次学习任务完成！</p>
+                    </div>`;
+                form.style.display = 'none';
+            }
+        }, 1500); // 延迟1.5秒，确保结果可见并给打印对话框弹出留出时间
+    });
+
+    // 初始生成第一轮考核
+    generateQuiz(currentWords);
+  </script>
+
+</body>
+</html>

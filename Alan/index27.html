@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Alan 的错词复习考核 (2025-06-27)</title>
+  <style>
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #005a9c;
+      border-bottom: 2px solid #e1e1e1;
+      padding-bottom: 10px;
+    }
+    p.instructions {
+      color: #555;
+      font-size: 1.1em;
+    }
+    .word-box {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .word-box label {
+      flex: 1;
+      min-width: 350px;
+      margin-right: 15px;
+    }
+    label .pos {
+        font-style: italic;
+        color: #007bff;
+        font-weight: bold;
+    }
+    label .ipa {
+        color: #d35400;
+        font-family: "Lucida Sans Unicode", "Arial Unicode MS", sans-serif;
+        margin-left: 8px;
+    }
+    input {
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #28a745;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+    }
+    button:hover {
+        background: #218838;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 8px;
+    }
+    .correct {
+        color: #28a745;
+        font-weight: bold;
+    }
+    .incorrect {
+        color: #dc3545;
+        text-decoration: line-through;
+    }
+    .result-line {
+        padding: 5px 0;
+        font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Alan 的错词复习考核</h1>
+    <h2>测试日期: 2025-06-27</h2>
+    <p class="instructions">请根据提示信息（词性、中文意思、音标），在右侧输入框中写出正确的英文单词。</p>
+    
+    <form id="quizForm">
+      <div id="wordList"></div>
+      <button type="submit">完成考核，查看结果</button>
+    </form>
+  
+    <div class="result" id="result" style="display:none;">
+      <h2>测试结果分析</h2>
+      <div id="result-details"></div>
+    </div>
+  </div>
+
+  <script>
+    // Alan 在 2025-06-27 的 50 个错词记录
+    const words = [
+        { word: "lend", pos: "v.", ipa: "/lɛnd/", meaning: "把...借给,出借" },
+        { word: "reply", pos: "n./v.", ipa: "/rɪˈplaɪ/", meaning: "回答,答复" },
+        { word: "honor", pos: "n./v.", ipa: "/ˈɒnər/", meaning: "尊敬,敬意;荣誉" },
+        { word: "sixteen", pos: "num.", ipa: "/sɪkˈstiːn/", meaning: "十六" },
+        { word: "thirteenth", pos: "num.", ipa: "/θɜːrˈtiːnθ/", meaning: "第十三" },
+        { word: "toward", pos: "prep.", ipa: "/təˈwɔːrd/", meaning: "向,朝,面对" },
+        { word: "third", pos: "num.", ipa: "/θɜːrd/", meaning: "第三" },
+        { word: "newspaper", pos: "n.", ipa: "/ˈnuːzpeɪpər/", meaning: "报纸" },
+        { word: "volleyball", pos: "n.", ipa: "/ˈvɒlibɔːl/", meaning: "排球" },
+        { word: "strategy", pos: "n.", ipa: "/ˈstrætədʒi/", meaning: "谋略,战略" },
+        { word: "restaurant", pos: "n.", ipa: "/ˈrɛstərɒnt/", meaning: "餐馆,饭店" },
+        { word: "cigarette", pos: "n.", ipa: "/ˈsɪɡərɛt/", meaning: "香烟" },
+        { word: "thirtieth", pos: "num.", ipa: "/ˈθɜːrtiɪθ/", meaning: "第三十" },
+        { word: "is", pos: "v.", ipa: "/ɪz/", meaning: "存在,是" },
+        { word: "correct", pos: "adj./v.", ipa: "/kəˈrɛkt/", meaning: "正确的;改正" },
+        { word: "board", pos: "v.", ipa: "/bɔːrd/", meaning: "登机,上船" },
+        { word: "everywhere", pos: "adv.", ipa: "/ˈɛvriwer/", meaning: "到处,各处" },
+        { word: "topic", pos: "n.", ipa: "/ˈtɒpɪk/", meaning: "题目,话题" },
+        { word: "size", pos: "n./v.", ipa: "/saɪz/", meaning: "大小,尺寸" },
+        { word: "bicycle", pos: "n./v.", ipa: "/ˈbaɪsɪkl/", meaning: "自行车" },
+        { word: "university", pos: "n.", ipa: "/ˌjuːnɪˈvɜːrsəti/", meaning: "大学" },
+        { word: "parent", pos: "n.", ipa: "/ˈperənt/", meaning: "父亲(或母亲)" },
+        { word: "march", pos: "v./n.", ipa: "/mɑːrtʃ/", meaning: "行军,前进" },
+        { word: "represent", pos: "v.", ipa: "/ˌrɛprɪˈzɛnt/", meaning: "作为...的代表" },
+        { word: "everyday", pos: "adj.", ipa: "/ˈɛvrideɪ/", meaning: "每天的;日常的" },
+        { word: "Sunday", pos: "n.", ipa: "/ˈsʌndeɪ/", meaning: "星期日" },
+        { word: "upstairs", pos: "adv.", ipa: "/ʌpˈsterz/", meaning: "在楼上" },
+        { word: "unimportant", pos: "adj.", ipa: "/ˌʌnɪmˈpɔːrtnt/", meaning: "不重要的" },
+        { word: "legend", pos: "n.", ipa: "/ˈlɛdʒənd/", meaning: "传说,传奇人物" },
+        { word: "guard", pos: "n./v.", ipa: "/ɡɑːrd/", meaning: "警戒,守卫" },
+        { word: "agent", pos: "n.", ipa: "/ˈeɪdʒənt/", meaning: "代理人,经纪人" },
+        { word: "gallery", pos: "n.", ipa: "/ˈɡæləri/", meaning: "画廊,美术馆" },
+        { word: "front", pos: "n./adj.", ipa: "/frʌnt/", meaning: "前面,正面" },
+        { word: "confident", pos: "adj.", ipa: "/ˈkɒnfɪdənt/", meaning: "确信的,自信的" },
+        { word: "foreign", pos: "adj.", ipa: "/ˈfɔːrən/", meaning: "外国的" },
+        { word: "passenger", pos: "n.", ipa: "/ˈpæsɪndʒər/", meaning: "乘客,旅客" },
+        { word: "pleasant", pos: "adj.", ipa: "/ˈplɛznt/", meaning: "舒适的,令人愉快的" },
+        { word: "beyond", pos: "adv.", ipa: "/biˈɒnd/", meaning: "在更远处" },
+        { word: "kangaroo", pos: "n.", ipa: "/ˌkæŋɡəˈruː/", meaning: "袋鼠" },
+        { word: "opportunity", pos: "n.", ipa: "/ˌɒpərˈtuːnəti/", meaning: "机会,良机" },
+        { word: "chopstick", pos: "n.", ipa: "/ˈtʃɒpstɪk/", meaning: "筷子" },
+        { word: "picnic", pos: "n./v.", ipa: "/ˈpɪknɪk/", meaning: "野餐" },
+        { word: "marry", pos: "v.", ipa: "/ˈmæri/", meaning: "娶,嫁" },
+        { word: "original", pos: "adj./n.", ipa: "/əˈrɪdʒənl/", meaning: "最初的,原始的" },
+        { word: "purse", pos: "n.", ipa: "/pɜːrs/", meaning: "钱包" },
+        { word: "discussion", pos: "n.", ipa: "/dɪˈskʌʃn/", meaning: "讨论,谈论" },
+        { word: "bow", pos: "n.", ipa: "/boʊ/", meaning: "弓,蝴蝶结" },
+        { word: "bow", pos: "v.", ipa: "/baʊ/", meaning: "鞠躬,低头" },
+        { word: "ninety", pos: "num.", ipa: "/ˈnaɪnti/", meaning: "九十" },
+        { word: "sauce", pos: "n.", ipa: "/sɔːs/", meaning: "调味汁,酱汁" }
+    ];
+
+    const wordListContainer = document.getElementById('wordList');
+    const form = document.getElementById('quizForm');
+    const resultContainer = document.getElementById('result');
+    const resultDetails = document.getElementById('result-details');
+
+    words.forEach((item, index) => {
+      const wordBox = document.createElement('div');
+      wordBox.className = 'word-box';
+
+      const label = document.createElement('label');
+      const inputId = `word-${index}`;
+      label.htmlFor = inputId;
+      label.innerHTML = `
+        <span class="pos">${item.pos}</span> 
+        ${item.meaning} 
+        <span class="ipa">[${item.ipa}]</span>：
+      `;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.name = inputId;
+      input.autocomplete = 'off';
+
+      wordBox.appendChild(label);
+      wordBox.appendChild(input);
+      wordListContainer.appendChild(wordBox);
+    });
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let correctCount = 0;
+      resultDetails.innerHTML = '';
+
+      words.forEach((item, index) => {
+        const inputId = `word-${index}`;
+        const inputElement = document.getElementById(inputId);
+        const userAnswer = inputElement.value.trim();
+        const correctAnswer = item.word;
+
+        const resultLine = document.createElement('div');
+        resultLine.className = 'result-line';
+        
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+          correctCount++;
+          resultLine.innerHTML = `<span class="correct">✔ 正确: ${correctAnswer}</span>`;
+        } else {
+          resultLine.innerHTML = `✘ 错误: “${correctAnswer}” — 你的答案: <span class="incorrect">${userAnswer || '（未填写）'}</span>`;
+        }
+        resultDetails.appendChild(resultLine);
+      });
+
+      const summary = document.createElement('h3');
+      const percentage = Math.round((correctCount / words.length) * 100);
+      summary.textContent = `答对 ${correctCount} / ${words.length} 个单词。 正确率: ${percentage}%`;
+      resultDetails.prepend(summary);
+
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+
+</body>
+</html>

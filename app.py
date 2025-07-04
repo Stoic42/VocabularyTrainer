@@ -137,14 +137,33 @@ def get_questions():
     # 新增：学习模式参数，默认为'standard'
     study_mode = request.args.get('mode', default='standard', type=str)
     
+    # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+    student_id = session.get('user_id', -1)
+    
     conn = get_db_connection()
     
-    # 基础SQL查询 - 包含所有详情字段
-    sql_query = '''SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us, 
-               derivatives, root_etymology, mnemonic, comparison, collocation, 
-               exam_sentence, exam_year_source, exam_options, exam_explanation, tips 
-               FROM Words WHERE list_id = ? ORDER BY RANDOM()'''
-    params = (list_id,)
+    # 根据学习模式选择不同的查询策略
+    if study_mode.lower() == 'error_review':
+        # 错误复习模式：只获取该学生在指定列表中犯过错误的单词
+        sql_query = '''
+        SELECT DISTINCT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               COUNT(e.error_id) as error_count, MAX(e.error_date) as last_error_date
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+        '''
+        params = (list_id, student_id)
+    else:
+        # 标准模式和默写模式：随机获取单词
+        sql_query = '''SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us, 
+                   derivatives, root_etymology, mnemonic, comparison, collocation, 
+                   exam_sentence, exam_year_source, exam_options, exam_explanation, tips 
+                   FROM Words WHERE list_id = ? ORDER BY RANDOM()'''
+        params = (list_id,)
 
     # 只有当数量不是'all'时，我们才加上LIMIT子句
     if count_str.lower() != 'all':
@@ -176,8 +195,16 @@ def get_questions():
             if field in word_dict and word_dict[field] is None:
                 word_dict[field] = ""
         
+        # 处理错误复习模式特有的字段
+        if study_mode.lower() == 'error_review':
+            # 确保错误统计字段存在
+            if 'error_count' not in word_dict:
+                word_dict['error_count'] = 0
+            if 'last_error_date' not in word_dict:
+                word_dict['last_error_date'] = ""
+        
         # 根据学习模式决定是否包含音频URL
-        if study_mode.lower() != 'dictation':
+        if study_mode.lower() not in ['dictation', 'error_review']:
             # 标准模式：包含音频URL
             if word_dict['audio_path_uk']:
                 word_dict['audio_path_uk'] = f"/wordlists/junior_high/media/{word_dict['audio_path_uk']}"
@@ -191,7 +218,7 @@ def get_questions():
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_us'] = f"/api/tts/{word_dict['spelling']}"
         else:
-            # 默写模式：不提供音频
+            # 默写模式和错误复习模式：不提供音频
             word_dict['audio_path_uk'] = ""
             word_dict['audio_path_us'] = ""
             
@@ -352,6 +379,63 @@ def get_lists():
     finally:
         if conn:
             conn.close()
+
+# --- API路由：获取错误统计信息 ---
+@app.route('/api/error-stats')
+def get_error_stats():
+    """获取指定列表的错误统计信息"""
+    try:
+        # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+        student_id = session.get('user_id', -1)
+        # 如果用户未登录，返回错误信息
+        if student_id == -1:
+            return jsonify({'error': '请先登录后查看错误统计'}), 401
+            
+        list_id = request.args.get('list_id', type=int)
+        if not list_id:
+            return jsonify({'error': '请提供list_id参数'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 查询该列表中学生的错误统计
+        query = """
+        SELECT 
+            COUNT(DISTINCT e.word_id) as error_words_count,
+            COUNT(e.error_id) as total_errors,
+            wl.list_name,
+            b.book_name
+        FROM ErrorLogs e
+        JOIN Words w ON e.word_id = w.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE e.student_id = ? AND w.list_id = ?
+        """
+        
+        cursor.execute(query, (student_id, list_id))
+        result = cursor.fetchone()
+        
+        if result:
+            stats = {
+                'error_words_count': result[0],
+                'total_errors': result[1],
+                'list_name': result[2] or f'List {list_id}',
+                'book_name': result[3] or 'Unknown Book'
+            }
+        else:
+            stats = {
+                'error_words_count': 0,
+                'total_errors': 0,
+                'list_name': f'List {list_id}',
+                'book_name': 'Unknown Book'
+            }
+        
+        conn.close()
+        return jsonify(stats)
+        
+    except sqlite3.Error as e:
+        app.logger.error(f"获取错误统计时出错: {e}")
+        return jsonify({'error': '获取错误统计失败'}), 500
 
 # --- 页面路由 ---
 @app.route('/')
