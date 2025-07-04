@@ -2354,6 +2354,13 @@
         // 记录错误到数据库的函数
         async function recordError(word, userAnswer) {
             try {
+                console.log('正在记录错误:', {
+                    word_id: word.word_id,
+                    word_spelling: word.spelling,
+                    student_answer: userAnswer,
+                    list_id: word.list_id
+                });
+                
                 const response = await fetch('/api/record-error', {
                     method: 'POST',
                     headers: {
@@ -2368,6 +2375,11 @@
                 
                 if (!response.ok) {
                     console.error('记录错误失败:', response.statusText);
+                    const errorData = await response.text();
+                    console.error('错误详情:', errorData);
+                } else {
+                    const result = await response.json();
+                    console.log('错误记录成功:', result);
                 }
             } catch (error) {
                 console.error('记录错误时出错:', error);
@@ -2494,7 +2506,9 @@
             }
 
             try {
-                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${selectedMode}`);
+                // 错词清零模式强制使用错词复习模式
+                const actualStudyMode = errorClearModeEnabled ? 'error_review' : selectedMode;
+                const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${actualStudyMode}`);
                 if (!response.ok) {
                     if (response.status === 401) {
                         alert('请先登录后使用此功能！');

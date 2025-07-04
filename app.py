@@ -52,24 +52,39 @@ def setup_logger(app):
     if not os.path.exists('logs'):
         os.makedirs('logs')
     
+    # 清除现有的处理器以避免重复
+    for handler in app.logger.handlers[:]:
+        app.logger.removeHandler(handler)
+    
     try:
-        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+        # 使用更安全的日志配置
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=5, delay=True)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
         ))
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
-    except PermissionError:
+    except (PermissionError, OSError) as e:
         # 如果无法访问日志文件，使用带时间戳的新文件名
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_handler = RotatingFileHandler(f'logs/app_{timestamp}.log', maxBytes=10240, backupCount=10)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
-        print(f"警告: 无法访问原始日志文件。已创建新的日志文件: app_{timestamp}.log")
+        try:
+            file_handler = RotatingFileHandler(f'logs/app_{timestamp}.log', maxBytes=10240, backupCount=5, delay=True)
+            file_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+            ))
+            file_handler.setLevel(logging.INFO)
+            app.logger.addHandler(file_handler)
+            print(f"警告: 无法访问原始日志文件。已创建新的日志文件: app_{timestamp}.log")
+        except Exception as fallback_error:
+            # 如果连备用日志文件也无法创建，使用控制台日志
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s'
+            ))
+            console_handler.setLevel(logging.INFO)
+            app.logger.addHandler(console_handler)
+            print(f"警告: 无法创建任何日志文件，将使用控制台日志。错误: {fallback_error}")
     
     app.logger.setLevel(logging.INFO)
     app.logger.info('应用启动')
@@ -149,6 +164,7 @@ def get_questions():
         SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
                w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
                w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
                (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
                (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
                wl.list_name, b.book_name
@@ -697,6 +713,66 @@ def get_error_history():
             'total_tested': total_tested,
             'accuracy_rate': accuracy_rate
         })
+    except Exception as e:
+        app.logger.error(f"获取错误历史记录时出错: {str(e)}")
+        return jsonify({'error': '获取错误历史记录失败'}), 500
+
+# --- 记录错误API ---
+@app.route('/api/record-error', methods=['POST'])
+def record_error():
+    """记录用户的错误答案"""
+    try:
+        # 获取当前登录用户ID，如果未登录则使用默认值-1（表示游客）
+        student_id = session.get('user_id', -1)
+        # 如果用户未登录，返回错误信息
+        if student_id == -1:
+            return jsonify({'error': '请先登录后记录错误'}), 401
+        
+        # 获取请求数据
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '请求数据为空'}), 400
+        
+        word_id = data.get('word_id')
+        student_answer = data.get('student_answer', '')
+        list_id = data.get('list_id')
+        
+        if not word_id:
+            return jsonify({'error': '缺少单词ID'}), 400
+        
+        app.logger.info(f"记录错误: student_id={student_id}, word_id={word_id}, student_answer='{student_answer}', list_id={list_id}")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 检查单词是否存在
+        cursor.execute("SELECT spelling, meaning_cn FROM Words WHERE word_id = ?", (word_id,))
+        word = cursor.fetchone()
+        if not word:
+            conn.close()
+            return jsonify({'error': '单词不存在'}), 404
+        
+        # 记录错误到ErrorLogs表
+        cursor.execute("""
+            INSERT INTO ErrorLogs (student_id, word_id, student_answer, error_type, error_date)
+            VALUES (?, ?, ?, ?, datetime('now'))
+        """, (student_id, word_id, student_answer, 'spelling_error'))
+        
+        conn.commit()
+        conn.close()
+        
+        app.logger.info(f"成功记录错误: student_id={student_id}, word_id={word_id}, word='{word['spelling']}'")
+        
+        return jsonify({
+            'success': True,
+            'message': '错误已记录',
+            'word_id': word_id,
+            'word': word['spelling']
+        })
+        
+    except Exception as e:
+        app.logger.error(f"记录错误时出错: {str(e)}")
+        return jsonify({'error': '记录错误失败'}), 500
         
     except sqlite3.Error as e:
         app.logger.error(f"获取错误历史记录时出错: {e}")
