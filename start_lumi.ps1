@@ -31,7 +31,10 @@ Write-Host "--------------------------------------------------"
 
 python app.py
 
-# 5. （如果python app.py意外退出）保持窗口开启，方便查看错误日志
+# 自动打开浏览器
+Start-Process http://127.0.0.1:5000 -NoNewWindow
+
+# 5. (如果python app.py意外退出)保持窗口开启，方便查看错误日志
 Write-Host "--------------------------------------------------"
 Write-Host "服务器已停止运行。" -ForegroundColor  Magenta
 Read-Host "按回车键关闭此窗口"
