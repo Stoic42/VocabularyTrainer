@@ -44,6 +44,7 @@ def create_tables_if_not_exists(conn):
         spelling TEXT NOT NULL,
         meaning_cn TEXT,
         pos TEXT,
+        ipa TEXT,
         audio_path_uk TEXT,
         audio_path_us TEXT,
         list_id INTEGER,
@@ -167,8 +168,8 @@ def import_senior_high_data(conn, csv_path):
                     continue
                 
                 # 插入单词数据到数据库
-                sql = "INSERT INTO Words (spelling, meaning_cn, pos, audio_path_uk, audio_path_us, list_id) VALUES (?, ?, ?, ?, ?, ?);"
-                cursor.execute(sql, (spelling, meaning_cn, pos, "", "", list_id))
+                sql = "INSERT INTO Words (spelling, meaning_cn, pos, ipa, audio_path_uk, audio_path_us, list_id) VALUES (?, ?, ?, ?, ?, ?, ?);"
+                cursor.execute(sql, (spelling, meaning_cn, pos, ipa, "", "", list_id))
                 count += 1
                 
                 if count % 100 == 0:
