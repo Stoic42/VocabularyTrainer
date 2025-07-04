@@ -163,10 +163,14 @@ def get_questions():
         params = (student_id, student_id, list_id, student_id)
     else:
         # 标准模式和默写模式：随机获取单词
-        sql_query = '''SELECT word_id, spelling, meaning_cn, pos, audio_path_uk, audio_path_us, 
-                   derivatives, root_etymology, mnemonic, comparison, collocation, 
-                   exam_sentence, exam_year_source, exam_options, exam_explanation, tips 
-                   FROM Words WHERE list_id = ? ORDER BY RANDOM()'''
+        sql_query = '''SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us, 
+                   w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation, 
+                   w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+                   b.book_name
+                   FROM Words w
+                   LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+                   LEFT JOIN Books b ON wl.book_id = b.book_id
+                   WHERE w.list_id = ? ORDER BY RANDOM()'''
         params = (list_id,)
 
     # 对于错词复习模式，总是获取全部错词，不应用LIMIT
@@ -224,18 +228,29 @@ def get_questions():
                 word_dict['list_name'] = ""
             if 'book_name' not in word_dict:
                 word_dict['book_name'] = ""
+        else:
+            # 标准模式和默写模式：确保book_name字段存在
+            if 'book_name' not in word_dict:
+                word_dict['book_name'] = ""
         
         # 根据学习模式决定是否包含音频URL
         if study_mode.lower() != 'dictation':
             # 标准模式和错词复习模式：包含音频URL
+            # 根据词书类型选择正确的媒体路径
+            book_name = word_dict.get('book_name', '')
+            if '高中' in book_name:
+                media_prefix = "/wordlists/senior_high/media"
+            else:
+                media_prefix = "/wordlists/junior_high/media"
+            
             if word_dict['audio_path_uk']:
-                word_dict['audio_path_uk'] = f"/wordlists/junior_high/media/{word_dict['audio_path_uk']}"
+                word_dict['audio_path_uk'] = f"{media_prefix}/{word_dict['audio_path_uk']}"
             else:
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_uk'] = f"/api/tts/{word_dict['spelling']}"
                 
             if word_dict['audio_path_us']:
-                word_dict['audio_path_us'] = f"/wordlists/junior_high/media/{word_dict['audio_path_us']}"
+                word_dict['audio_path_us'] = f"{media_prefix}/{word_dict['audio_path_us']}"
             else:
                 # 如果没有音频文件，提供TTS URL
                 word_dict['audio_path_us'] = f"/api/tts/{word_dict['spelling']}"
