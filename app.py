@@ -149,9 +149,12 @@ def get_questions():
         SELECT DISTINCT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
                w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
                w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
-               COUNT(e.error_id) as error_count, MAX(e.error_date) as last_error_date
+               COUNT(e.error_id) as error_count, MAX(e.error_date) as last_error_date,
+               wl.list_name, b.book_name
         FROM Words w
         INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE w.list_id = ? AND e.student_id = ?
         GROUP BY w.word_id
         ORDER BY error_count DESC, last_error_date DESC
@@ -202,6 +205,10 @@ def get_questions():
                 word_dict['error_count'] = 0
             if 'last_error_date' not in word_dict:
                 word_dict['last_error_date'] = ""
+            if 'list_name' not in word_dict:
+                word_dict['list_name'] = ""
+            if 'book_name' not in word_dict:
+                word_dict['book_name'] = ""
         
         # 根据学习模式决定是否包含音频URL
         if study_mode.lower() not in ['dictation', 'error_review']:
@@ -270,7 +277,7 @@ def submit_answers():
                 # 将错误记录到ErrorLogs表，使用当前用户ID
                 try:
                     cursor.execute(
-                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, date('now', 'localtime'))",
+                        "INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))",
                         (student_id, word_id, 'spelling_mvp', student_answer)
                     )
                     app.logger.info(f"记录错误: 用户ID={student_id}, 单词ID={word_id}, 学生答案={student_answer}")
@@ -398,36 +405,50 @@ def get_error_stats():
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # 首先获取列表和词书信息（无论是否有错误）
+        list_query = """
+        SELECT wl.list_name, b.book_name
+        FROM WordLists wl
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE wl.list_id = ?
+        """
+        
+        cursor.execute(list_query, (list_id,))
+        list_result = cursor.fetchone()
+        
+        list_name = f'List {list_id}'  # 默认值
+        book_name = 'Unknown Book'     # 默认值
+        
+        if list_result:
+            list_name = list_result[0] or f'List {list_id}'
+            book_name = list_result[1] or 'Unknown Book'
+        
         # 查询该列表中学生的错误统计
-        query = """
+        error_query = """
         SELECT 
             COUNT(DISTINCT e.word_id) as error_words_count,
-            COUNT(e.error_id) as total_errors,
-            wl.list_name,
-            b.book_name
+            COUNT(e.error_id) as total_errors
         FROM ErrorLogs e
         JOIN Words w ON e.word_id = w.word_id
-        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
-        LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE e.student_id = ? AND w.list_id = ?
         """
         
-        cursor.execute(query, (student_id, list_id))
-        result = cursor.fetchone()
+        cursor.execute(error_query, (student_id, list_id))
+        error_result = cursor.fetchone()
         
-        if result:
+        if error_result:
             stats = {
-                'error_words_count': result[0],
-                'total_errors': result[1],
-                'list_name': result[2] or f'List {list_id}',
-                'book_name': result[3] or 'Unknown Book'
+                'error_words_count': error_result[0],
+                'total_errors': error_result[1],
+                'list_name': list_name,
+                'book_name': book_name
             }
         else:
             stats = {
                 'error_words_count': 0,
                 'total_errors': 0,
-                'list_name': f'List {list_id}',
-                'book_name': 'Unknown Book'
+                'list_name': list_name,
+                'book_name': book_name
             }
         
         conn.close()
@@ -481,7 +502,6 @@ def get_error_history():
         LEFT JOIN WordLists wl ON w.list_id = wl.list_id
         LEFT JOIN Books b ON wl.book_id = b.book_id
         WHERE e.student_id = ?
-        GROUP BY e.word_id, e.error_date
         """
         
         params = [student_id]
