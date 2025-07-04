@@ -691,18 +691,85 @@ def get_error_history():
         stats_list = [dict(stat) for stat in stats]
         word_history_list = [dict(item) for item in word_history]
         
-        # 计算总体正确率（假设每个单词测试一次）
+        # 获取错误单词数（用于计算正确率）
         total_tested_query = "SELECT COUNT(DISTINCT word_id) FROM ErrorLogs WHERE student_id = ?"
         cursor.execute(total_tested_query, (student_id,))
         total_tested = cursor.fetchone()[0]
         
-        # 假设我们有一个记录总测试单词数的方法，这里简化处理
-        # 实际应用中可能需要一个单独的表来记录每次测试的所有单词
+        # 计算总体正确率
+        # 由于数据库只记录错误，我们采用一个更合理的计算方式
+        # 方案：基于错误单词数来估算正确率
+        # 假设用户测试的单词数约为错误单词数的3-5倍（这是一个合理的假设）
+        
+        # 获取用户错误单词涉及的所有列表的总单词数
+        lists_with_errors_query = """
+        SELECT DISTINCT w.list_id
+        FROM ErrorLogs e
+        JOIN Words w ON e.word_id = w.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE e.student_id = ?
+        """
+        
+        lists_params = [student_id]
+        
+        # 添加筛选条件
+        if book_id is not None:
+            lists_with_errors_query += " AND wl.book_id = ?"
+            lists_params.append(book_id)
+        if list_id is not None:
+            lists_with_errors_query += " AND w.list_id = ?"
+            lists_params.append(list_id)
+        if date_from is not None:
+            lists_with_errors_query += " AND e.error_date >= ?"
+            lists_params.append(date_from)
+        if date_to is not None:
+            lists_with_errors_query += " AND e.error_date <= ?"
+            lists_params.append(date_to + ' 23:59:59')
+        
+        cursor.execute(lists_with_errors_query, lists_params)
+        lists_with_errors = cursor.fetchall()
+        
+        # 计算这些列表中的总单词数
+        total_words = 0
+        if lists_with_errors:
+            list_ids = [str(row['list_id']) for row in lists_with_errors]
+            list_ids_str = ','.join(list_ids)
+            
+            total_words_query = f"""
+            SELECT COUNT(*) as total_words
+            FROM Words w
+            LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+            LEFT JOIN Books b ON wl.book_id = b.book_id
+            WHERE w.list_id IN ({list_ids_str})
+            """
+            
+            # 添加词书筛选条件
+            if book_id is not None:
+                total_words_query += " AND wl.book_id = ?"
+                cursor.execute(total_words_query, [book_id])
+            else:
+                cursor.execute(total_words_query)
+            
+            total_words_result = cursor.fetchone()
+            total_words = total_words_result[0] if total_words_result else 0
+        
+        # 计算正确率
         accuracy_rate = 0
-        if total_tested > 0:
-            # 这里的计算是简化的，实际应用中需要更准确的数据
-            # 假设每个单词只测试一次，错误的单词数就是total_tested
-            accuracy_rate = round((1 - total_tested / 100) * 100, 2)  # 假设总共测试了100个单词
+        if total_words > 0 and total_tested > 0:
+            # 错误单词数就是total_tested
+            # 正确率 = (总单词数 - 错误单词数) / 总单词数 * 100
+            correct_words = total_words - total_tested
+            accuracy_rate = round((correct_words / total_words) * 100, 2)
+            # 确保正确率在0-100之间
+            accuracy_rate = max(0, min(100, accuracy_rate))
+        elif total_tested > 0:
+            # 如果没有找到总单词数，使用一个保守的估算
+            # 假设用户测试了错误单词数的4倍单词
+            estimated_total = total_tested * 4
+            correct_words = estimated_total - total_tested
+            accuracy_rate = round((correct_words / estimated_total) * 100, 2)
+            accuracy_rate = max(0, min(100, accuracy_rate))
         
         conn.close()
         
