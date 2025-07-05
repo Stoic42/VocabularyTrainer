@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>答题延时逻辑测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-area {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            background-color: #6c757d !important;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.enabled {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.disabled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>答题延时逻辑测试</h1>
+    
+    <div class="test-area">
+        <h2>测试说明</h2>
+        <p>这个测试模拟了修改后的答题延时逻辑：</p>
+        <ul>
+            <li>新题显示后，"下一个"操作（按钮和回车键）会被禁用0.6秒</li>
+            <li>用户仍可以在输入框中输入，但不能提交答案</li>
+            <li>0.6秒后，"下一个"操作重新启用</li>
+            <li>答题后立即显示下一题（无延时）</li>
+        </ul>
+    </div>
+
+    <div class="test-area">
+        <div class="question">
+            <h3>第 <span id="question-number">1</span> 题</h3>
+            <p><strong>问题：</strong> <span id="question-text">apple</span></p>
+            <p><strong>答案：</strong> <span id="correct-answer">苹果</span></p>
+            
+            <div>
+                <input type="text" id="answer-input" placeholder="请输入答案" autocomplete="off">
+                <button id="next-btn">下一题</button>
+            </div>
+            
+            <div id="status" class="status enabled">状态：输入已启用</div>
+        </div>
+    </div>
+
+    <div class="test-area">
+        <h3>测试结果</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // 模拟题目数据
+        const questions = [
+            { id: 1, question: "apple", answer: "苹果" },
+            { id: 2, question: "banana", answer: "香蕉" },
+            { id: 3, question: "orange", answer: "橙子" },
+            { id: 4, question: "grape", answer: "葡萄" },
+            { id: 5, question: "strawberry", answer: "草莓" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let inputEnabled = true;
+        let results = [];
+
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const correctAnswerEl = document.getElementById('correct-answer');
+        const answerInput = document.getElementById('answer-input');
+        const nextBtn = document.getElementById('next-btn');
+        const statusEl = document.getElementById('status');
+        const resultsEl = document.getElementById('results');
+
+        function updateStatus() {
+            if (inputEnabled) {
+                statusEl.textContent = '状态："下一个"操作已启用';
+                statusEl.className = 'status enabled';
+                nextBtn.disabled = false;
+            } else {
+                statusEl.textContent = '状态："下一个"操作已禁用（延时中...）';
+                statusEl.className = 'status disabled';
+                nextBtn.disabled = true;
+            }
+        }
+
+        function displayQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionNumberEl.textContent = currentQuestionIndex + 1;
+            questionTextEl.textContent = q.question;
+            correctAnswerEl.textContent = q.answer;
+            answerInput.value = '';
+
+            // 新题显示后，添加延时控制
+            inputEnabled = false;
+            updateStatus();
+
+            // 0.6秒后启用"下一个"操作
+            setTimeout(() => {
+                inputEnabled = true;
+                updateStatus();
+                answerInput.focus();
+            }, 600);
+        }
+
+        function handleNextQuestion() {
+            if (!inputEnabled) return;
+
+            const userAnswer = answerInput.value.trim();
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const isCorrect = userAnswer === correctAnswer;
+
+            // 记录结果
+            results.push({
+                question: questions[currentQuestionIndex].question,
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer,
+                isCorrect: isCorrect,
+                timestamp: new Date().toLocaleTimeString()
+            });
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                // 立即显示下一题
+                displayQuestion();
+            } else {
+                // 显示最终结果
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const correctCount = results.filter(r => r.isCorrect).length;
+            const accuracy = Math.round((correctCount / results.length) * 100);
+
+            resultsEl.innerHTML = `
+                <h4>测试完成！</h4>
+                <p>正确率：${correctCount}/${results.length} (${accuracy}%)</p>
+                <h5>详细结果：</h5>
+                ${results.map((result, index) => `
+                    <div style="margin: 5px 0; padding: 5px; border-left: 3px solid ${result.isCorrect ? '#28a745' : '#dc3545'};">
+                        <strong>第${index + 1}题：</strong> ${result.question} → ${result.userAnswer || '(未填写)'}
+                        ${result.isCorrect ? ' ✓' : ` ✗ (正确答案: ${result.correctAnswer})`}
+                        <small style="color: #666;"> - ${result.timestamp}</small>
+                    </div>
+                `).join('')}
+                <button onclick="location.reload()" style="margin-top: 10px;">重新测试</button>
+            `;
+
+            // 隐藏问题区域
+            document.querySelector('.question').style.display = 'none';
+        }
+
+        // 事件监听器
+        nextBtn.addEventListener('click', handleNextQuestion);
+        answerInput.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13 && inputEnabled) {
+                event.preventDefault();
+                handleNextQuestion();
+            }
+        });
+
+        // 初始化显示第一题
+        displayQuestion();
+    </script>
+</body>
+</html> 

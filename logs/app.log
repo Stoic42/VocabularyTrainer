@@ -68,3 +68,8 @@
 2025-07-05 10:04:50,099 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-05, date_to=2025-07-05, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:543]
 2025-07-05 10:12:05,656 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-05, date_to=2025-07-05, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:543]
 2025-07-05 10:15:33,464 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-05, date_to=2025-07-05, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:543]
+2025-07-05 10:21:47,967 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-05, date_to=2025-07-05, sort_by=error_count, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:543]
+2025-07-05 10:33:56,264 INFO: 错词复习模式参数: (1, 1, 197, 1) [in D:\Projects\VocabularyTrainer\app.py:209]
+2025-07-05 10:33:56,273 INFO: 错词复习模式: 列表ID=197, 学生ID=1, 获取到37个错词 [in D:\Projects\VocabularyTrainer\app.py:216]
+2025-07-05 10:33:56,273 INFO: 错词示例: ['thief', 'pupil', 'scientist'] [in D:\Projects\VocabularyTrainer\app.py:218]
+2025-07-05 10:33:56,389 ERROR: 发送媒体文件时出错: wordlists/junior_high/media/cambridge-1047235c-ac6c7f0a-81859e57-59788d0a-2d1dbc06.mp3, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]

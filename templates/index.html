@@ -676,6 +676,14 @@
         let instantFeedbackEnabled = false; // 答题即时反馈状态
         let errorClearModeEnabled = false; // 错词清零模式状态
         let currentUser = null; // 当前登录用户
+        let inputEnabled = true; // 输入控制状态
+        const lumiImages = {
+            'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
+            'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
+            'correct': '/assets/img/Lumi/Lumi_Triumph.png',
+            'wrong': '/assets/img/Lumi/Lumi_Crying.png',
+            'celebration': '/assets/img/Lumi/Lumi_Yeah.png'
+        };
         
         // 错词清零模式相关变量
         let errorClearModeData = {
@@ -687,14 +695,6 @@
             roundResults: []
         };
         
-        const lumiImages = {
-            'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
-            'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
-            'correct': '/assets/img/Lumi/Lumi_Triumph.png',
-            'wrong': '/assets/img/Lumi/Lumi_Crying.png',
-            'celebration': '/assets/img/Lumi/Lumi_Yeah.png'
-        };
-
         // --- DOM 元素缓存 ---
         const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
@@ -1387,7 +1387,17 @@
             }
 
             nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? '完成并提交' : '下一题';
-            answerInput.focus();
+            
+            // 新题显示后，添加延时控制
+            inputEnabled = false; // 禁用"下一个"操作
+            nextBtn.disabled = true;
+            
+            // 0.6秒后启用"下一个"操作
+            setTimeout(() => {
+                inputEnabled = true;
+                nextBtn.disabled = false;
+                answerInput.focus();
+            }, 600);
             
             // 如果启用了自动播放且支持音频，自动播放音频
             if (autoPlayEnabled && showAudio) {
@@ -1521,20 +1531,18 @@
             currentQuestionIndex++;
             answerInput.value = '';
 
-            setTimeout(() => {
-                // 移除文字反馈提示（如果有）
-                const textFeedback = document.querySelector('.text-feedback');
-                if (textFeedback) {
-                    textFeedback.parentNode.removeChild(textFeedback);
-                }
-                
-                if (currentQuestionIndex < questions.length) {
-                    displayQuestion();
-                    updateLumiReaction('thinking');
-                } else {
-                    submitTest();
-                }
-            }, 1500); // 延迟1.5秒，给用户足够时间查看反馈和准备下一题
+            // 立即显示下一题，移除文字反馈提示（如果有）
+            const textFeedback = document.querySelector('.text-feedback');
+            if (textFeedback) {
+                textFeedback.parentNode.removeChild(textFeedback);
+            }
+            
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+                updateLumiReaction('thinking');
+            } else {
+                submitTest();
+            }
         }
 
         // 提交测试
@@ -2553,6 +2561,7 @@
                         totalQNumEl.textContent = questions.length;
                         userAnswers = []; // 重置答案
                         currentQuestionIndex = 0; // 重置索引
+                        inputEnabled = true; // 重置输入状态
                         displayQuestion();
                         updateLumiReaction('thinking');
                     }
@@ -2606,6 +2615,7 @@
             currentQuestionIndex = 0;
             userAnswers = [];
             consecutiveCorrect = 0;
+            inputEnabled = true; // 重置输入状态
             errorClearModeData = {
                 isActive: false,
                 currentRound: 1,
@@ -2661,7 +2671,11 @@
         }
 
         // 下一步按钮和回车键
-        nextBtn.addEventListener('click', handleNextQuestion);
+        nextBtn.addEventListener('click', function() {
+            if (inputEnabled) {
+                handleNextQuestion();
+            }
+        });
 
         toggleDetailsBtn.addEventListener('click', () => {
             if (wordDetailsContainer.style.display === 'none') {
@@ -2705,7 +2719,7 @@
             }
         });
         answerInput.addEventListener('keydown', function(event) {
-            if (event.keyCode === 13) {
+            if (event.keyCode === 13 && inputEnabled) {
                 event.preventDefault();
                 handleNextQuestion();
             }
