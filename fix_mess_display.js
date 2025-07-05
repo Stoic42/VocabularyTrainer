@@ -33,43 +33,32 @@ function formatMultiMeanings(meaning, pos) {
     if (!meaning) return '';
     if (!pos) return meaning;
     
-    // 检查是否有多个词性
-    const posArray = pos.split(/;|\s+/).filter(p => p.trim());
-    if (posArray.length <= 1) return meaning;
+    // 检查meaning_cn中是否已经包含词性标记
+    const posPattern = /([a-z]+\.)/gi;
+    const posMatches = meaning.match(posPattern);
     
-    // 尝试根据词性分割意思
-    let result = '';
-    let remainingMeaning = meaning;
-    
-    posArray.forEach((p, index) => {
-        // 查找下一个词性前的意思
-        let currentMeaning = '';
-        if (index < posArray.length - 1) {
-            // 查找下一个词性标记
-            const nextPosPattern = new RegExp(`${posArray[index+1]}\.\s*`, 'i');
-            const parts = remainingMeaning.split(nextPosPattern, 2);
-            if (parts.length > 1) {
-                currentMeaning = parts[0];
-                remainingMeaning = `${posArray[index+1]}. ${parts[1]}`;
+    if (posMatches && posMatches.length > 0) {
+        // 如果中文意思中已经包含词性标记，按词性分割并格式化显示
+        let formattedMeaning = meaning;
+        
+        // 为每个词性添加样式，并在词性前添加换行（除了第一个）
+        posMatches.forEach((posTag, index) => {
+            const regex = new RegExp(`(${posTag})`, 'g');
+            if (index === 0) {
+                // 第一个词性，只添加样式
+                formattedMeaning = formattedMeaning.replace(regex, '<span class="pos-tag">$1</span>');
             } else {
-                // 如果找不到下一个词性标记，就取剩余全部
-                currentMeaning = remainingMeaning;
-                remainingMeaning = '';
+                // 后续词性，添加换行和样式
+                formattedMeaning = formattedMeaning.replace(regex, '<br><span class="pos-tag">$1</span>');
             }
-        } else {
-            // 最后一个词性，取剩余全部
-            currentMeaning = remainingMeaning;
-        }
+        });
         
-        // 移除当前词性标记
-        const currentPosPattern = new RegExp(`^${p}\.\s*`, 'i');
-        currentMeaning = currentMeaning.replace(currentPosPattern, '');
-        
-        // 添加到结果中
-        result += `<span class="pos-tag">${p}.</span> ${currentMeaning.trim()}<br>`;
-    });
-    
-    return result;
+        return formattedMeaning;
+    } else {
+        // 如果中文意思中没有词性标记，在开头添加词性
+        const extractedPos = pos.trim();
+        return `<span class="pos-tag">${extractedPos}</span> ${meaning}`;
+    }
 }
 
 // 修复错误历史页面

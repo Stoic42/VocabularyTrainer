@@ -89,8 +89,13 @@ function extractPOSAndMeaning(pos, meaning) {
             }
         }
         
+        // 如果没有找到词性标签，但pos字段有值，在开头添加词性
+        if (posInfo.length === 0 && pos && pos.trim()) {
+            const extractedPos = pos.trim();
+            formattedMeaning = `<span class="pos-tag">${extractedPos}</span> ${processedMeaning}`;
+        }
         // 如果有词性标签，处理换行和词性标签
-        if (posInfo.length > 0) {
+        else if (posInfo.length > 0) {
             // 将文本按词性分段
             let segments = [];
             
