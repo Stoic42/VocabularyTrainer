@@ -36,23 +36,39 @@ def extract_details_from_csv(csv_file_path):
             reader = csv.DictReader(file)
             
             for row in reader:
-                word = row.get('spelling', '').strip().lower()
+                word = row.get('Word', '').strip().lower()
                 if not word:
                     continue
                 
-                # 提取详细信息
-                details = {
-                    'derivatives': row.get('derivatives', '').strip(),
-                    'root_etymology': row.get('root_etymology', '').strip(),
-                    'mnemonic': row.get('mnemonic', '').strip(),
-                    'comparison': row.get('comparison', '').strip(),
-                    'collocation': row.get('collocation', '').strip(),
-                    'exam_sentence': row.get('exam_sentence', '').strip(),
-                    'exam_year_source': row.get('exam_year_source', '').strip(),
-                    'exam_options': row.get('exam_options', '').strip(),
-                    'exam_explanation': row.get('exam_explanation', '').strip(),
-                    'tips': row.get('tips', '').strip()
-                }
+                # 根据不同的CSV文件格式映射列名
+                if 'junior_high' in csv_file_path:
+                    # 初中词汇CSV文件的列名映射
+                    details = {
+                        'derivatives': row.get('Derivatives 派生词', '').strip(),
+                        'root_etymology': '',  # 初中词汇没有词源字段
+                        'mnemonic': row.get('Mnemonic', '').strip(),
+                        'comparison': row.get('Comparison', '').strip(),
+                        'collocation': row.get('Collocation', '').strip(),
+                        'exam_sentence': row.get('Example', '').strip(),  # 使用Example作为例句
+                        'exam_year_source': row.get('Exam Question Year', '').strip(),
+                        'exam_options': row.get('Exam Question Options', '').strip(),
+                        'exam_explanation': row.get('Exam Question Explanation', '').strip(),
+                        'tips': row.get('Tips', '').strip()
+                    }
+                else:
+                    # 高中词汇CSV文件的列名映射
+                    details = {
+                        'derivatives': row.get('Derivatives 派生词', '').strip(),
+                        'root_etymology': row.get('root_etymology', '').strip(),
+                        'mnemonic': row.get('Mnemonic', '').strip(),
+                        'comparison': row.get('Comparison', '').strip(),
+                        'collocation': row.get('Collocation', '').strip(),
+                        'exam_sentence': row.get('exam_sentence', '').strip(),
+                        'exam_year_source': row.get('exam_year_source', '').strip(),
+                        'exam_options': row.get('exam_options', '').strip(),
+                        'exam_explanation': row.get('exam_explanation', '').strip(),
+                        'tips': row.get('Tips', '').strip()
+                    }
                 
                 # 只保存有内容的详细信息
                 has_content = any(details.values())
