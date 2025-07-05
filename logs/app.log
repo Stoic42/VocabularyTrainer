@@ -26,3 +26,72 @@
 2025-07-05 10:57:49,061 ERROR: 发送媒体文件时出错: api/tts/per-, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
 2025-07-05 10:57:50,925 ERROR: 发送媒体文件时出错: api/tts/dis-, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
 2025-07-05 10:57:52,437 ERROR: 发送媒体文件时出错: api/tts/re-, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
+2025-07-05 11:04:49,245 INFO: 错词复习模式SQL: 
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
+               wl.list_name, b.book_name
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+         [in D:\Projects\VocabularyTrainer\app.py:208]
+2025-07-05 11:04:49,251 INFO: 错词复习模式参数: (1, 1, 121, 1) [in D:\Projects\VocabularyTrainer\app.py:209]
+2025-07-05 11:04:49,258 INFO: 错词复习模式: 列表ID=121, 学生ID=1, 获取到7个错词 [in D:\Projects\VocabularyTrainer\app.py:216]
+2025-07-05 11:04:49,260 INFO: 错词示例: ['as-', 'at-', 'dis-'] [in D:\Projects\VocabularyTrainer\app.py:218]
+2025-07-05 11:04:49,321 ERROR: 发送媒体文件时出错: api/tts/as-, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
+2025-07-05 11:05:41,606 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-05, date_to=2025-07-05, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:543]
+2025-07-05 11:15:48,658 INFO: 错词复习模式SQL: 
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
+               wl.list_name, b.book_name
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+         [in D:\Projects\VocabularyTrainer\app.py:208]
+2025-07-05 11:15:48,659 INFO: 错词复习模式参数: (1, 1, 121, 1) [in D:\Projects\VocabularyTrainer\app.py:209]
+2025-07-05 11:15:48,663 INFO: 错词复习模式: 列表ID=121, 学生ID=1, 获取到7个错词 [in D:\Projects\VocabularyTrainer\app.py:216]
+2025-07-05 11:15:48,664 INFO: 错词示例: ['as-', 'at-', 'dis-'] [in D:\Projects\VocabularyTrainer\app.py:218]
+2025-07-05 11:15:48,730 ERROR: 发送媒体文件时出错: api/tts/as-, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
+2025-07-05 11:15:54,122 ERROR: 发送媒体文件时出错: api/tts/as-, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
+2025-07-05 11:16:28,073 INFO: 错词复习模式SQL: 
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
+               wl.list_name, b.book_name
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+         [in D:\Projects\VocabularyTrainer\app.py:208]
+2025-07-05 11:16:28,074 INFO: 错词复习模式参数: (1, 1, 197, 1) [in D:\Projects\VocabularyTrainer\app.py:209]
+2025-07-05 11:16:28,079 INFO: 错词复习模式: 列表ID=197, 学生ID=1, 获取到37个错词 [in D:\Projects\VocabularyTrainer\app.py:216]
+2025-07-05 11:16:28,080 INFO: 错词示例: ['thief', 'pupil', 'scientist'] [in D:\Projects\VocabularyTrainer\app.py:218]
+2025-07-05 11:16:28,235 ERROR: 发送媒体文件时出错: wordlists/junior_high/media/cambridge-1047235c-ac6c7f0a-81859e57-59788d0a-2d1dbc06.mp3, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
+2025-07-05 11:16:32,668 ERROR: 发送媒体文件时出错: wordlists/junior_high/media/cambridge-1047235c-ac6c7f0a-81859e57-59788d0a-2d1dbc06.mp3, 错误: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in D:\Projects\VocabularyTrainer\app.py:108]
+2025-07-05 11:16:34,093 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-05, date_to=2025-07-05, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:543]
+2025-07-05 11:16:43,008 INFO: 错词复习模式参数: (1, 1, 197, 1) [in D:\Projects\VocabularyTrainer\app.py:209]
+2025-07-05 11:16:43,014 INFO: 错词复习模式: 列表ID=197, 学生ID=1, 获取到37个错词 [in D:\Projects\VocabularyTrainer\app.py:216]
+2025-07-05 11:16:43,014 INFO: 错词示例: ['thief', 'pupil', 'scientist'] [in D:\Projects\VocabularyTrainer\app.py:218]
+2025-07-05 11:24:12,767 INFO: 错词复习模式参数: (1, 1, 121, 1) [in D:\Projects\VocabularyTrainer\app.py:209]
+2025-07-05 11:24:12,772 INFO: 错词复习模式: 列表ID=121, 学生ID=1, 获取到7个错词 [in D:\Projects\VocabularyTrainer\app.py:216]
