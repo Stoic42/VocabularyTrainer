@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sqlite3
 import os
 
@@ -13,7 +16,9 @@ def check_database_structure():
         # 获取所有表名
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = cursor.fetchall()
-        print(f"当前数据库中的表: {[table[0] for table in tables]}")
+        print("数据库中的表:")
+        for table in tables:
+            print(f"  - {table[0]}")
         
         # 检查ErrorLogs表结构
         if any('ErrorLogs' in table for table in tables):
@@ -36,6 +41,25 @@ def check_database_structure():
                 print(f"  {record}")
         else:
             print("当前数据库中没有ErrorLogs表")
+        
+        # 检查words表的结构
+        cursor.execute("PRAGMA table_info(words)")
+        columns = cursor.fetchall()
+        print("\nwords表的列:")
+        for col in columns:
+            print(f"  - {col[1]} ({col[2]})")
+        
+        # 检查是否有高中词书的单词
+        cursor.execute("SELECT COUNT(*) FROM words")
+        total_words = cursor.fetchone()[0]
+        print(f"\n总单词数: {total_words}")
+        
+        # 检查一些示例单词
+        cursor.execute("SELECT word_id, spelling, meaning_cn FROM words LIMIT 5")
+        sample_words = cursor.fetchall()
+        print("\n示例单词:")
+        for word in sample_words:
+            print(f"  ID: {word[0]}, 单词: {word[1]}, 释义: {word[2][:50]}...")
         
         conn.close()
     else:

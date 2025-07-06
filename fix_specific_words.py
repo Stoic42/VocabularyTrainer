@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sqlite3
 import os
 import hashlib
 from gtts import gTTS
+import re
 
 # 连接到数据库
 DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
@@ -99,6 +103,58 @@ def fix_specific_words(words):
     conn.close()
     return results
 
+def fix_content_word():
+    """修正content单词的数据"""
+    conn = sqlite3.connect('vocabulary.db')
+    cursor = conn.cursor()
+    
+    print("正在修正content单词...")
+    
+    # 根据词书原件，content的正确信息应该是：
+    content_data = {
+        'pos': 'adj. 满意的/ˈkɒntent/n. 内容；含量',
+        'meaning_cn': 'adj. 满意的/ˈkɒntent/n. 内容；含量',
+        'mnemonic': '词根记忆：con＋tent（伸展）→全身舒展→满意的',
+        'collocation': '1．be content with...对…满意2．be content to do...乐于做…',
+        'exam_sentence': 'After a good meal, we were all content. 美餐一顿之后，我们都心满意足了。//This dessert has a high fat content. 这种甜点脂肪含量很高。'
+    }
+    
+    cursor.execute("""
+        UPDATE Words SET 
+            pos = ?,
+            meaning_cn = ?,
+            mnemonic = ?,
+            collocation = ?,
+            exam_sentence = ?
+        WHERE spelling = 'content'
+    """, (
+        content_data['pos'],
+        content_data['meaning_cn'],
+        content_data['mnemonic'],
+        content_data['collocation'],
+        content_data['exam_sentence']
+    ))
+    
+    print("content单词修正完成")
+    
+    conn.commit()
+    conn.close()
+
+def fix_forgivee_word():
+    """修正forgivee单词的拼写错误"""
+    conn = sqlite3.connect('vocabulary.db')
+    cursor = conn.cursor()
+    
+    print("正在修正forgivee单词的拼写...")
+    
+    # 将forgivee改为forgive
+    cursor.execute("UPDATE Words SET spelling = 'forgive' WHERE spelling = 'forgivee'")
+    
+    print("forgivee单词拼写修正完成")
+    
+    conn.commit()
+    conn.close()
+
 # 主函数
 def main():
     print("===== 特定单词音频修复工具 =====")
@@ -125,6 +181,13 @@ def main():
             print(f"✗ {word}: 修复失败 - {result.get('error', '未知错误')}")
     
     print("\n修复完成。请重启应用以应用更改。")
+
+    print("\n开始修正特定单词问题...")
+    
+    fix_content_word()
+    fix_forgivee_word()
+    
+    print("所有特定单词修正完成！")
 
 if __name__ == "__main__":
     main()

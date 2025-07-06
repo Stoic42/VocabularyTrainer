@@ -1,0 +1,4 @@
+word_id	spelling	pos
+16817	a. m./A. M.", /ˌeɪˈem/n. 上午，午前	
+16818	No. /ˈnʌmbə/n. 数字；号码；第…号"	
+16821	P. E. /ˌpiːˈiː/（＝physical education）n. 体育"	
