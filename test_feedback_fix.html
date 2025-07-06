@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反馈功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .lumi-reaction {
+            position: fixed;
+            bottom: 3vh;
+            left: 50%;
+            width: 150px;
+            height: 150px;
+            transform: translateX(-50%);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+        .lumi-reaction.active {
+            opacity: 1;
+        }
+        .lumi-reaction.bounce {
+            animation: lumiJump 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+        }
+        @keyframes lumiJump {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1) translateY(-10px); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .feedback.correct {
+            background-color: #f0fff4;
+            border-left-color: #27ae60;
+            color: #27ae60;
+        }
+        .feedback.wrong {
+            background-color: #fff0f0;
+            border-left-color: #c0392b;
+            color: #c0392b;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>反馈功能测试</h1>
+    
+    <div class="test-section">
+        <h2>开关状态测试</h2>
+        <p>测试localStorage保存和恢复功能：</p>
+        
+        <div>
+            <label for="lumi-toggle">Lumi即时反馈: </label>
+            <label class="switch">
+                <input type="checkbox" id="lumi-toggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div>
+            <label for="instant-feedback-toggle">答题即时反馈: </label>
+            <label class="switch">
+                <input type="checkbox" id="instant-feedback-toggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div>
+            <label for="auto-play-toggle">自动播放发音: </label>
+            <label class="switch">
+                <input type="checkbox" id="auto-play-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div>
+            <label for="error-clear-mode-toggle">错词清零模式: </label>
+            <label class="switch">
+                <input type="checkbox" id="error-clear-mode-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <button onclick="clearStorage()">清除localStorage</button>
+        <button onclick="showStorage()">显示当前状态</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Lumi反馈测试</h2>
+        <p>测试Lumi的不同状态：</p>
+        <button onclick="testLumi('welcome')">欢迎状态</button>
+        <button onclick="testLumi('thinking')">思考状态</button>
+        <button onclick="testLumi('correct')">正确状态</button>
+        <button onclick="testLumi('wrong')">错误状态</button>
+        <button onclick="testLumi('celebration')">庆祝状态</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>答题反馈测试</h2>
+        <p>模拟答题过程：</p>
+        <input type="text" id="answer-input" placeholder="输入答案">
+        <button onclick="testAnswer()">提交答案</button>
+        <div id="feedback-container"></div>
+    </div>
+    
+    <div class="lumi-reaction"></div>
+    
+    <script>
+        // 全局变量
+        let lumiEnabled = true;
+        let instantFeedbackEnabled = true;
+        let autoPlayEnabled = false;
+        let errorClearModeEnabled = false;
+        
+        const lumiImages = {
+            'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
+            'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
+            'correct': '/assets/img/Lumi/Lumi_Triumph.png',
+            'wrong': '/assets/img/Lumi/Lumi_Crying.png',
+            'celebration': '/assets/img/Lumi/Lumi_Yeah.png'
+        };
+        
+        // DOM元素
+        const lumiImg = document.querySelector('.lumi-reaction');
+        const lumiToggle = document.getElementById('lumi-toggle');
+        const instantFeedbackToggle = document.getElementById('instant-feedback-toggle');
+        const autoPlayToggle = document.getElementById('auto-play-toggle');
+        const errorClearModeToggle = document.getElementById('error-clear-mode-toggle');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackContainer = document.getElementById('feedback-container');
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化Lumi开关状态
+            const savedLumi = localStorage.getItem('lumiEnabled');
+            if (savedLumi !== null) {
+                lumiEnabled = savedLumi === 'true';
+                lumiToggle.checked = lumiEnabled;
+            } else {
+                lumiEnabled = lumiToggle.checked;
+            }
+            
+            // 初始化即时反馈开关状态
+            const savedInstantFeedback = localStorage.getItem('instantFeedbackEnabled');
+            if (savedInstantFeedback !== null) {
+                instantFeedbackEnabled = savedInstantFeedback === 'true';
+                instantFeedbackToggle.checked = instantFeedbackEnabled;
+            } else {
+                instantFeedbackEnabled = instantFeedbackToggle.checked;
+            }
+            
+            // 初始化自动播放开关状态
+            const savedAutoPlay = localStorage.getItem('autoPlayEnabled');
+            if (savedAutoPlay !== null) {
+                autoPlayEnabled = savedAutoPlay === 'true';
+                autoPlayToggle.checked = autoPlayEnabled;
+            } else {
+                autoPlayEnabled = autoPlayToggle.checked;
+            }
+            
+            // 初始化错词清零模式开关状态
+            const savedErrorClearMode = localStorage.getItem('errorClearModeEnabled');
+            if (savedErrorClearMode !== null) {
+                errorClearModeEnabled = savedErrorClearMode === 'true';
+                errorClearModeToggle.checked = errorClearModeEnabled;
+            } else {
+                errorClearModeEnabled = errorClearModeToggle.checked;
+            }
+            
+            // 初始化Lumi状态
+            if (lumiEnabled) {
+                updateLumiReaction('welcome');
+            } else {
+                lumiImg.classList.remove('active');
+            }
+            
+            // 事件监听器
+            lumiToggle.addEventListener('change', function() {
+                lumiEnabled = this.checked;
+                localStorage.setItem('lumiEnabled', lumiEnabled);
+                if (lumiEnabled) {
+                    updateLumiReaction('welcome');
+                } else {
+                    lumiImg.classList.remove('active');
+                }
+            });
+            
+            instantFeedbackToggle.addEventListener('change', function() {
+                instantFeedbackEnabled = this.checked;
+                localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
+            });
+            
+            autoPlayToggle.addEventListener('change', function() {
+                autoPlayEnabled = this.checked;
+                localStorage.setItem('autoPlayEnabled', autoPlayEnabled);
+            });
+            
+            errorClearModeToggle.addEventListener('change', function() {
+                errorClearModeEnabled = this.checked;
+                localStorage.setItem('errorClearModeEnabled', errorClearModeEnabled);
+            });
+        });
+        
+        // 更新Lumi状态
+        function updateLumiReaction(state) {
+            if (!lumiImg || !lumiImages[state] || !lumiEnabled) return;
+            lumiImg.classList.remove('bounce');
+            lumiImg.style.backgroundImage = `url(${lumiImages[state]})`;
+            if (!lumiImg.classList.contains('active')) {
+                lumiImg.classList.add('active');
+            }
+            if (state === 'correct' || state === 'celebration') {
+                void lumiImg.offsetWidth; // 触发重排以重置动画
+                lumiImg.classList.add('bounce');
+            }
+        }
+        
+        // 测试Lumi状态
+        function testLumi(state) {
+            updateLumiReaction(state);
+        }
+        
+        // 测试答题反馈
+        function testAnswer() {
+            const answer = answerInput.value.trim();
+            const correctAnswer = 'test';
+            
+            // 清除之前的反馈
+            feedbackContainer.innerHTML = '';
+            
+            if (answer === correctAnswer) {
+                // 答案正确
+                updateLumiReaction('correct');
+                
+                if (instantFeedbackEnabled) {
+                    const feedbackEl = document.createElement('div');
+                    feedbackEl.className = 'feedback correct';
+                    feedbackEl.innerHTML = '<span>✓ 正确!</span>';
+                    feedbackContainer.appendChild(feedbackEl);
+                }
+            } else {
+                // 答案错误
+                updateLumiReaction('wrong');
+                
+                if (instantFeedbackEnabled) {
+                    const feedbackEl = document.createElement('div');
+                    feedbackEl.className = 'feedback wrong';
+                    feedbackEl.innerHTML = `<span>✗ 错误!</span> 正确答案: <strong>${correctAnswer}</strong>`;
+                    feedbackContainer.appendChild(feedbackEl);
+                }
+            }
+            
+            // 清空输入框
+            answerInput.value = '';
+        }
+        
+        // 清除localStorage
+        function clearStorage() {
+            localStorage.removeItem('lumiEnabled');
+            localStorage.removeItem('instantFeedbackEnabled');
+            localStorage.removeItem('autoPlayEnabled');
+            localStorage.removeItem('errorClearModeEnabled');
+            alert('localStorage已清除，请刷新页面查看默认状态');
+        }
+        
+        // 显示当前状态
+        function showStorage() {
+            const status = {
+                lumiEnabled: localStorage.getItem('lumiEnabled'),
+                instantFeedbackEnabled: localStorage.getItem('instantFeedbackEnabled'),
+                autoPlayEnabled: localStorage.getItem('autoPlayEnabled'),
+                errorClearModeEnabled: localStorage.getItem('errorClearModeEnabled')
+            };
+            alert('当前localStorage状态:\n' + JSON.stringify(status, null, 2));
+        }
+        
+        // 回车键提交答案
+        answerInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                testAnswer();
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,117 @@
+=== Senior High 音频映射验证报告 ===
+
+SUMMARY:
+- 总词数: 4733
+- 有有效音频的词: 4652
+- 缺失音频的词: 81
+- 音频文件不存在的词: 0
+- 音频覆盖率: 98.29%
+- 可用音频文件数: 6991
+
+缺失音频的词:
+====================
+- -ary
+- -ary
+- -ary
+- -atic
+- -atic
+- -ator
+- -ator
+- -cy
+- -eer
+- -ern
+- -ern
+- -ery
+- -ery
+- -ety
+- -ety
+- -eur
+- -ial
+- -ial
+- -ibly
+- -ician
+- -ician
+- -icity
+- -ier
+- -ier
+- -ile
+- -ile
+- -ory
+- -sion
+- -sion
+- -th
+- -th
+- -tion
+- -tion
+- -tion
+- -ty
+- -ty
+- -ty
+- -ual
+- -ual
+- -ure
+- -ure
+- Bible
+- No. /ˈnʌmbə/n. 数字；号码；第…号"
+- O. K.
+- Olympic（s）
+- P. E. /ˌpiːˈiː/（＝physical education）n. 体育"
+- VCD
+- a. m./A. M.", /ˌeɪˈem/n. 上午，午前
+- ambassadress
+- ambassadress
+- ambi-
+- ar-
+- autobiography
+- beddings
+- beddings
+- bene-
+- bene-
+- cata-
+- cata-
+- dia-
+- ef-
+- forgivee
+- loyal
+- o'clock
+- oc-
+- p. m./P. M.
+- paradise
+- philosophy
+- royalty
+- salesgirl
+- se-
+- se-
+- sideway
+- suf-
+- sus-
+- sus-
+- sus-
+- sym-
+- sym-
+- sym-
+- yourselves
+
+样本有效音频映射:
+=========================
+-able: UK=cambridge-1e2cd6f2-3c3a5b97-06bd89ab-af70a806-5d2eff70.mp3, US=cambridge-c52b9449-965b95f9-d486a94f-1967724a-98ba188c.mp3
+-able: UK=cambridge-1e2cd6f2-3c3a5b97-06bd89ab-af70a806-5d2eff70.mp3, US=cambridge-c52b9449-965b95f9-d486a94f-1967724a-98ba188c.mp3
+-able: UK=cambridge-1e2cd6f2-3c3a5b97-06bd89ab-af70a806-5d2eff70.mp3, US=cambridge-c52b9449-965b95f9-d486a94f-1967724a-98ba188c.mp3
+-able: UK=cambridge-1e2cd6f2-3c3a5b97-06bd89ab-af70a806-5d2eff70.mp3, US=cambridge-c52b9449-965b95f9-d486a94f-1967724a-98ba188c.mp3
+-ably: UK=cambridge-8b497110-ff8edd47-475602b6-09f6b071-e6e97d75.mp3, US=cambridge-7097df6a-13174b25-f56f9d8b-08a7322f-6ca01d95.mp3
+-age: UK=cambridge-70d67d93-bf2f3d7f-5af6cb45-681cf4c4-8ce8b09f.mp3, US=cambridge-02181d26-428fa396-f57d9a42-86105fa9-6e7bb391.mp3
+-al: UK=cambridge-7e3476a3-4e940a94-5ac07333-cb9d1176-05446571.mp3, US=cambridge-55732158-4efe5559-774a4f62-167e71c9-004f150f.mp3
+-al: UK=cambridge-7e3476a3-4e940a94-5ac07333-cb9d1176-05446571.mp3, US=cambridge-55732158-4efe5559-774a4f62-167e71c9-004f150f.mp3
+-an: UK=cambridge-09b133ac-b2fc10d8-977d520b-bc8c2f4e-3095f79e.mp3, US=cambridge-7ffedef6-f4a91ce7-c4dcb545-3fe72e2a-128afac1.mp3
+-an: UK=cambridge-09b133ac-b2fc10d8-977d520b-bc8c2f4e-3095f79e.mp3, US=cambridge-7ffedef6-f4a91ce7-c4dcb545-3fe72e2a-128afac1.mp3
+-ance: UK=cambridge-860bd5ff-55c3f1ce-1d381ca0-06efe21a-27efaa54.mp3, US=cambridge-77a84112-de8738ae-1617c637-374ef6ab-b34fbc32.mp3
+-ant: UK=cambridge-5a4c9c7d-65e038f9-e1a6a650-345b3d63-d45e7643.mp3, US=cambridge-0056a620-f4131a33-da96cd9b-17bcbe08-498ff9b4.mp3
+-ant: UK=cambridge-5a4c9c7d-65e038f9-e1a6a650-345b3d63-d45e7643.mp3, US=cambridge-0056a620-f4131a33-da96cd9b-17bcbe08-498ff9b4.mp3
+-ate: UK=cambridge-71a74c33-80abe6f4-7a44ee3c-605c40b2-bb8bee04.mp3, US=cambridge-a607628a-e04e389b-c9aa172c-ab9757af-f921a261.mp3
+-ate: UK=cambridge-71a74c33-80abe6f4-7a44ee3c-605c40b2-bb8bee04.mp3, US=cambridge-a607628a-e04e389b-c9aa172c-ab9757af-f921a261.mp3
+-ate: UK=cambridge-71a74c33-80abe6f4-7a44ee3c-605c40b2-bb8bee04.mp3, US=cambridge-a607628a-e04e389b-c9aa172c-ab9757af-f921a261.mp3
+-ate: UK=cambridge-71a74c33-80abe6f4-7a44ee3c-605c40b2-bb8bee04.mp3, US=cambridge-a607628a-e04e389b-c9aa172c-ab9757af-f921a261.mp3
+-ation: UK=cambridge-0013936b-98215699-6e430431-ba090f9d-25cb1bfd.mp3, US=cambridge-48819cf9-feba730b-14052240-ff25d315-69c802d8.mp3
+-ation: UK=cambridge-0013936b-98215699-6e430431-ba090f9d-25cb1bfd.mp3, US=cambridge-48819cf9-feba730b-14052240-ff25d315-69c802d8.mp3
+-ative: UK=cambridge-3c1f899a-089686aa-7126ce03-f692a5b1-447f4600.mp3, US=cambridge-d5d69ffd-e578bd7f-be033c9c-f953e1c7-7a4c2f63.mp3
+

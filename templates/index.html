@@ -536,6 +536,7 @@
                     <option value="standard">标准模式</option>
                     <option value="dictation">默写模式</option>
                     <option value="error_review">错词复习模式</option>
+                    <option value="error_clear">错词清零模式</option>
                 </select>
             </div>
         </div>
@@ -574,14 +575,7 @@
             </label>
         </div>
 
-        <!-- 添加错词清零模式开关 -->
-        <div class="error-clear-mode-container" style="display: flex; align-items: center; margin-top: 10px;">
-            <label for="error-clear-mode-toggle">错词清零模式: </label>
-            <label class="switch">
-                <input type="checkbox" id="error-clear-mode-toggle">
-                <span class="slider"></span>
-            </label>
-        </div>
+
 
         <div style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 20px;">
             <button id="start-btn">开始测试</button>
@@ -674,7 +668,7 @@
         let lumiEnabled = true; // Lumi显示状态
         let autoPlayEnabled = false; // 自动播放状态
         let instantFeedbackEnabled = false; // 答题即时反馈状态
-        let errorClearModeEnabled = false; // 错词清零模式状态
+
         let currentUser = null; // 当前登录用户
         let inputEnabled = true; // 输入控制状态
         const lumiImages = {
@@ -749,7 +743,7 @@
         const lumiToggle = document.getElementById('lumi-toggle');
         const autoPlayToggle = document.getElementById('auto-play-toggle');
         const instantFeedbackToggle = document.getElementById('instant-feedback-toggle');
-        const errorClearModeToggle = document.getElementById('error-clear-mode-toggle');
+
 
         // --- 功能函数 ---
         
@@ -1540,8 +1534,11 @@
             }
             
             if (currentQuestionIndex < questions.length) {
-                displayQuestion();
-                updateLumiReaction('thinking');
+                // 延迟显示下一题，让用户能看到答题反馈
+                setTimeout(() => {
+                    displayQuestion();
+                    updateLumiReaction('thinking');
+                }, 800); // 0.8秒后切换到下一题
             } else {
                 submitTest();
             }
@@ -1781,9 +1778,9 @@
             loadBookLists(); // 加载词书列表，而不是直接加载单词列表
             checkLoginStatus();
             
-            // 初始化错词复习模式的设置
+            // 初始化错词复习模式和错词清零模式的设置
             const selectedMode = document.getElementById('study-mode').value;
-            if (selectedMode === 'error_review') {
+            if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
                 const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)');
                 const countSelect = document.getElementById('count-select');
                 countSelectContainer.style.display = 'none';
@@ -1805,8 +1802,7 @@
             // 初始化自动播放开关状态
             autoPlayEnabled = autoPlayToggle.checked;
             
-            // 初始化错词清零模式开关状态
-            errorClearModeEnabled = errorClearModeToggle.checked;
+            // 错词清零模式现在通过学习模式选择器控制，无需初始化toggle状态
             
             // 添加词书选择变化事件监听器
             document.getElementById('book-select').addEventListener('change', function() {
@@ -1817,9 +1813,9 @@
                     // 如果没有选择词书，清空单元列表
                     document.getElementById('list-select').innerHTML = '<option value="">请先选择词书...</option>';
                 }
-                // 新增：切换词书时，如果是错词复习模式，刷新错词统计区
+                // 新增：切换词书时，如果是错词复习模式或错词清零模式，刷新错词统计区
                 const selectedMode = document.getElementById('study-mode').value;
-                if (selectedMode === 'error_review') {
+                if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
                     const errorStatsContent = document.getElementById('error-stats-content');
                     errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
                     loadErrorStats();
@@ -1921,22 +1917,7 @@
             localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
         });
 
-        // 错词清零模式开关事件监听
-        document.getElementById('error-clear-mode-toggle').addEventListener('change', function() {
-            errorClearModeEnabled = this.checked;
-            if (errorClearModeEnabled) {
-                // 如果开启错词清零模式，自动切换到错词复习模式
-                document.getElementById('study-mode').value = 'error_review';
-                // 触发学习模式变化事件
-                document.getElementById('study-mode').dispatchEvent(new Event('change'));
-            } else {
-                // 如果关闭错词清零模式，重新加载错词统计以移除特殊提示
-                const selectedMode = document.getElementById('study-mode').value;
-                if (selectedMode === 'error_review') {
-                    loadErrorStats();
-                }
-            }
-        });
+
 
         // 学习模式变化事件监听
         document.getElementById('study-mode').addEventListener('change', function() {
@@ -1954,12 +1935,26 @@
                 countSelect.value = 'all';
                 // 加载错词统计信息
                 loadErrorStats();
+            } else if (selectedMode === 'error_clear') {
+                // 错词清零模式：显示错词统计容器并隐藏数量选择器
+                errorStatsContainer.style.display = 'block';
+                countSelectContainer.style.display = 'none';
+                countSelect.value = 'all';
+                // 加载错词统计信息
+                loadErrorStats();
                 
-                // 如果错词清零模式已开启，显示特殊提示
-                if (errorClearModeEnabled) {
+                // 显示错词清零模式特殊提示
+                setTimeout(() => {
                     const errorStatsContent = document.getElementById('error-stats-content');
                     if (errorStatsContent) {
+                        // 移除之前的特殊提示（如果有）
+                        const existingNote = errorStatsContent.querySelector('.error-clear-note');
+                        if (existingNote) {
+                            existingNote.remove();
+                        }
+                        
                         const clearModeNote = document.createElement('div');
+                        clearModeNote.className = 'error-clear-note';
                         clearModeNote.style.cssText = `
                             background: #e3f2fd;
                             border: 1px solid #2196f3;
@@ -1972,25 +1967,18 @@
                         clearModeNote.innerHTML = '🎯 <strong>错词清零模式已开启</strong> - 将对错词进行循环考核直到100%正确！';
                         errorStatsContent.appendChild(clearModeNote);
                     }
-                }
+                }, 100); // 延迟一点确保错词统计已加载
             } else {
-                // 隐藏错词统计容器
+                // 其他模式：隐藏错词统计容器，显示数量选择器
                 errorStatsContainer.style.display = 'none';
-                // 显示数量选择器
                 countSelectContainer.style.display = 'block';
-                
-                // 如果切换到其他模式，关闭错词清零模式
-                if (errorClearModeEnabled) {
-                    errorClearModeToggle.checked = false;
-                    errorClearModeEnabled = false;
-                }
             }
         });
 
-        // 单元选择变化事件监听（用于错词复习模式）
+        // 单元选择变化事件监听（用于错词复习模式和错词清零模式）
         document.getElementById('list-select').addEventListener('change', function() {
             const selectedMode = document.getElementById('study-mode').value;
-            if (selectedMode === 'error_review') {
+            if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
                 // 立即显示加载状态
                 const errorStatsContent = document.getElementById('error-stats-content');
                 errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
@@ -2609,8 +2597,8 @@
                 return;
             }
 
-            // 错词复习模式特殊处理
-            if (selectedMode === 'error_review') {
+            // 错词复习模式和错词清零模式特殊处理
+            if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
                 try {
                     // 先检查错词统计
                     const statsResponse = await fetch(`/api/error-stats?list_id=${selectedListId}`);
@@ -2636,8 +2624,8 @@
             }
 
             try {
-                // 错词清零模式强制使用错词复习模式
-                const actualStudyMode = errorClearModeEnabled ? 'error_review' : selectedMode;
+                // 错词清零模式使用错词复习模式获取数据
+                const actualStudyMode = selectedMode === 'error_clear' ? 'error_review' : selectedMode;
                 const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${actualStudyMode}`);
                 if (!response.ok) {
                     if (response.status === 401) {
@@ -2650,7 +2638,7 @@
                 
                 if (questions && questions.length > 0) {
                     // 错词清零模式特殊处理
-                    if (errorClearModeEnabled) {
+                    if (selectedMode === 'error_clear') {
                         // 获取当前选择的词书和单元信息
                         const selectedBookName = document.getElementById('book-select').options[document.getElementById('book-select').selectedIndex]?.text || '未知词书';
                         const selectedListName = document.getElementById('list-select').options[document.getElementById('list-select').selectedIndex]?.text || '未知单元';
@@ -2675,26 +2663,26 @@
                         document.querySelector('.lumi-toggle-container').style.display = 'none';
                         document.querySelector('.auto-play-container').style.display = 'none';
                         document.querySelector('.feedback-container').style.display = 'none';
-                        document.querySelector('.error-clear-mode-container').style.display = 'none';
                         
                         // 显示错词清零模式界面
                         showErrorClearModeInterface();
-                    } else {
-                        // 标准模式
-                        document.querySelector('.list-selector').style.display = 'none';
-                        startBtn.style.display = 'none';
-                        document.querySelector('a.btn').style.display = 'none';
-                        document.getElementById('error-stats-container').style.display = 'none';
-                        quizArea.style.display = 'block';
-                        totalQNumEl.textContent = questions.length;
-                        userAnswers = []; // 重置答案
-                        currentQuestionIndex = 0; // 重置索引
-                        inputEnabled = true; // 重置输入状态
-                        displayQuestion();
-                        updateLumiReaction('thinking');
+                        return;
                     }
+                    
+                    // 其他模式（标准模式、默写模式、错词复习模式）
+                    document.querySelector('.list-selector').style.display = 'none';
+                    startBtn.style.display = 'none';
+                    document.querySelector('a.btn').style.display = 'none';
+                    document.getElementById('error-stats-container').style.display = 'none';
+                    quizArea.style.display = 'block';
+                    totalQNumEl.textContent = questions.length;
+                    userAnswers = []; // 重置答案
+                    currentQuestionIndex = 0; // 重置索引
+                    inputEnabled = true; // 重置输入状态
+                    displayQuestion();
+                    updateLumiReaction('thinking');
                 } else {
-                    if (selectedMode === 'error_review') {
+                    if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
                         alert('该列表中没有错词需要复习！');
                     } else {
                         alert('无法加载题目或该列表为空！');
@@ -2763,7 +2751,6 @@
             document.querySelector('.lumi-toggle-container').style.display = 'flex';
             document.querySelector('.auto-play-container').style.display = 'flex';
             document.querySelector('.feedback-container').style.display = 'flex';
-            document.querySelector('.error-clear-mode-container').style.display = 'flex';
             
             // 隐藏测试区域
             quizArea.style.display = 'none';

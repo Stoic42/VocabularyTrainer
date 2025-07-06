@@ -1,0 +1,225 @@
+=== Senior High 音频更新报告 ===
+
+SUMMARY:
+- 数据库中的词数: 4733
+- CSV 中的词数: 4483
+- 有音频映射的词数: 3513
+- 可用音频文件数: 6991
+- 缺失音频的词数: 81
+- CSV 独有词数: 105
+
+缺失音频的词:
+====================
+- -ary
+- -ary
+- -ary
+- -atic
+- -atic
+- -ator
+- -ator
+- -cy
+- -eer
+- -ern
+- -ern
+- -ery
+- -ery
+- -ety
+- -ety
+- -eur
+- -ial
+- -ial
+- -ibly
+- -ician
+- -ician
+- -icity
+- -ier
+- -ier
+- -ile
+- -ile
+- -ory
+- -sion
+- -sion
+- -th
+- -th
+- -tion
+- -tion
+- -tion
+- -ty
+- -ty
+- -ty
+- -ual
+- -ual
+- -ure
+- -ure
+- Bible
+- No. /ˈnʌmbə/n. 数字；号码；第…号"
+- O. K.
+- Olympic（s）
+- P. E. /ˌpiːˈiː/（＝physical education）n. 体育"
+- VCD
+- a. m./A. M.", /ˌeɪˈem/n. 上午，午前
+- ambassadress
+- ambassadress
+- ambi-
+- ar-
+- autobiography
+- beddings
+- beddings
+- bene-
+- bene-
+- cata-
+- cata-
+- dia-
+- ef-
+- forgivee
+- loyal
+- o'clock
+- oc-
+- p. m./P. M.
+- paradise
+- philosophy
+- royalty
+- salesgirl
+- se-
+- se-
+- sideway
+- suf-
+- sus-
+- sus-
+- sus-
+- sym-
+- sym-
+- sym-
+- yourselves
+
+CSV 中有但数据库中没有的词:
+==============================
+- vis，vid
+- mor
+- mot，mote
+- void
+- sert
+- duc，duct
+- tain
+- rupt
+- acu
+- gram，graph
+- priv
+- cline
+- astro，aster
+- vers，vert
+- solut
+- ceed，cess
+- ident
+- loc
+- ject
+- hibit
+- ple
+- cur，curr
+- fect
+- rect
+- prim，prem
+- mob
+- hes
+- log
+- init
+- dic，dict
+- sume
+- audi（t）
+- pens
+- agri
+- brillil
+- jur
+- clud
+- cred
+- scribe
+- miss，mit
+- fend
+- equ
+- spect
+- ag
+- voc
+- circ，cycl
+- vail
+- cid
+- sens
+- maj
+- mod
+- jud
+- fer
+- gress
+- medi
+- surd
+- sist，sta（n）t
+- sphere
+- optim
+- mir
+- liter
+- flect，flex
+- urg
+- tribute
+- urb
+- lect
+- sect
+- pos，posit
+- tract
+- pend
+- vent
+- turb
+- P. C. /ˌpiːˈsiː/（＝personalcomputer）n. 个人电脑
+- wis，wit
+- ceive
+- sembl
+- gener
+- bi，bio
+- sacr
+- noc
+- par
+- ment
+- vit，viv，vive
+- tend，tens
+- preci
+- tempor
+- puls
+- cept
+- ply
+- vac
+- numer
+- cuse
+- tach
+- lect，leg
+- lim
+- memor
+- oper
+- grad
+- punct
+- cogn
+- cur
+- mand
+- fic，fit
+- ann
+- physic
+
+样本音频映射:
+====================
+a-: UK=cambridge-e5955a77-5d59794d-2e727e3b-9c1658c9-eae28bf4.mp3, US=cambridge-ae2f7e4f-b716b632-4ce83926-b1e20fee-a494e91a.mp3
+ab-: UK=cambridge-71eb257f-ebd80463-36cef790-d08b3ddc-6c7d7a4b.mp3, US=cambridge-482db49f-ddc82ca7-a0dd678c-fbdde76b-12a5b71a.mp3
+ac-: UK=cambridge-a9018976-81236c28-bacd83e3-2260bb41-ce8c0393.mp3, US=cambridge-a3db01b3-e808f51c-d4c82258-153dcdee-f94fffe5.mp3
+ad-: UK=cambridge-ebc1213d-40fa64df-57793abc-52ca9d91-121d6524.mp3, US=cambridge-7cac7a95-d2a40703-320f3e6e-27d78885-fe314ea0.mp3
+ag-: UK=cambridge-24585e98-ba6947a5-0f97b983-a3660d33-1a604b5f.mp3, US=cambridge-3d9738f9-0e8783ee-ce15475a-785d8b38-99c07540.mp3
+al-: UK=cambridge-f71b424e-5a22ffa8-3a95ce0e-35f16876-4573fbcf.mp3, US=cambridge-9f1c1da8-fd8127d1-c6e6b04d-792ec5f1-b6a2cdda.mp3
+an-: UK=cambridge-d05d458d-a3a06986-82792d84-738adeb3-a16f377b.mp3, US=cambridge-b1f4eed3-869814f9-f59347d1-92989de1-b0a8a679.mp3
+ap-: UK=cambridge-17e210d0-f0013ec3-f1df76b6-bff42b70-0b418d76.mp3, US=cambridge-b294cc4e-f5ff6f5a-58a602cf-8459765e-d66b05fc.mp3
+as-: UK=cambridge-4f520a65-99ada8e5-716ccc60-373b143b-1b4bc462.mp3, US=cambridge-a1d847e2-a9ccbaf6-e0faa3c6-3de1efa0-328c48b6.mp3
+at-: UK=cambridge-a3d3abdd-5ca16ac9-746acd45-683e7491-e819f5af.mp3, US=cambridge-a5dfa39a-549259b0-a11b02d7-e09aad4d-a665af58.mp3
+auto-: UK=cambridge-36c968fe-f42942dc-e1cd2672-4cc9e79c-21d2978e.mp3, US=cambridge-8434d187-d9c4a666-0095eeaa-151485f6-d1338bcb.mp3
+col-: UK=cambridge-64c949fd-633d9fd9-fa66d515-6be2eb2d-3d113444.mp3, US=cambridge-a8653fd7-ae564d3e-86aec11f-47b13665-19d69e82.mp3
+com-: UK=cambridge-f013f062-4fbc8e73-5ed18d37-f13b6ec2-c74b8d9f.mp3, US=cambridge-5ea8fa73-d2a8221a-70d591fb-a53233d9-9e8485af.mp3
+con-: UK=cambridge-7f13b019-86b0a661-204da775-0d5d7305-9bfad41d.mp3, US=cambridge-3cbbc62d-ce110fdd-b8f4c511-78ae5fcf-69d0f5a0.mp3
+contra-: UK=cambridge-db3b6d27-7ab0ec00-775e389c-918baf72-e949ade8.mp3, US=cambridge-d6f80ebd-2f96faf6-6bf60ef0-ccbf1e84-5dccd654.mp3
+cor-: UK=cambridge-5885888e-0dc8e251-4dce4ee6-043e2c48-765a7ff8.mp3, US=cambridge-0345c3ca-cc7985fc-85c8f256-09b52ca0-201b94e6.mp3
+de-: UK=cambridge-6a376133-af61759c-a3c4893e-b6870c76-67374a08.mp3, US=cambridge-9edc2c02-ffb6fa43-73dd9491-673e12ae-1e4d7341.mp3
+di-: UK=cambridge-31396762-105fec4a-281e8e01-400f76ba-96eaafbd.mp3, US=cambridge-ca8ae049-35b65cb2-cb5513a8-253fcfb6-bda08f14.mp3
+dif-: UK=cambridge-2afa8447-1e63a153-9dd55575-2268d5c7-c972bb53.mp3, US=cambridge-4f2845d5-8d5b4a61-4851a41b-b1282b5f-ad7fba7a.mp3
+dis-: UK=cambridge-2d2f42b1-fbd8cc39-94d67bf6-deda5333-a56537af.mp3, US=cambridge-7de44dc9-84827b5e-d8e2f0d8-c04b8234-1a69c900.mp3
+

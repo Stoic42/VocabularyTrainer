@@ -1,0 +1,525 @@
+=== Senior High Audio Mapping Detailed Report ===
+
+SUMMARY:
+- Total words in CSV: 4483
+- Total words in txt with audio: 3513
+- Total audio files available: 6991
+- Missing audio files: 0
+- Unused audio files: 0
+- Words in CSV only: 121
+- Words in txt only: 1
+
+WORDS IN CSV BUT NOT IN TXT (need audio mapping):
+==================================================
+Word: -ary
+Meaning: （名词后缀）表人、物、场所，…的
+Example: secretary秘书//library图书馆//literary文学的
+------------------------------
+Word: -atic
+Meaning: （形容词后缀）…的
+Example: bureaucratic官僚政治的//systematic系统的
+------------------------------
+Word: -ator
+Meaning: （名词后缀）表人、物
+Example: educator教育家//calculator计算器
+------------------------------
+Word: -cy
+Meaning: （名词后缀）表性质、状态
+Example: accuracy准确性
+------------------------------
+Word: -eer
+Meaning: （名词后缀）表人
+Example: engineer工程师
+------------------------------
+Word: -ern
+Meaning: （形容词后缀）表方位，…的
+Example: southern南方的//eastern东方的
+------------------------------
+Word: -ery
+Meaning: （名词后缀）表场所、状态、行业
+Example: bakery面包店//bravery勇敢
+------------------------------
+Word: -ety
+Meaning: （名词后缀）表性质、状态
+Example: variety种种，种类//safety安全
+------------------------------
+Word: -eur
+Meaning: （名词后缀）表人
+Example: amateur业余活动者
+------------------------------
+Word: -ial
+Meaning: （形容词后缀）…的
+Example: facial面部的//initial开始的
+------------------------------
+Word: -ibly
+Meaning: （副词后缀）可能地
+Example: possibly可能地
+------------------------------
+Word: -ician
+Meaning: （名词后缀）表人
+Example: physician医生//politician政治家
+------------------------------
+Word: -icity
+Meaning: （名词后缀）表性质、状态
+Example: electricity电，电流
+------------------------------
+Word: -ier
+Meaning: （名词后缀）表人或物
+Example: soldier士兵//barrier栅栏
+------------------------------
+Word: -ile
+Meaning: （形容词后缀）…的，可…的
+Example: fragile易碎的，脆的//mobile活动的，可移动的
+------------------------------
+Word: -ory
+Meaning: （形容词后缀）…的
+Example: contradictory矛盾的
+------------------------------
+Word: -sion
+Meaning: （名词后缀）表行为、状态
+Example: decision决定//expression表情，表达法
+------------------------------
+Word: -th
+Meaning: （名词后缀）第…，…之一，表性质
+Example: sixth第六//warmth温暖，暖和
+------------------------------
+Word: -tion
+Meaning: （名词后缀）表行为、状态
+Example: instruction说明//intention计划，意图//invention发明
+------------------------------
+Word: -ty
+Meaning: （名词后缀）表性质、状态、数量
+Example: activity活动//certainty肯定//plenty大量
+------------------------------
+Word: -ual
+Meaning: （形容词后缀）…的
+Example: punctual准时的//visual视觉的，视力的
+------------------------------
+Word: -ure
+Meaning: （名词后缀）表行为、状态
+Example: agriculture农业//pressure压力，压强
+------------------------------
+Word: No. /ˈnʌmbə/n. 数字；号码；第…号"
+Meaning: 
+Example: 
+------------------------------
+Word: O. K.
+Meaning: 〈口语〉好，对，不错
+Example: 
+------------------------------
+Word: Olympic（s）
+Meaning: n. &adj. 奥林匹克（的）
+Example: 
+------------------------------
+Word: P. C. /ˌpiːˈsiː/（＝personalcomputer）n. 个人电脑
+Meaning: None
+Example: None
+------------------------------
+Word: P. E. /ˌpiːˈiː/（＝physical education）n. 体育"
+Meaning: 
+Example: 
+------------------------------
+Word: VCD
+Meaning: n. 视频高密光盘
+Example: 
+------------------------------
+Word: a. m./A. M.", /ˌeɪˈem/n. 上午，午前
+Meaning: 
+Example: 
+------------------------------
+Word: acu
+Meaning: acute尖锐的
+Example: 
+------------------------------
+Word: agri
+Meaning: agriculture农业
+Example: 
+------------------------------
+Word: ambassadress
+Meaning: n. 大使夫人；女大使
+Example: 
+------------------------------
+Word: ambi-
+Meaning: 两，两边
+Example: ambiguous不明确的
+------------------------------
+Word: ann
+Meaning: annual每年的
+Example: 
+------------------------------
+Word: ar-
+Meaning: （ad-的一种形式）表加强
+Example: arrange安排
+------------------------------
+Word: astro，aster
+Meaning: disaster灾难//astronomy天文学
+Example: 
+------------------------------
+Word: audi（t）
+Meaning: audible可听见的//audience观众，听众
+Example: 
+------------------------------
+Word: beddings
+Meaning: n. 被褥
+Example: The girl pulled the beddings over her boyfriend who was sleeping on the sofa. 那个女孩把棉被拉过来盖在在沙发上熟睡的男朋友身上。
+------------------------------
+Word: bene-
+Meaning: 善，好
+Example: beneficial有益的//benefit使受益
+------------------------------
+Word: bi，bio
+Meaning: biology生物学//biography传记
+Example: 
+------------------------------
+Word: brillil
+Meaning: brilliant闪耀的
+Example: 
+------------------------------
+Word: cata-
+Meaning: 下面
+Example: catastrophe灾难//category种类
+------------------------------
+Word: ceed，cess
+Meaning: access进入//process程序//succeed成功//accessible易接近的
+Example: 
+------------------------------
+Word: ceive
+Meaning: receive收到
+Example: 
+------------------------------
+Word: cept
+Meaning: accept接受//concept概念，观念//except除…之外//reception接待
+Example: 
+------------------------------
+Word: circ，cycl
+Meaning: circle圆圈//cycle循环
+Example: 
+------------------------------
+Word: clud
+Meaning: conclude完成，结束//include包括，包含
+Example: 
+------------------------------
+Word: cogn
+Meaning: recognize认出，承认
+Example: 
+------------------------------
+Word: cur，curr
+Meaning: occur发生//current当前的//currency货币//curriculum课程
+Example: 
+------------------------------
+Word: cuse
+Meaning: accuse谴责
+Example: 
+------------------------------
+Word: dia-
+Meaning: 贯通，透过，相对
+Example: diagram图表，图样
+------------------------------
+Word: dic，dict
+Meaning: dictionary字典//predict预言，预报
+Example: 
+------------------------------
+Word: duc，duct
+Meaning: conduct引导//educate教育
+Example: 
+------------------------------
+Word: ef-
+Meaning: 出
+Example: effect效果
+------------------------------
+Word: equ
+Meaning: equal相等的//adequate足够的，适当的
+Example: 
+------------------------------
+Word: fect
+Meaning: effect效果
+Example: 
+------------------------------
+Word: fer
+Meaning: conference会议//refer提到//differ有区别//suffer受苦
+Example: 
+------------------------------
+Word: fic，fit
+Meaning: beneficial有益的//benefit使受益
+Example: 
+------------------------------
+Word: flect，flex
+Meaning: reflect反射//反映//flexible柔软的//灵活的
+Example: 
+------------------------------
+Word: forgivee
+Meaning: vt. （forgave，forgiven，forgiving）原谅，宽恕
+Example: 
+------------------------------
+Word: gener
+Meaning: generous慷慨的
+Example: 
+------------------------------
+Word: gram，graph
+Meaning: diagram图表//telegram电报//photograph照片
+Example: 
+------------------------------
+Word: gress
+Meaning: progress进步，上进//aggressive侵略的
+Example: 
+------------------------------
+Word: hibit
+Meaning: prohibit禁止，阻止
+Example: 
+------------------------------
+Word: init
+Meaning: initial开始的，最初的
+Example: 
+------------------------------
+Word: ject
+Meaning: object反对//reject拒绝
+Example: 
+------------------------------
+Word: jud
+Meaning: prejudice偏见
+Example: 
+------------------------------
+Word: jur
+Meaning: injure伤害
+Example: 
+------------------------------
+Word: lect
+Meaning: collect收集//lecture讲课
+Example: 
+------------------------------
+Word: lect，leg
+Meaning: select选择，挑选//elect（投票）选举//elegant文雅的，雅致的
+Example: 
+------------------------------
+Word: lim
+Meaning: limit限制，限定
+Example: 
+------------------------------
+Word: maj
+Meaning: major主要的
+Example: 
+------------------------------
+Word: mand
+Meaning: command命令//demand要求
+Example: 
+------------------------------
+Word: medi
+Meaning: medium中间的//媒介
+Example: 
+------------------------------
+Word: memor
+Meaning: memory记忆//memorial纪念物，纪念碑
+Example: 
+------------------------------
+Word: mir
+Meaning: admire钦佩，羡慕//miracle奇迹
+Example: 
+------------------------------
+Word: miss，mit
+Meaning: admission准许进入//admit承认//commitment献身，投入//dismiss解雇
+Example: 
+------------------------------
+Word: mor
+Meaning: moral道德的
+Example: 
+------------------------------
+Word: mot，mote
+Meaning: promote促进，提升//remote遥远的
+Example: 
+------------------------------
+Word: noc
+Meaning: innocent纯真的
+Example: 
+------------------------------
+Word: numer
+Meaning: numerous多的，大量的
+Example: 
+------------------------------
+Word: o'clock
+Meaning: n. …点钟
+Example: 
+------------------------------
+Word: oc-
+Meaning: （ob-的一种形式）表加强
+Example: occur发生，出现
+------------------------------
+Word: oper
+Meaning: operate操作//operation手术
+Example: 
+------------------------------
+Word: optim
+Meaning: optimistic乐观的
+Example: 
+------------------------------
+Word: p. m./P. M.
+Meaning: n. 下午；午后
+Example: 
+------------------------------
+Word: pend
+Meaning: depend取决于
+Example: 
+------------------------------
+Word: ple
+Meaning: complete完成//结束
+Example: 
+------------------------------
+Word: pos，posit
+Meaning: oppose反对//positive积极的//expose暴露，揭露
+Example: 
+------------------------------
+Word: preci
+Meaning: appreciate欣赏//precious宝贵的，珍贵的
+Example: 
+------------------------------
+Word: prim，prem
+Meaning: primary首要的//premier首相，总理
+Example: 
+------------------------------
+Word: priv
+Meaning: private私人的//私营的
+Example: 
+------------------------------
+Word: puls
+Meaning: compulsory义务的
+Example: 
+------------------------------
+Word: punct
+Meaning: punctual准时的
+Example: 
+------------------------------
+Word: rect
+Meaning: correct改正，纠正//rectangle长方形
+Example: 
+------------------------------
+Word: rupt
+Meaning: corrupt腐败的//abrupt突然的，意外的
+Example: 
+------------------------------
+Word: sacr
+Meaning: sacred庄严的，神圣的//sacrifice牺牲，奉献
+Example: 
+------------------------------
+Word: salesgirl
+Meaning: n. 女售货员
+Example: 
+------------------------------
+Word: se-
+Meaning: 分开
+Example: select选出//separate分开，分离
+------------------------------
+Word: sembl
+Meaning: resemble像，类似
+Example: 
+------------------------------
+Word: sert
+Meaning: desert遗弃//insert插入
+Example: 
+------------------------------
+Word: sideway
+Meaning: n. 岔路，旁路
+Example: 
+------------------------------
+Word: sist，sta（n）t
+Meaning: consist由…组成//consistent一致的//constant不断的//insist坚持//instant立即的//status身份，地位
+Example: 
+------------------------------
+Word: solut
+Meaning: absolute完全的
+Example: 
+------------------------------
+Word: suf-
+Meaning: （sub-的一种形式）在下面
+Example: suffer受苦
+------------------------------
+Word: sume
+Meaning: assume承担
+Example: 
+------------------------------
+Word: surd
+Meaning: absurd荒谬的
+Example: 
+------------------------------
+Word: sus-
+Meaning: （sub-的一种形式）在…下面
+Example: suspect怀疑//suspension悬挂//暂停
+------------------------------
+Word: sym-
+Meaning: 共同，相同
+Example: symptom症状//sympathy同情//symphony交响乐队
+------------------------------
+Word: tach
+Meaning: attach贴上，系上
+Example: 
+------------------------------
+Word: tain
+Meaning: contain包含//包括
+Example: 
+------------------------------
+Word: tempor
+Meaning: contemporary同时代的//temporary暂时的
+Example: 
+------------------------------
+Word: tend，tens
+Meaning: tendency倾向，趋势//tension拉紧，张力
+Example: 
+------------------------------
+Word: turb
+Meaning: disturb扰乱
+Example: 
+------------------------------
+Word: urb
+Meaning: urban城市的
+Example: 
+------------------------------
+Word: urg
+Meaning: urge催促，力劝//urgent急迫的，紧急的
+Example: 
+------------------------------
+Word: vers，vert
+Meaning: advertise做广告//anniversary周年纪念//controversial争议的//diverse不同的，多种多样的//universe宇宙
+Example: 
+------------------------------
+Word: vis，vid
+Meaning: advise劝告//evident明显的
+Example: 
+------------------------------
+Word: vit，viv，vive
+Meaning: survive比…活得长//vital生死攸关的//vivid生动的
+Example: 
+------------------------------
+Word: wis，wit
+Meaning: wisdom智慧//witness目击，作证
+Example: 
+------------------------------
+Word: yourselves
+Meaning: pron. 你们自己（反身代词）
+Example: 
+------------------------------
+
+WORDS IN TXT BUT NOT IN CSV:
+==============================
+- "o&#x27;clock"
+
+SAMPLE WORD-AUDIO MAPPINGS:
+==============================
+"o&#x27;clock": cambridge-26ec005d-6845b8d8-01ee7a91-54a70a3e-e8da34f4.mp3, cambridge-5cb78cb9-a604bc19-faf4d072-573d287a-9fc263f2.mp3
+-able: cambridge-1e2cd6f2-3c3a5b97-06bd89ab-af70a806-5d2eff70.mp3, cambridge-c52b9449-965b95f9-d486a94f-1967724a-98ba188c.mp3
+-ably: cambridge-8b497110-ff8edd47-475602b6-09f6b071-e6e97d75.mp3, cambridge-7097df6a-13174b25-f56f9d8b-08a7322f-6ca01d95.mp3
+-age: cambridge-70d67d93-bf2f3d7f-5af6cb45-681cf4c4-8ce8b09f.mp3, cambridge-02181d26-428fa396-f57d9a42-86105fa9-6e7bb391.mp3
+-al: cambridge-7e3476a3-4e940a94-5ac07333-cb9d1176-05446571.mp3, cambridge-55732158-4efe5559-774a4f62-167e71c9-004f150f.mp3
+-an: cambridge-09b133ac-b2fc10d8-977d520b-bc8c2f4e-3095f79e.mp3, cambridge-7ffedef6-f4a91ce7-c4dcb545-3fe72e2a-128afac1.mp3
+-ance: cambridge-860bd5ff-55c3f1ce-1d381ca0-06efe21a-27efaa54.mp3, cambridge-77a84112-de8738ae-1617c637-374ef6ab-b34fbc32.mp3
+-ant: cambridge-5a4c9c7d-65e038f9-e1a6a650-345b3d63-d45e7643.mp3, cambridge-0056a620-f4131a33-da96cd9b-17bcbe08-498ff9b4.mp3
+-ate: cambridge-71a74c33-80abe6f4-7a44ee3c-605c40b2-bb8bee04.mp3, cambridge-a607628a-e04e389b-c9aa172c-ab9757af-f921a261.mp3
+-ation: cambridge-0013936b-98215699-6e430431-ba090f9d-25cb1bfd.mp3, cambridge-48819cf9-feba730b-14052240-ff25d315-69c802d8.mp3
+-ative: cambridge-3c1f899a-089686aa-7126ce03-f692a5b1-447f4600.mp3, cambridge-d5d69ffd-e578bd7f-be033c9c-f953e1c7-7a4c2f63.mp3
+-cide: cambridge-9d4efde8-f32c3127-7cf704fe-4aacfe89-a7ebd639.mp3, cambridge-25e2a209-46779c68-4b25de74-900a1852-d66108c9.mp3
+-dom: cambridge-f4a28ca8-e88c6a7c-dda467e2-98217aec-8318c9af.mp3, cambridge-596d905c-f3026f3c-b791ee30-cc4d0f26-0a122a7d.mp3
+-ed: cambridge-a9b3a078-265bddb8-4a5be9b7-d1d5a0e2-d476ccbf.mp3, cambridge-78e7f9fd-57c57637-19eaba21-811d145c-db4ecc03.mp3
+-ee: cambridge-649aa47e-ba8146bf-b8c36c48-9c1b28ee-377eaefc.mp3, cambridge-1591035a-5b7cebb1-7783989a-002d5b03-71428420.mp3
+-en: cambridge-e7c09702-cbefed0d-7c6f1d6e-df81a040-9e635407.mp3, cambridge-e7ede36a-8bfa31d9-18a3b3fb-9efdbd66-b55ec908.mp3
+-ence: cambridge-b99e856e-5fd57326-523ce32f-b0f7c30d-23a2940f.mp3, cambridge-64924c46-b678ad78-81057f96-2ce062f7-521398d6.mp3
+-ency: cambridge-7f02b713-c28f98b8-255f275b-1294c8d9-e1c153db.mp3, cambridge-c7dee339-d8dafb02-7ee7a2b7-ba23e53c-014932a9.mp3
+-ent: cambridge-a2a45cda-8bec1715-c232bc7e-3ef58343-73c63a1c.mp3, cambridge-bc7ed91b-0f578343-74f915b4-a4fcc301-6a2b0417.mp3
+-er: cambridge-d63382cd-959ba2e4-6dcdf459-2441f7df-668bda63.mp3, cambridge-6022bd57-6f8fbecd-a4bbb47f-2ba59332-6f7220a1.mp3
+
