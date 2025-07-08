@@ -549,6 +549,42 @@
             </div>
         </div>
 
+        <!-- SRS掌握度显示区域 -->
+        <div id="srs-mastery-container" style="display: none; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: white; font-size: 1.2em;">📚 学习进度 & 掌握度</h3>
+                <button id="srs-review-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">
+                    🔄 SRS复习
+                </button>
+            </div>
+            <div id="srs-stats-content">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-total-words">0</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">总单词</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-learned-words">0</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">已学习</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-due-words">0</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">待复习</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-avg-interval">0</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">平均间隔</div>
+                    </div>
+                </div>
+                <div id="srs-recent-words" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 1em;">最近学习的单词</h4>
+                    <div id="srs-recent-words-list" style="font-size: 0.9em; line-height: 1.4;">
+                        <p style="margin: 0; opacity: 0.8;">正在加载...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="lumi-toggle-container">
             <label for="lumi-toggle">Lumi即时反馈: </label>
             <label class="switch">
@@ -768,7 +804,7 @@
                     } else {
                         return part.trim();
                     }
-                }).join('；');
+                }).join(' / '); // 使用斜杠分隔，避免换行
             } else {
                 // 单个词性
                 formattedMeaning = `<em style="color: #007bff; font-weight: bold;">${extractedPos}</em> ${meaning}`;
@@ -1823,7 +1859,10 @@
             });
             
             // 添加认证相关事件监听器
-            loginBtn.addEventListener('click', handleLogin);
+            loginBtn.addEventListener('click', async () => {
+                await handleLogin();
+                loadSRSMastery();
+            });
             
             // 添加回车键登录功能
             loginPassword.addEventListener('keypress', function(event) {
@@ -1874,7 +1913,11 @@
                     loginForm.style.display = 'block';
                 }, 300);
             });
-            logoutBtn.addEventListener('click', handleLogout);
+            logoutBtn.addEventListener('click', async () => {
+                await handleLogout();
+                loadSRSMastery();
+            });
+            loadSRSMastery(); // 加载SRS掌握度
         });
         
         // Lumi开关事件监听
@@ -2586,6 +2629,67 @@
             }
         }
 
+        // 加载SRS掌握度信息的函数
+        async function loadSRSMastery() {
+            const srsContainer = document.getElementById('srs-mastery-container');
+            const srsStatsContent = document.getElementById('srs-stats-content');
+            
+            // 检查用户是否已登录
+            if (!currentUser) {
+                srsContainer.style.display = 'none';
+                return;
+            }
+            
+            // 显示SRS容器
+            srsContainer.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/srs/progress');
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        srsContainer.style.display = 'none';
+                        return;
+                    } else {
+                        throw new Error('获取SRS进度失败');
+                    }
+                }
+                
+                const data = await response.json();
+                const stats = data.stats;
+                const recentWords = data.recent_words;
+                
+                // 更新统计数据
+                document.getElementById('srs-total-words').textContent = stats.total_words;
+                document.getElementById('srs-learned-words').textContent = stats.learned_words;
+                document.getElementById('srs-due-words').textContent = stats.due_words;
+                document.getElementById('srs-avg-interval').textContent = stats.avg_interval + '天';
+                
+                // 更新最近学习的单词
+                const recentWordsList = document.getElementById('srs-recent-words-list');
+                if (recentWords && recentWords.length > 0) {
+                    const wordsHtml = recentWords.slice(0, 5).map(word => {
+                        const masteryLevel = word.repetitions === 0 ? '未学习' :
+                                           word.repetitions === 1 ? '初学' :
+                                           word.repetitions <= 3 ? '熟悉' :
+                                           word.repetitions <= 10 ? '掌握' : '精通';
+                        return `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                                <span><strong>${word.spelling}</strong> - ${word.meaning_cn}</span>
+                                <span style="font-size: 0.8em; opacity: 0.8;">${masteryLevel}</span>
+                            </div>
+                        `;
+                    }).join('');
+                    recentWordsList.innerHTML = wordsHtml;
+                } else {
+                    recentWordsList.innerHTML = '<p style="margin: 0; opacity: 0.8;">还没有学习记录</p>';
+                }
+                
+            } catch (error) {
+                console.error('加载SRS掌握度时出错:', error);
+                srsContainer.style.display = 'none';
+            }
+        }
+
         // 开始按钮
         startBtn.addEventListener('click', async () => {
             const selectedListId = document.getElementById('list-select').value;
@@ -2674,6 +2778,7 @@
                     startBtn.style.display = 'none';
                     document.querySelector('a.btn').style.display = 'none';
                     document.getElementById('error-stats-container').style.display = 'none';
+                    document.getElementById('srs-mastery-container').style.display = 'none';
                     quizArea.style.display = 'block';
                     totalQNumEl.textContent = questions.length;
                     userAnswers = []; // 重置答案
@@ -2785,6 +2890,7 @@
             
             // 重新加载错词统计
             loadErrorStats();
+            document.getElementById('srs-mastery-container').style.display = 'block';
         }
 
         // 下一步按钮和回车键
@@ -2840,6 +2946,11 @@
                 event.preventDefault();
                 handleNextQuestion();
             }
+        });
+        // SRS复习按钮事件
+        document.getElementById('srs-review-btn').addEventListener('click', async () => {
+            // 这里可以弹出一个SRS复习入口或跳转到SRS复习模式
+            alert('SRS复习功能即将上线，敬请期待！');
         });
     </script>
     <script src="/fix_mess_display_new.js"></script>

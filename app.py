@@ -358,6 +358,81 @@ def submit_answers():
                         except sqlite3.Error as e2:
                             app.logger.error(f"创建ErrorLogs表并插入数据失败: {e2}")
 
+    # 更新SRS进度（仅对已登录用户）
+    if student_id != -1:
+        try:
+            for item in answers:
+                word_id = item.get('word_id')
+                student_answer = item.get('answer', '')
+                correct_word = cursor.execute('SELECT spelling FROM Words WHERE word_id = ?', (word_id,)).fetchone()
+                
+                if correct_word:
+                    correct_spelling = correct_word['spelling']
+                    valid_spellings = [s.strip().lower() for s in correct_spelling.split('/')]
+                    
+                    # 处理逗号分隔的拼写变体
+                    expanded_spellings = []
+                    for spelling in valid_spellings:
+                        if ',' in spelling:
+                            comma_variants = [v.strip().lower() for v in spelling.split(',')]
+                            expanded_spellings.extend(comma_variants)
+                        else:
+                            expanded_spellings.append(spelling)
+                    
+                    valid_spellings = expanded_spellings
+                    
+                    # 判断答案是否正确，更新SRS进度
+                    is_correct = student_answer.strip().lower() in valid_spellings
+                    grade = 4 if is_correct else 1  # 正确给4分，错误给1分
+                    
+                    # 获取当前SRS进度
+                    cursor.execute("""
+                        SELECT repetitions, interval FROM StudentWordProgress 
+                        WHERE student_id = ? AND word_id = ?
+                    """, (student_id, word_id))
+                    
+                    progress = cursor.fetchone()
+                    
+                    if not progress:
+                        # 创建新进度记录
+                        repetitions = 0
+                        interval = 1
+                    else:
+                        repetitions = progress[0] or 0
+                        interval = progress[1] or 1
+                    
+                    # 根据评分更新间隔（简化的SuperMemo算法）
+                    if grade >= 3:  # 记得
+                        repetitions += 1
+                        if repetitions == 1:
+                            interval = 1
+                        elif repetitions == 2:
+                            interval = 6
+                        else:
+                            interval = int(interval * 2.5)
+                    else:  # 不记得
+                        repetitions = max(0, repetitions - 1)  # 减少重复次数但不重置为0
+                        interval = max(1, interval // 2)  # 减少间隔但不重置为1
+                    
+                    # 限制最大间隔
+                    interval = min(interval, 365)
+                    
+                    # 计算下次复习日期
+                    from datetime import datetime, timedelta
+                    next_review_date = (datetime.now() + timedelta(days=interval)).strftime('%Y-%m-%d')
+                    
+                    # 更新或插入进度
+                    cursor.execute("""
+                        INSERT OR REPLACE INTO StudentWordProgress 
+                        (student_id, word_id, repetitions, interval, next_review_date)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (student_id, word_id, repetitions, interval, next_review_date))
+                    
+            app.logger.info(f"SRS进度更新完成: 用户ID={student_id}, 处理单词数={len(answers)}")
+        except Exception as e:
+            app.logger.error(f"更新SRS进度时出错: {e}")
+            # 不中断主流程，继续执行
+
     conn.commit()
     conn.close()
     
@@ -1185,6 +1260,256 @@ def export_pdf():
 @app.route('/fix_mess_display_new.js')
 def get_fix_mess_display_new_js():
     return send_from_directory('.', 'fix_mess_display_new.js')
+
+# --- SRS (Spaced Repetition System) API Endpoints ---
+
+@app.route('/api/srs/progress', methods=['GET'])
+def get_srs_progress():
+    """获取用户的SRS学习进度"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 获取用户的学习进度统计
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total_words,
+                SUM(CASE WHEN repetitions > 0 THEN 1 ELSE 0 END) as learned_words,
+                SUM(CASE WHEN next_review_date <= date('now') THEN 1 ELSE 0 END) as due_words,
+                AVG(interval) as avg_interval
+            FROM StudentWordProgress 
+            WHERE student_id = ?
+        """, (student_id,))
+        
+        stats = cursor.fetchone()
+        
+        # 获取最近学习的单词（最近7天）
+        cursor.execute("""
+            SELECT w.spelling, w.meaning_cn, p.repetitions, p.interval, p.next_review_date,
+                   wl.list_name, b.book_name
+            FROM StudentWordProgress p
+            JOIN Words w ON p.word_id = w.word_id
+            LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+            LEFT JOIN Books b ON wl.book_id = b.book_id
+            WHERE p.student_id = ? 
+            AND p.repetitions > 0
+            ORDER BY p.next_review_date DESC
+            LIMIT 20
+        """, (student_id,))
+        
+        recent_words = [dict(row) for row in cursor.fetchall()]
+        
+        conn.close()
+        
+        return jsonify({
+            'stats': {
+                'total_words': stats[0] or 0,
+                'learned_words': stats[1] or 0,
+                'due_words': stats[2] or 0,
+                'avg_interval': round(stats[3] or 0, 1)
+            },
+            'recent_words': recent_words
+        })
+        
+    except Exception as e:
+        app.logger.error(f"获取SRS进度时出错: {e}")
+        return jsonify({'error': '获取学习进度失败'}), 500
+
+@app.route('/api/srs/due-words', methods=['GET'])
+def get_due_words():
+    """获取需要复习的单词"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        # 获取参数
+        limit = request.args.get('limit', default=10, type=int)
+        list_id = request.args.get('list_id', type=int)
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 构建查询条件
+        where_clause = "p.student_id = ? AND p.next_review_date <= date('now')"
+        params = [student_id]
+        
+        if list_id:
+            where_clause += " AND w.list_id = ?"
+            params.append(list_id)
+        
+        # 获取需要复习的单词
+        cursor.execute(f"""
+            SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+                   w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+                   w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+                   p.repetitions, p.interval, p.next_review_date,
+                   wl.list_name, b.book_name
+            FROM StudentWordProgress p
+            JOIN Words w ON p.word_id = w.word_id
+            LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+            LEFT JOIN Books b ON wl.book_id = b.book_id
+            WHERE {where_clause}
+            ORDER BY p.next_review_date ASC, p.repetitions ASC
+            LIMIT ?
+        """, params + [limit])
+        
+        due_words = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        return jsonify({'due_words': due_words})
+        
+    except Exception as e:
+        app.logger.error(f"获取待复习单词时出错: {e}")
+        return jsonify({'error': '获取待复习单词失败'}), 500
+
+@app.route('/api/srs/update-progress', methods=['POST'])
+def update_srs_progress():
+    """更新单词的SRS进度"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        data = request.get_json()
+        word_id = data.get('word_id')
+        grade = data.get('grade', 3)  # 0-5的评分
+        
+        if not word_id:
+            return jsonify({'error': '缺少单词ID'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 获取当前进度
+        cursor.execute("""
+            SELECT repetitions, interval FROM StudentWordProgress 
+            WHERE student_id = ? AND word_id = ?
+        """, (student_id, word_id))
+        
+        progress = cursor.fetchone()
+        
+        if not progress:
+            # 创建新进度记录
+            repetitions = 0
+            interval = 1
+        else:
+            repetitions = progress[0] or 0
+            interval = progress[1] or 1
+        
+        # 根据评分更新间隔（简化的SuperMemo算法）
+        if grade >= 3:  # 记得
+            repetitions += 1
+            if repetitions == 1:
+                interval = 1
+            elif repetitions == 2:
+                interval = 6
+            else:
+                interval = int(interval * 2.5)
+        else:  # 不记得
+            repetitions = 0
+            interval = 1
+        
+        # 限制最大间隔
+        interval = min(interval, 365)
+        
+        # 计算下次复习日期
+        from datetime import datetime, timedelta
+        next_review_date = (datetime.now() + timedelta(days=interval)).strftime('%Y-%m-%d')
+        
+        # 更新或插入进度
+        cursor.execute("""
+            INSERT OR REPLACE INTO StudentWordProgress 
+            (student_id, word_id, repetitions, interval, next_review_date)
+            VALUES (?, ?, ?, ?, ?)
+        """, (student_id, word_id, repetitions, interval, next_review_date))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'message': '进度更新成功',
+            'new_interval': interval,
+            'new_repetitions': repetitions,
+            'next_review_date': next_review_date
+        })
+        
+    except Exception as e:
+        app.logger.error(f"更新SRS进度时出错: {e}")
+        return jsonify({'error': '更新进度失败'}), 500
+
+@app.route('/api/srs/mastery-stats', methods=['GET'])
+def get_mastery_stats():
+    """获取掌握度统计"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 获取掌握度分布
+        cursor.execute("""
+            SELECT 
+                CASE 
+                    WHEN repetitions = 0 THEN '未学习'
+                    WHEN repetitions = 1 THEN '初学'
+                    WHEN repetitions <= 3 THEN '熟悉'
+                    WHEN repetitions <= 10 THEN '掌握'
+                    ELSE '精通'
+                END as mastery_level,
+                COUNT(*) as count
+            FROM StudentWordProgress 
+            WHERE student_id = ?
+            GROUP BY mastery_level
+            ORDER BY 
+                CASE mastery_level
+                    WHEN '未学习' THEN 1
+                    WHEN '初学' THEN 2
+                    WHEN '熟悉' THEN 3
+                    WHEN '掌握' THEN 4
+                    WHEN '精通' THEN 5
+                END
+        """, (student_id,))
+        
+        mastery_distribution = [dict(row) for row in cursor.fetchall()]
+        
+        # 获取最近7天的学习统计
+        cursor.execute("""
+            SELECT 
+                date(created_at) as study_date,
+                COUNT(*) as words_studied
+            FROM (
+                SELECT 
+                    CASE 
+                        WHEN next_review_date IS NOT NULL THEN next_review_date
+                        ELSE date('now')
+                    END as created_at
+                FROM StudentWordProgress 
+                WHERE student_id = ? AND repetitions > 0
+            )
+            WHERE created_at >= date('now', '-7 days')
+            GROUP BY date(created_at)
+            ORDER BY study_date
+        """, (student_id,))
+        
+        weekly_stats = [dict(row) for row in cursor.fetchall()]
+        
+        conn.close()
+        
+        return jsonify({
+            'mastery_distribution': mastery_distribution,
+            'weekly_stats': weekly_stats
+        })
+        
+    except Exception as e:
+        app.logger.error(f"获取掌握度统计时出错: {e}")
+        return jsonify({'error': '获取掌握度统计失败'}), 500
 
 # --- 启动命令 ---
 if __name__ == '__main__':
