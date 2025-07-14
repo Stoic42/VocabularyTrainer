@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRS界面逻辑测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .srs-mastery-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .srs-review-area {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .error-stats-container {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ffeaa7;
+        }
+        .quiz-area {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        select, button {
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 SRS界面逻辑测试</h1>
+    
+    <div class="container">
+        <h3>学习模式选择</h3>
+        <select id="study-mode">
+            <option value="standard">标准模式</option>
+            <option value="dictation">默写模式</option>
+            <option value="error_review">错词复习模式</option>
+            <option value="error_clear">错词清零模式</option>
+            <option value="srs_review">SRS复习模式</option>
+        </select>
+        
+        <button onclick="testModeChange()">测试模式切换</button>
+        <button onclick="resetDisplay()">重置显示</button>
+    </div>
+
+    <!-- SRS掌握度容器 -->
+    <div id="srs-mastery-container" class="srs-mastery-container hidden">
+        <h3>📚 智能学习进度</h3>
+        <p>这个容器应该只在SRS复习模式时显示</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
+            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                <div style="font-size: 1.5em; font-weight: bold;">0</div>
+                <div style="font-size: 0.8em; opacity: 0.8;">总单词</div>
+            </div>
+            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                <div style="font-size: 1.5em; font-weight: bold;">0</div>
+                <div style="font-size: 0.8em; opacity: 0.8;">已学习</div>
+            </div>
+            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                <div style="font-size: 1.5em; font-weight: bold;">0</div>
+                <div style="font-size: 0.8em; opacity: 0.8;">待复习</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SRS复习区域 -->
+    <div id="srs-review-area" class="srs-review-area hidden">
+        <h2>🔄 SRS智能复习</h2>
+        <p>优先复习错词，基于你的实际表现智能安排复习计划</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold; color: #667eea;">0</div>
+                <div style="color: #666; font-size: 0.9em;">待复习单词</div>
+            </div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold; color: #28a745;">0</div>
+                <div style="color: #666; font-size: 0.9em;">已复习单词</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错词统计容器 -->
+    <div id="error-stats-container" class="error-stats-container hidden">
+        <h3>📊 错词统计</h3>
+        <p>这个容器应该只在错词复习和错词清零模式时显示</p>
+        <div id="error-stats-content">
+            <p>正在加载错词统计...</p>
+        </div>
+    </div>
+
+    <!-- 测试区域 -->
+    <div id="quiz-area" class="quiz-area hidden">
+        <h3>📝 测试区域</h3>
+        <p>这个区域应该只在标准模式和默写模式时显示</p>
+        <div style="background: white; padding: 15px; border-radius: 5px;">
+            <p><strong>问题：</strong> 请拼写单词 "example"</p>
+            <input type="text" placeholder="请输入答案" style="width: 200px; padding: 8px;">
+            <button>提交答案</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>当前显示状态</h3>
+        <div id="status-display">
+            <p>请选择学习模式来测试界面逻辑</p>
+        </div>
+    </div>
+
+    <script>
+        function testModeChange() {
+            const selectedMode = document.getElementById('study-mode').value;
+            const errorStatsContainer = document.getElementById('error-stats-container');
+            const srsReviewArea = document.getElementById('srs-review-area');
+            const srsMasteryContainer = document.getElementById('srs-mastery-container');
+            const quizArea = document.getElementById('quiz-area');
+            
+            // 隐藏所有容器
+            errorStatsContainer.classList.add('hidden');
+            srsReviewArea.classList.add('hidden');
+            srsMasteryContainer.classList.add('hidden');
+            quizArea.classList.add('hidden');
+            
+            if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
+                // 错词相关模式
+                errorStatsContainer.classList.remove('hidden');
+                updateStatus(`错词${selectedMode === 'error_clear' ? '清零' : '复习'}模式：显示错词统计`);
+            } else if (selectedMode === 'srs_review') {
+                // SRS复习模式
+                srsReviewArea.classList.remove('hidden');
+                srsMasteryContainer.classList.remove('hidden');
+                updateStatus('SRS复习模式：显示SRS复习区域和掌握度容器');
+            } else {
+                // 标准模式和默写模式
+                quizArea.classList.remove('hidden');
+                updateStatus(`${selectedMode === 'standard' ? '标准' : '默写'}模式：显示测试区域`);
+            }
+        }
+        
+        function resetDisplay() {
+            document.getElementById('study-mode').value = 'standard';
+            document.getElementById('error-stats-container').classList.add('hidden');
+            document.getElementById('srs-review-area').classList.add('hidden');
+            document.getElementById('srs-mastery-container').classList.add('hidden');
+            document.getElementById('quiz-area').classList.add('hidden');
+            updateStatus('已重置所有显示状态');
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status-display').innerHTML = `
+                <p><strong>当前模式：</strong> ${document.getElementById('study-mode').options[document.getElementById('study-mode').selectedIndex].text}</p>
+                <p><strong>显示逻辑：</strong> ${message}</p>
+                <p><strong>时间：</strong> ${new Date().toLocaleTimeString()}</p>
+            `;
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus('页面已加载，请选择学习模式');
+        });
+    </script>
+</body>
+</html> 

@@ -2223,6 +2223,7 @@
             const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)'); // 数量选择器容器
             const countSelect = document.getElementById('count-select');
             const srsReviewArea = document.getElementById('srs-review-area');
+            const srsMasteryContainer = document.getElementById('srs-mastery-container');
             const quizArea = document.getElementById('quiz-area');
             
             if (selectedMode === 'error_review') {
@@ -2236,6 +2237,7 @@
                 loadErrorStats();
                 // 隐藏其他区域
                 srsReviewArea.style.display = 'none';
+                srsMasteryContainer.style.display = 'none';
                 quizArea.style.display = 'none';
             } else if (selectedMode === 'error_clear') {
                 // 错词清零模式：显示错词统计容器并隐藏数量选择器
@@ -2246,6 +2248,7 @@
                 loadErrorStats();
                 // 隐藏其他区域
                 srsReviewArea.style.display = 'none';
+                srsMasteryContainer.style.display = 'none';
                 quizArea.style.display = 'none';
                 
                 // 显示错词清零模式特殊提示
@@ -2274,8 +2277,9 @@
                     }
                 }, 100); // 延迟一点确保错词统计已加载
             } else if (selectedMode === 'srs_review') {
-                // SRS复习模式：显示SRS复习区域，隐藏其他区域
+                // SRS复习模式：显示SRS复习区域和掌握度容器，隐藏其他区域
                 srsReviewArea.style.display = 'block';
+                srsMasteryContainer.style.display = 'block';
                 errorStatsContainer.style.display = 'none';
                 quizArea.style.display = 'none';
                 countSelectContainer.style.display = 'none';
@@ -2287,11 +2291,13 @@
                     return;
                 }
                 
-                // 加载SRS待复习单词统计
+                // 加载SRS掌握度信息和待复习单词统计
+                loadSRSMastery();
                 loadSRSDueWords();
             } else {
-                // 其他模式：隐藏错词统计容器，显示数量选择器
+                // 其他模式：隐藏错词统计容器和SRS相关容器，显示数量选择器
                 errorStatsContainer.style.display = 'none';
+                srsMasteryContainer.style.display = 'none';
                 countSelectContainer.style.display = 'block';
                 srsReviewArea.style.display = 'none';
                 quizArea.style.display = 'none';
@@ -2920,8 +2926,8 @@
                 return;
             }
             
-            // 显示SRS容器
-            srsContainer.style.display = 'block';
+            // 注意：容器的显示/隐藏现在由学习模式变化事件控制
+            // 这里只负责加载数据，不控制显示状态
             
             try {
                 const response = await fetch('/api/srs/progress');
@@ -2982,7 +2988,7 @@
                 
             } catch (error) {
                 console.error('加载SRS掌握度时出错:', error);
-                srsContainer.style.display = 'none';
+                // 错误时不自动隐藏容器，让学习模式变化事件来控制
             }
         }
 
@@ -3074,7 +3080,7 @@
                     startBtn.style.display = 'none';
                     document.querySelector('a.btn').style.display = 'none';
                     document.getElementById('error-stats-container').style.display = 'none';
-                    document.getElementById('srs-mastery-container').style.display = 'none';
+                    // SRS掌握度容器现在由学习模式变化事件控制，这里不需要手动隐藏
                     quizArea.style.display = 'block';
                     totalQNumEl.textContent = questions.length;
                     userAnswers = []; // 重置答案
