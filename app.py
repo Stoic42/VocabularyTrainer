@@ -383,9 +383,8 @@ def submit_answers():
                     
                     valid_spellings = expanded_spellings
                     
-                    # 判断答案是否正确，更新SRS进度
+                    # 判断答案是否正确
                     is_correct = student_answer.strip().lower() in valid_spellings
-                    grade = 4 if is_correct else 1  # 正确给4分，错误给1分
                     
                     # 获取当前SRS进度
                     cursor.execute("""
@@ -399,22 +398,37 @@ def submit_answers():
                         # 创建新进度记录
                         repetitions = 0
                         interval = 1
+                        app.logger.info(f"创建新的SRS进度记录: student_id={student_id}, word_id={word_id}, 正确={is_correct}")
                     else:
                         repetitions = progress[0] or 0
                         interval = progress[1] or 1
+                        app.logger.info(f"更新现有SRS进度: student_id={student_id}, word_id={word_id}, 当前repetitions={repetitions}, interval={interval}, 正确={is_correct}")
                     
-                    # 根据评分更新间隔（简化的SuperMemo算法）
-                    if grade >= 3:  # 记得
-                        repetitions += 1
-                        if repetitions == 1:
+                    # 根据答案正确性更新SRS进度
+                    if is_correct:
+                        # 答对了：增加熟练度
+                        if repetitions == 0:
+                            # 第一次答对：标记为初学，1天后复习
+                            repetitions = 1
                             interval = 1
-                        elif repetitions == 2:
+                        elif repetitions == 1:
+                            # 第二次答对：标记为熟悉，6天后复习
+                            repetitions = 2
                             interval = 6
                         else:
-                            interval = int(interval * 2.5)
-                    else:  # 不记得
-                        repetitions = max(0, repetitions - 1)  # 减少重复次数但不重置为0
-                        interval = max(1, interval // 2)  # 减少间隔但不重置为1
+                            # 多次答对：增加间隔
+                            repetitions += 1
+                            interval = int(interval * 1.5)  # 温和增长
+                    else:
+                        # 答错了：降低熟练度，标记为需要重点复习
+                        if repetitions == 0:
+                            # 第一次答错：标记为不熟悉，明天复习
+                            repetitions = 0
+                            interval = 1
+                        else:
+                            # 之前答对过但这次答错：降低熟练度
+                            repetitions = max(0, repetitions - 1)
+                            interval = max(1, interval // 2)  # 减少间隔
                     
                     # 限制最大间隔
                     interval = min(interval, 365)
@@ -429,6 +443,8 @@ def submit_answers():
                         (student_id, word_id, repetitions, interval, next_review_date)
                         VALUES (?, ?, ?, ?, ?)
                     """, (student_id, word_id, repetitions, interval, next_review_date))
+                    
+                    app.logger.info(f"SRS进度更新: word_id={word_id}, 正确={is_correct}, repetitions: {repetitions}, interval: {interval}天, next_review: {next_review_date}")
                     
             app.logger.info(f"SRS进度更新完成: 用户ID={student_id}, 处理单词数={len(answers)}")
         except Exception as e:
@@ -1420,7 +1436,7 @@ def get_srs_progress():
 
 @app.route('/api/srs/due-words', methods=['GET'])
 def get_due_words():
-    """获取需要复习的单词"""
+    """获取需要复习的单词 - 优先错词，然后是按间隔到期的单词"""
     try:
         student_id = session.get('user_id', -1)
         if student_id == -1:
@@ -1433,32 +1449,71 @@ def get_due_words():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询条件
-        where_clause = "p.student_id = ? AND p.next_review_date <= date('now')"
+        # 构建基础查询条件
+        base_where = "p.student_id = ?"
         params = [student_id]
         
         if list_id:
-            where_clause += " AND w.list_id = ?"
+            base_where += " AND w.list_id = ?"
             params.append(list_id)
         
-        # 获取需要复习的单词
+        # 策略1：优先获取错词（在ErrorLogs中有记录的单词）
         cursor.execute(f"""
             SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
                    w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
                    w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
                    p.repetitions, p.interval, p.next_review_date,
-                   wl.list_name, b.book_name
+                   wl.list_name, b.book_name,
+                   (SELECT COUNT(*) FROM ErrorLogs e WHERE e.word_id = w.word_id AND e.student_id = p.student_id) as error_count,
+                   (SELECT MAX(error_date) FROM ErrorLogs e WHERE e.word_id = w.word_id AND e.student_id = p.student_id) as last_error_date
             FROM StudentWordProgress p
             JOIN Words w ON p.word_id = w.word_id
             LEFT JOIN WordLists wl ON w.list_id = wl.list_id
             LEFT JOIN Books b ON wl.book_id = b.book_id
-            WHERE {where_clause}
-            ORDER BY p.next_review_date ASC, p.repetitions ASC
+            WHERE {base_where}
+            AND EXISTS (SELECT 1 FROM ErrorLogs e WHERE e.word_id = w.word_id AND e.student_id = p.student_id)
+            ORDER BY error_count DESC, last_error_date DESC, p.next_review_date ASC
             LIMIT ?
         """, params + [limit])
         
-        due_words = [dict(row) for row in cursor.fetchall()]
+        error_words = [dict(row) for row in cursor.fetchall()]
+        
+        # 如果错词不够，补充按间隔到期的单词
+        remaining_limit = limit - len(error_words)
+        if remaining_limit > 0:
+            # 排除已经在错词列表中的单词
+            error_word_ids = [word['word_id'] for word in error_words]
+            exclude_clause = ""
+            if error_word_ids:
+                exclude_clause = f" AND w.word_id NOT IN ({','.join(['?'] * len(error_word_ids))})"
+                params.extend(error_word_ids)
+            
+            cursor.execute(f"""
+                SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+                       w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+                       w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+                       p.repetitions, p.interval, p.next_review_date,
+                       wl.list_name, b.book_name,
+                       0 as error_count,
+                       NULL as last_error_date
+                FROM StudentWordProgress p
+                JOIN Words w ON p.word_id = w.word_id
+                LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+                LEFT JOIN Books b ON wl.book_id = b.book_id
+                WHERE {base_where}
+                AND p.next_review_date <= date('now')
+                {exclude_clause}
+                ORDER BY p.next_review_date ASC, p.repetitions ASC
+                LIMIT ?
+            """, params + [remaining_limit])
+            
+            due_words = error_words + [dict(row) for row in cursor.fetchall()]
+        else:
+            due_words = error_words
+        
         conn.close()
+        
+        app.logger.info(f"SRS复习单词获取: 用户ID={student_id}, 错词数={len(error_words)}, 总单词数={len(due_words)}")
         
         return jsonify({'due_words': due_words})
         

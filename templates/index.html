@@ -553,9 +553,9 @@
         <!-- SRS掌握度显示区域 -->
         <div id="srs-mastery-container" style="display: none; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: white; font-size: 1.2em;">📚 学习进度 & 掌握度</h3>
+                <h3 style="margin: 0; color: white; font-size: 1.2em;">📚 智能学习进度</h3>
                 <button id="srs-review-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">
-                    🔄 SRS复习
+                    🔄 智能复习
                 </button>
             </div>
             <div id="srs-stats-content">
@@ -622,8 +622,8 @@
         <!-- SRS复习界面 -->
         <div id="srs-review-area" style="display: none;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h2 style="margin: 0 0 10px 0;">🔄 SRS间隔重复复习</h2>
-                <p style="margin: 0; opacity: 0.9;">基于科学记忆曲线，智能安排复习计划</p>
+                <h2 style="margin: 0 0 10px 0;">🔄 SRS智能复习</h2>
+                <p style="margin: 0; opacity: 0.9;">优先复习错词，基于你的实际表现智能安排复习计划</p>
             </div>
             
             <!-- SRS复习统计 -->
@@ -722,6 +722,13 @@
                                 <span style="color: #666; font-size: 0.9em;">下次复习:</span>
                                 <span id="srs-next-review" style="font-weight: bold; color: #1976d2;"></span>
                             </div>
+                            <div id="srs-error-info" style="display: none;">
+                                <span style="color: #666; font-size: 0.9em;">错误次数:</span>
+                                <span id="srs-error-count" style="font-weight: bold; color: #dc3545;"></span>
+                            </div>
+                        </div>
+                        <div id="srs-mastery-level" style="margin-top: 10px; padding: 8px; border-radius: 4px; text-align: center; font-weight: bold; display: none;">
+                            <span id="srs-mastery-text"></span>
                         </div>
                     </div>
                     
@@ -2941,14 +2948,30 @@
                 const recentWordsList = document.getElementById('srs-recent-words-list');
                 if (recentWords && recentWords.length > 0) {
                     const wordsHtml = recentWords.slice(0, 5).map(word => {
-                        const masteryLevel = word.repetitions === 0 ? '未学习' :
-                                           word.repetitions === 1 ? '初学' :
-                                           word.repetitions <= 3 ? '熟悉' :
-                                           word.repetitions <= 10 ? '掌握' : '精通';
+                        let masteryLevel = '';
+                        let levelColor = '';
+                        
+                        if (word.repetitions === 0) {
+                            masteryLevel = '🔴 不熟悉';
+                            levelColor = '#ffcdd2';
+                        } else if (word.repetitions === 1) {
+                            masteryLevel = '🟡 初学';
+                            levelColor = '#ffe0b2';
+                        } else if (word.repetitions <= 3) {
+                            masteryLevel = '🟠 熟悉';
+                            levelColor = '#fff3e0';
+                        } else if (word.repetitions <= 10) {
+                            masteryLevel = '🟢 掌握';
+                            levelColor = '#c8e6c9';
+                        } else {
+                            masteryLevel = '🔵 精通';
+                            levelColor = '#bbdefb';
+                        }
+                        
                         return `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px;">
                                 <span><strong>${word.spelling}</strong> - ${word.meaning_cn}</span>
-                                <span style="font-size: 0.8em; opacity: 0.8;">${masteryLevel}</span>
+                                <span style="font-size: 0.8em; background: ${levelColor}; color: #333; padding: 2px 6px; border-radius: 3px;">${masteryLevel}</span>
                             </div>
                         `;
                     }).join('');
@@ -3307,6 +3330,52 @@
             document.getElementById('srs-repetitions').textContent = word.repetitions || 0;
             document.getElementById('srs-interval').textContent = `${word.interval || 1}天`;
             document.getElementById('srs-next-review').textContent = word.next_review_date || '今天';
+            
+            // 显示错词信息（如果有）
+            const errorInfo = document.getElementById('srs-error-info');
+            const errorCount = document.getElementById('srs-error-count');
+            if (word.error_count && word.error_count > 0) {
+                errorCount.textContent = word.error_count;
+                errorInfo.style.display = 'block';
+            } else {
+                errorInfo.style.display = 'none';
+            }
+            
+            // 显示掌握度级别
+            const masteryLevel = document.getElementById('srs-mastery-level');
+            const masteryText = document.getElementById('srs-mastery-text');
+            const repetitions = word.repetitions || 0;
+            
+            let levelText = '';
+            let bgColor = '';
+            let textColor = '';
+            
+            if (repetitions === 0) {
+                levelText = '🔴 不熟悉';
+                bgColor = '#ffebee';
+                textColor = '#c62828';
+            } else if (repetitions === 1) {
+                levelText = '🟡 初学';
+                bgColor = '#fff3e0';
+                textColor = '#ef6c00';
+            } else if (repetitions <= 3) {
+                levelText = '🟠 熟悉';
+                bgColor = '#fff8e1';
+                textColor = '#f57c00';
+            } else if (repetitions <= 10) {
+                levelText = '🟢 掌握';
+                bgColor = '#e8f5e8';
+                textColor = '#2e7d32';
+            } else {
+                levelText = '🔵 精通';
+                bgColor = '#e3f2fd';
+                textColor = '#1565c0';
+            }
+            
+            masteryText.textContent = levelText;
+            masteryLevel.style.backgroundColor = bgColor;
+            masteryLevel.style.color = textColor;
+            masteryLevel.style.display = 'block';
             
             // 设置音频按钮
             if (word.audio_path_uk) {
