@@ -1,9 +1,10 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import re
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = get_database_path()
 WORDLISTS_BASE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists'
 
 def get_db_connection():

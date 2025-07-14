@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 
 def fix_content_pos():
     """修正content单词的词性"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     print("正在修正content单词的词性...")

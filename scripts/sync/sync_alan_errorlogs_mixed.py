@@ -5,6 +5,7 @@
 基于(student_id, word_id, error_type, student_answer, error_date)判断是否已存在
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 from datetime import datetime
@@ -14,7 +15,7 @@ def sync_alan_errorlogs_mixed():
     
     # 数据库文件路径
     source_db = "Alan/vocabulary_classroom.db"
-    target_db = "vocabulary.db"
+    target_db = get_database_path()
     
     # 检查源数据库是否存在
     if not os.path.exists(source_db):

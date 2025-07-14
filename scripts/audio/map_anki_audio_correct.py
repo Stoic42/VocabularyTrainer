@@ -1,3 +1,4 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 import os
@@ -67,7 +68,7 @@ def map_anki_audio_correct():
     print(f"  英音+美音: {both} 个单词")
     
     # 更新数据库
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     # 获取高中英语词汇的book_id
@@ -109,7 +110,7 @@ def map_anki_audio_correct():
     
     # 验证修复结果
     print("\n🔍 验证修复结果:")
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     cursor.execute("""

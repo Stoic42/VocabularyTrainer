@@ -1,3 +1,4 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 import os
@@ -69,7 +70,7 @@ def update_database(mapping, existing_files):
     """更新数据库中的音频路径和音标"""
     print("🔄 开始更新数据库...")
     
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     # 获取高中英语词汇的book_id
@@ -125,7 +126,7 @@ def update_database(mapping, existing_files):
                 if audio_file in existing_files:
                     # 检查是否未更新
                     # 这里假设未更新的单词就是未找到的
-                    cursor = sqlite3.connect('vocabulary.db').cursor()
+                    cursor = get_database_connection().cursor()
                     cursor.execute("""
                         SELECT word_id FROM Words WHERE spelling = ? AND list_id IN (
                             SELECT list_id FROM WordLists WHERE book_id = ?

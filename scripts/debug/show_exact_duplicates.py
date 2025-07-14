@@ -4,6 +4,7 @@
 输出Alan错题记录中所有error_date完全相同的重复记录
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 from collections import defaultdict
 

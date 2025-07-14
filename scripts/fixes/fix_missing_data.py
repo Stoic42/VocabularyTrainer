@@ -1,3 +1,4 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 import requests
@@ -62,7 +63,7 @@ def get_pronunciation_from_api(word):
 
 def fix_missing_data():
     """修复数据库中缺少音标和词性的单词"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     print("🔧 开始修复数据库中缺少音标和词性的单词")

@@ -1,9 +1,10 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import csv
 import re
 
 # 连接到数据库
-conn = sqlite3.connect('vocabulary.db')
+conn = get_database_connection()
 cursor = conn.cursor()
 
 # 删除旧的senior_high词书及其相关数据

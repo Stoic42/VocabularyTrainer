@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import hashlib
@@ -8,7 +9,7 @@ from gtts import gTTS
 import re
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = get_database_path()
 WORDLISTS_BASE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists'
 TTS_CACHE_DIR = os.path.join(WORDLISTS_BASE_DIR, 'tts_cache')
 os.makedirs(TTS_CACHE_DIR, exist_ok=True)
@@ -105,7 +106,7 @@ def fix_specific_words(words):
 
 def fix_content_word():
     """修正content单词的数据"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     print("正在修正content单词...")
@@ -142,7 +143,7 @@ def fix_content_word():
 
 def fix_forgivee_word():
     """修正forgivee单词的拼写错误"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     print("正在修正forgivee单词的拼写...")

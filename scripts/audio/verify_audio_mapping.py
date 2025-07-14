@@ -5,12 +5,13 @@
 确保每个词都能在考核时调取到正确的发音文件
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import csv
 
 # 配置
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 MEDIA_DIR = 'wordlists/senior_high/media'
 
 def get_db_connection():

@@ -1,10 +1,11 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import argparse
 import time
 
 # --- 配置区 ---
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 # 音频文件目录
 MEDIA_BASE_DIR = 'wordlists'
 # ----------------

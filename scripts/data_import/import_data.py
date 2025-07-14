@@ -1,10 +1,12 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import csv
 import os
+from utils import get_database_connection, get_database_path
 import sqlite3
 
 # --- 配置区 ---
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 # 主要数据源 (结构好，但缺音频)
 CSV_FILE_PATH = 'wordlists/junior_high/junior_high_vocab_random.csv'
 # 音频数据源 (结构乱，但有音频)

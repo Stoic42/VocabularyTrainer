@@ -1,9 +1,10 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import hashlib
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = get_database_path()
 WORDLISTS_BASE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists'
 
 def get_db_connection():
@@ -95,7 +96,8 @@ def generate_fix_script(affected_words):
     if not affected_words:
         return
     
-    script_content = '''import sqlite3
+    script_content = '''from utils import get_database_connection, get_database_path
+import sqlite3
 import os
 import hashlib
 from gtts import gTTS

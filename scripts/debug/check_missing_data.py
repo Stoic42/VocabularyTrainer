@@ -1,9 +1,10 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 
 def check_missing_data():
     """检查数据库中缺少音标和词性的单词"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     # 查询缺少音标或词性的单词

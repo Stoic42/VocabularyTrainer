@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 
@@ -9,8 +10,8 @@ def check_database_structure():
     
     # 检查当前数据库
     print("=== 当前数据库结构 ===")
-    if os.path.exists('vocabulary.db'):
-        conn = sqlite3.connect('vocabulary.db')
+    if os.path.exists(get_database_path()):
+        conn = get_database_connection()
         cursor = conn.cursor()
         
         # 获取所有表名

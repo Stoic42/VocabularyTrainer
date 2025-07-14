@@ -5,12 +5,13 @@
 验证错词优先和掌握度记录功能
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 from datetime import datetime, timedelta
 
 # 数据库文件路径
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 
 def test_srs_enhancement():
     """测试SRS增强功能"""

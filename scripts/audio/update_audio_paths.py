@@ -1,8 +1,9 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 
 # --- 配置区 ---
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 # 音频数据源 (包含[sound:xxx]标签)
 TXT_FILE_PATH = 'wordlists/junior_high/初中 乱序 绿宝书.txt'
 # 音频文件目录

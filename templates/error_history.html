@@ -2453,6 +2453,36 @@
             // 默认选中"当日错题详解模式"预设
             applyPreset('daily-detail');
         });
+        
+        // 格式化词性和意思的函数
+        function formatPOSAndMeaning(pos, meaning) {
+            if (!pos || !meaning) {
+                return { extractedPos: pos || '', formattedMeaning: meaning || '' };
+            }
+            
+            // 提取词性信息
+            const posMatch = pos.match(/^([^，。；]*?)(?=[，。；]|$)/);
+            const extractedPos = posMatch ? posMatch[1].trim() : pos;
+            
+            // 格式化意思，将词性信息用斜体显示
+            let formattedMeaning = meaning;
+            if (extractedPos && extractedPos !== pos) {
+                // 如果提取的词性与原始词性不同，说明有多个词性
+                const posParts = pos.split(/[，。；]/);
+                formattedMeaning = posParts.map((part, index) => {
+                    if (index === 0) {
+                        return `<em style="color: #007bff; font-weight: bold;">${part.trim()}</em>`;
+                    } else {
+                        return part.trim();
+                    }
+                }).join(' / '); // 使用斜杠分隔，避免换行
+            } else {
+                // 单个词性
+                formattedMeaning = `<em style="color: #007bff; font-weight: bold;">${extractedPos}</em> ${meaning}`;
+            }
+            
+            return { extractedPos, formattedMeaning };
+        }
     </script>
     <!-- 导出对话框 -->
     <div id="export-modal" class="modal-overlay">

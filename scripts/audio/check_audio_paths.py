@@ -1,8 +1,9 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 
 # 连接到数据库
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = get_database_path()
 TTS_CACHE_DIR = 'd:\\Projects\\VocabularyTrainer\\wordlists\\tts_cache'
 
 def get_db_connection():
@@ -102,7 +103,7 @@ def main():
         print(f"{i+1}. {word['spelling']} - 英音: {'有' if word['audio_path_uk'] else '无'}")
 
 def check_audio_paths():
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     # 检查高中词书的音频路径

@@ -1,9 +1,10 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 
 def analyze_missing_data():
     """详细分析数据库中缺少音标和词性的单词"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     print("🔍 详细分析数据库中缺少音标和词性的单词")

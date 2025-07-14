@@ -4,6 +4,7 @@
 基于error_id增量同步Alan的错词记录从vocabulary_classroom.db到vocabulary.db
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 from datetime import datetime
@@ -13,7 +14,7 @@ def sync_alan_errorlogs_by_id():
     
     # 数据库文件路径
     source_db = "Alan/vocabulary_classroom.db"
-    target_db = "vocabulary.db"
+    target_db = get_database_path()
     
     # 检查源数据库是否存在
     if not os.path.exists(source_db):

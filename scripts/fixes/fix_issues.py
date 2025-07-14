@@ -7,12 +7,13 @@
 3. 修复 shall 单词的中文释义
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import re
 
 # 配置
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 SENIOR_HIGH_TXT = 'wordlists/senior_high/Senior_high.txt'
 MEDIA_DIR = 'wordlists/senior_high/media'
 

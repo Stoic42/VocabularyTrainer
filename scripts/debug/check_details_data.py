@@ -1,7 +1,8 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 
 def check_details_data():
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     # 检查总单词数和有详细信息的单词数

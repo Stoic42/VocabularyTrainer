@@ -4,12 +4,13 @@
 从Anki文件中提取IPA信息并更新数据库
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 import os
 
 # 配置
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 SENIOR_HIGH_ANKI_FILE = 'wordlists/senior_high/高中 乱序 绿宝书.txt'
 JUNIOR_HIGH_ANKI_FILE = 'wordlists/junior_high/初中 乱序 绿宝书.txt'
 

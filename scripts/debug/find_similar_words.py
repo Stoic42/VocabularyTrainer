@@ -1,8 +1,9 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 
 def find_similar_words():
     """查找类似'shall'的单词（缺少音标和词性）"""
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     print("🔍 查找类似'shall'的单词（缺少音标和词性）")

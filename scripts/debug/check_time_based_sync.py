@@ -4,6 +4,7 @@
 基于时间记录详细排查增量同步情况
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 from collections import defaultdict
 
@@ -11,7 +12,7 @@ def check_time_based_sync():
     """基于时间记录详细排查"""
     
     source_db = "Alan/vocabulary_classroom.db"
-    target_db = "vocabulary.db"
+    target_db = get_database_path()
     
     try:
         source_conn = sqlite3.connect(source_db)

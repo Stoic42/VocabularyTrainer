@@ -1,3 +1,4 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 
@@ -5,7 +6,7 @@ def get_db_connection():
     # 获取当前脚本所在目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
     # 构建数据库文件的路径
-    db_path = os.path.join(current_dir, 'vocabulary.db')
+    db_path = os.path.join(current_dir, get_database_path())
     # 连接到SQLite数据库
     conn = sqlite3.connect(db_path)
     # 设置行工厂为字典，这样查询结果会以字典形式返回

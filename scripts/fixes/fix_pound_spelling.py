@@ -5,11 +5,12 @@
 将"poun"改为"pound"
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 
 # 配置
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 
 def fix_pound_spelling():
     """修复数据库中"poun"的拼写错误"""

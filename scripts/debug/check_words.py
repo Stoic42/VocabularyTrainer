@@ -1,7 +1,8 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 
 # 数据库文件路径
-DATABASE_FILE = 'd:\\Projects\\VocabularyTrainer\\vocabulary.db'
+DATABASE_FILE = get_database_path()
 
 def get_db_connection():
     """创建数据库连接"""

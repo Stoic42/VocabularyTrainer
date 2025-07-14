@@ -4,6 +4,7 @@
 调试Alan错词记录同步问题
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 
@@ -11,7 +12,7 @@ def debug_sync():
     """调试同步问题"""
     
     source_db = "Alan/vocabulary_classroom.db"
-    target_db = "vocabulary.db"
+    target_db = get_database_path()
     
     try:
         source_conn = sqlite3.connect(source_db)

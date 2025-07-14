@@ -4,6 +4,7 @@
 清理错误同步的记录，然后只同步2025-07-08缺失的70条记录
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 from datetime import datetime
@@ -13,7 +14,7 @@ def cleanup_and_sync_70():
     
     # 数据库文件路径
     source_db = "Alan/vocabulary_classroom.db"
-    target_db = "vocabulary.db"
+    target_db = get_database_path()
     
     try:
         # 连接数据库

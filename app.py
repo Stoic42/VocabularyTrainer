@@ -1277,7 +1277,7 @@ def export_pdf():
 # --- 提供JS修复脚本 ---
 @app.route('/fix_mess_display_new.js')
 def get_fix_mess_display_new_js():
-    return send_from_directory('.', 'fix_mess_display_new.js')
+    return send_from_directory('scripts/fixes', 'fix_mess_display_new.js')
 
 # --- SRS (Spaced Repetition System) API Endpoints ---
 

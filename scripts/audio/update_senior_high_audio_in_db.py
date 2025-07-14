@@ -5,6 +5,7 @@
 确保每个词都能在考核时调取到正确的发音文件
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import re
@@ -12,7 +13,7 @@ import csv
 from pathlib import Path
 
 # 配置
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 SENIOR_HIGH_TXT = 'wordlists/senior_high/Senior_high.txt'
 SENIOR_HIGH_CSV = 'wordlists/senior_high/senior_high_complete.csv'
 MEDIA_DIR = 'wordlists/senior_high/media'

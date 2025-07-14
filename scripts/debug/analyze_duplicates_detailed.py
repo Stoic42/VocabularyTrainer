@@ -4,6 +4,7 @@
 详细分析2025-07-08的70条"重复"记录
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 from collections import defaultdict
 
@@ -11,7 +12,7 @@ def analyze_duplicates_detailed():
     """详细分析重复记录"""
     
     source_db = "Alan/vocabulary_classroom.db"
-    target_db = "vocabulary.db"
+    target_db = get_database_path()
     
     try:
         source_conn = sqlite3.connect(source_db)

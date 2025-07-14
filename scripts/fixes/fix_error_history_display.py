@@ -5,10 +5,11 @@
 更新ErrorLogs表中关联的Words数据，确保错误历史显示正确的单词信息
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 
 def get_db_connection():
     """创建数据库连接"""

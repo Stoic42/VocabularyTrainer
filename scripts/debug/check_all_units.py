@@ -1,7 +1,8 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 
 # 连接到数据库
-conn = sqlite3.connect('vocabulary.db')
+conn = get_database_connection()
 cursor = conn.cursor()
 
 # 获取senior_high词书的ID

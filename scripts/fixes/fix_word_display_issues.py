@@ -8,10 +8,11 @@
 4. 处理重复记录
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 
 def get_db_connection():
     """创建数据库连接"""

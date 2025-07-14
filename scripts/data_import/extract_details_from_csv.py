@@ -4,13 +4,14 @@
 从CSV文件中提取详细信息并填充到数据库
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import csv
 import os
 import re
 
 # 配置
-DATABASE_FILE = 'vocabulary.db'
+DATABASE_FILE = get_database_path()
 CSV_FILES = {
     'junior_high': 'wordlists/junior_high/junior_high_vocab_random.csv',
     'senior_high': 'wordlists/senior_high/senior_high_complete.csv'

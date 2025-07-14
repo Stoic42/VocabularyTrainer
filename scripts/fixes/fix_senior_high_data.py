@@ -6,6 +6,7 @@
 保持word_id不变，避免影响用户错误记录
 """
 
+from utils import get_database_connection, get_database_path
 import sqlite3
 import re
 import os
@@ -13,7 +14,7 @@ from typing import Dict, List, Tuple, Optional
 
 def connect_db():
     """连接数据库"""
-    return sqlite3.connect('vocabulary.db')
+    return get_database_connection()
 
 def extract_pos_and_meaning(text: str) -> Tuple[str, str]:
     """

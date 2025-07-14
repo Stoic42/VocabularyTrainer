@@ -1,3 +1,4 @@
+from utils import get_database_connection, get_database_path
 import sqlite3
 import os
 import re
@@ -9,7 +10,7 @@ def strip_prefix(path):
     return os.path.basename(path)
 
 def fix_audio_paths():
-    conn = sqlite3.connect('vocabulary.db')
+    conn = get_database_connection()
     cursor = conn.cursor()
 
     # 获取所有词书
