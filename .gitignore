@@ -62,3 +62,7 @@ LumiCamp_for_Alan/logs/
 product_manager/.obsidian/
 
 Alan/*.*
+
+# 忽略部署包
+deployment_packages/
+*.zip
