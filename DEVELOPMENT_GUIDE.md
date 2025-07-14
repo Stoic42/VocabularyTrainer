@@ -5,7 +5,7 @@
 本项目包含两个主要部分：
 
 1. **主程序**：位于根目录 (`d:/Projects/VocabularyTrainer/`)，包含最新的开发代码和功能。
-2. **Alan定制版**：位于 `LumiCamp_for_Alan/` 子目录，是为特定用户定制的版本。
+2. **Alan定制版**：位于 `d:/Projects/LumiCamp_for_Alan/` 子目录，是为特定用户定制的版本。
 
 ## 开发原则
 

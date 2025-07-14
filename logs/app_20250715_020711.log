@@ -1,0 +1,3 @@
+2025-07-15 02:07:11,055 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:92]
+2025-07-15 02:07:17,239 INFO: SRS复习单词获取: 用户ID=1, 错词数=4, 总单词数=4 [in D:\Projects\VocabularyTrainer\app.py:1516]
+2025-07-15 02:07:58,647 INFO: SRS复习单词获取: 用户ID=1, 错词数=4, 总单词数=4 [in D:\Projects\VocabularyTrainer\app.py:1516]

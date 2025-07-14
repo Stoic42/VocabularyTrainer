@@ -1279,6 +1279,14 @@ def export_pdf():
 def get_fix_mess_display_new_js():
     return send_from_directory('scripts/fixes', 'fix_mess_display_new.js')
 
+@app.route('/fix_content_display.js')
+def get_fix_content_display_js():
+    return send_from_directory('scripts/fixes', 'fix_content_display.js')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('.', 'favicon.ico')
+
 # --- SRS (Spaced Repetition System) API Endpoints ---
 
 # 新增：SRS验证池管理

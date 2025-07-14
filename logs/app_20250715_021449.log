@@ -1,0 +1,1 @@
+2025-07-15 02:16:40,488 INFO: 获取错误历史记录: student_id=1, limit=500, book_id=None, list_id=None, date_from=2025-06-14, date_to=2025-07-14, sort_by=error_count, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:636]

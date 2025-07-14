@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Lumi Vocabulary Trainer</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -2239,6 +2240,9 @@
                 srsReviewArea.style.display = 'none';
                 srsMasteryContainer.style.display = 'none';
                 quizArea.style.display = 'none';
+                
+                // 显示start-btn
+                startBtn.style.display = 'inline-block';
             } else if (selectedMode === 'error_clear') {
                 // 错词清零模式：显示错词统计容器并隐藏数量选择器
                 errorStatsContainer.style.display = 'block';
@@ -2250,6 +2254,9 @@
                 srsReviewArea.style.display = 'none';
                 srsMasteryContainer.style.display = 'none';
                 quizArea.style.display = 'none';
+                
+                // 显示start-btn
+                startBtn.style.display = 'inline-block';
                 
                 // 显示错词清零模式特殊提示
                 setTimeout(() => {
@@ -2277,12 +2284,17 @@
                     }
                 }, 100); // 延迟一点确保错词统计已加载
             } else if (selectedMode === 'srs_review') {
-                // SRS复习模式：显示SRS复习区域和掌握度容器，隐藏其他区域
-                srsReviewArea.style.display = 'block';
+                // SRS复习模式：显示SRS掌握度容器，隐藏其他区域
                 srsMasteryContainer.style.display = 'block';
                 errorStatsContainer.style.display = 'none';
                 quizArea.style.display = 'none';
                 countSelectContainer.style.display = 'none';
+                
+                // 显示start-btn，保持与其他模式一致
+                startBtn.style.display = 'inline-block';
+                
+                // 隐藏SRS复习区域，等待用户点击开始后显示
+                srsReviewArea.style.display = 'none';
                 
                 // 检查用户是否已登录
                 if (!currentUser) {
@@ -2291,9 +2303,8 @@
                     return;
                 }
                 
-                // 加载SRS掌握度信息和待复习单词统计
+                // 加载SRS掌握度信息
                 loadSRSMastery();
-                loadSRSDueWords();
             } else {
                 // 其他模式：隐藏错词统计容器和SRS相关容器，显示数量选择器
                 errorStatsContainer.style.display = 'none';
@@ -2301,6 +2312,9 @@
                 countSelectContainer.style.display = 'block';
                 srsReviewArea.style.display = 'none';
                 quizArea.style.display = 'none';
+                
+                // 显示start-btn
+                startBtn.style.display = 'inline-block';
             }
         });
 
@@ -3002,6 +3016,12 @@
                 alert('请先选择一个单词列表！');
                 return;
             }
+            
+            // SRS模式下的特殊处理
+            if (selectedMode === 'srs_review') {
+                await handleSRSStart();
+                return;
+            }
 
             // 错词复习模式和错词清零模式特殊处理
             if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
@@ -3157,7 +3177,8 @@
             document.querySelector('.list-selector').style.display = 'flex';
             startBtn.style.display = 'inline-block';
             document.querySelector('a.btn').style.display = 'inline-flex';
-            document.getElementById('error-stats-container').style.display = 'block';
+            document.getElementById('error-stats-container').style.display = 'none';
+            document.getElementById('srs-mastery-container').style.display = 'none';
             document.querySelector('.lumi-toggle-container').style.display = 'flex';
             document.querySelector('.auto-play-container').style.display = 'flex';
             document.querySelector('.feedback-container').style.display = 'flex';
@@ -3619,6 +3640,33 @@
             document.getElementById('srs-results-container').style.display = 'block';
         }
         
+        // SRS开始处理函数
+        async function handleSRSStart() {
+            const wordLimit = parseInt(document.getElementById('srs-word-limit').value);
+            srsReviewData.wordLimit = wordLimit;
+            
+            const hasWords = await loadSRSDueWords();
+            if (hasWords) {
+                // 隐藏所有不相干的div，就像其他学习模式一样
+                document.querySelector('.list-selector').style.display = 'none';
+                document.getElementById('start-btn').style.display = 'none';
+                document.querySelector('a.btn').style.display = 'none';
+                document.getElementById('error-stats-container').style.display = 'none';
+                document.getElementById('srs-mastery-container').style.display = 'none';
+                document.querySelector('.lumi-toggle-container').style.display = 'none';
+                document.querySelector('.auto-play-container').style.display = 'none';
+                document.querySelector('.feedback-container').style.display = 'none';
+                
+                // 显示SRS复习区域
+                document.getElementById('srs-review-area').style.display = 'block';
+                
+                // 开始SRS复习
+                startSRSReview();
+            } else {
+                alert('没有需要复习的单词！');
+            }
+        }
+        
         function resetSRSReview() {
             srsReviewData.isActive = false;
             srsReviewData.dueWords = [];
@@ -3638,24 +3686,13 @@
         
         // SRS复习按钮事件
         document.getElementById('srs-review-btn').addEventListener('click', async () => {
-            // 切换到SRS复习模式
-            const studyModeSelect = document.getElementById('study-mode');
-            studyModeSelect.value = 'srs_review';
-            
-            // 触发学习模式变化事件
-            const event = new Event('change');
-            studyModeSelect.dispatchEvent(event);
+            // 直接进入SRS复习流程
+            await handleSRSStart();
         });
         
         // SRS复习相关事件监听
         document.getElementById('srs-start-btn').addEventListener('click', async () => {
-            const wordLimit = parseInt(document.getElementById('srs-word-limit').value);
-            srsReviewData.wordLimit = wordLimit;
-            
-            const hasWords = await loadSRSDueWords();
-            if (hasWords) {
-                startSRSReview();
-            }
+            await handleSRSStart();
         });
         
         // SRS评分按钮事件
@@ -3678,6 +3715,8 @@
         document.getElementById('srs-back-home-btn').addEventListener('click', () => {
             resetSRSReview();
             resetQuizState();
+            // 确保SRS复习区域被隐藏
+            document.getElementById('srs-review-area').style.display = 'none';
         });
         
         // SRS复习控制按钮事件
@@ -3685,12 +3724,16 @@
             if (confirm('确定要返回主页吗？当前复习进度将丢失。')) {
                 resetSRSReview();
                 resetQuizState();
+                // 确保SRS复习区域被隐藏
+                document.getElementById('srs-review-area').style.display = 'none';
             }
         });
         
         document.getElementById('srs-exit-review-btn').addEventListener('click', () => {
             if (confirm('确定要退出SRS复习吗？当前复习进度将丢失。')) {
                 resetSRSReview();
+                // 确保SRS复习区域被隐藏
+                document.getElementById('srs-review-area').style.display = 'none';
             }
         });
         
@@ -3708,5 +3751,48 @@
     </script>
     <script src="/fix_mess_display_new.js"></script>
     <script src="/fix_content_display.js"></script>
+    
+    <!-- Console error filtering script -->
+    <script>
+        // Filter out external console errors to reduce noise
+        (function() {
+            const originalConsoleError = console.error;
+            const originalConsoleLog = console.log;
+            
+            // List of external scripts to filter out
+            const externalScripts = [
+                'enable_copy.js',
+                'FloatingAssistant',
+                'X3YWCIQX.js',
+                'mixpanel',
+                'api-js.mixpanel.com'
+            ];
+            
+            console.error = function(...args) {
+                const message = args.join(' ');
+                const shouldFilter = externalScripts.some(script => 
+                    message.includes(script)
+                );
+                
+                if (!shouldFilter) {
+                    originalConsoleError.apply(console, args);
+                }
+            };
+            
+            console.log = function(...args) {
+                const message = args.join(' ');
+                const shouldFilter = externalScripts.some(script => 
+                    message.includes(script)
+                );
+                
+                if (!shouldFilter) {
+                    originalConsoleLog.apply(console, args);
+                }
+            };
+            
+            // Add a note about filtered messages
+            console.log('🔧 Console filtering active - external errors hidden');
+        })();
+    </script>
 </body>
 </html>
