@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-增量同步Alan的错词记录从vocabulary_classroom.db到vocabulary.db
+最终版本：增量同步Alan的错词记录从vocabulary_classroom.db到vocabulary.db
+基于(student_id, word_id, error_type, student_answer, error_date)判断是否已存在
 """
 
 import sqlite3
 import os
 from datetime import datetime
 
-def sync_alan_errorlogs():
+def sync_alan_errorlogs_final():
     """增量同步Alan的错词记录"""
     
     # 数据库文件路径
@@ -43,15 +44,15 @@ def sync_alan_errorlogs():
         alan_id = alan_id[0]
         print(f"Alan的用户ID: {alan_id}")
         
-        # 获取目标数据库中已存在的错词记录的唯一标识
+        # 获取目标数据库中已存在的记录的唯一标识
         target_cursor.execute("""
-            SELECT word_id, error_type, student_answer, error_date
+            SELECT student_id, word_id, error_type, student_answer, error_date
             FROM ErrorLogs 
             WHERE student_id = ?
         """, (alan_id,))
         
         existing_records = set(target_cursor.fetchall())
-        print(f"目标数据库中已存在的错词记录数量: {len(existing_records)}")
+        print(f"目标数据库中已存在的记录数: {len(existing_records)}")
         
         # 获取源数据库中所有的错词记录
         source_cursor.execute("""
@@ -71,17 +72,20 @@ def sync_alan_errorlogs():
         for record in all_source_records:
             error_id, student_id, word_id, error_type, student_answer, error_date = record
             
-            # 检查是否已存在相同的记录（基于word_id, error_type, student_answer, error_date）
-            record_key = (word_id, error_type, student_answer, error_date)
+            # 检查是否已存在相同的记录（基于除error_id外的所有字段）
+            record_key = (student_id, word_id, error_type, student_answer, error_date)
             
             if record_key not in existing_records:
-                # 插入新记录
+                # 插入新记录（不指定error_id，让数据库自动生成）
                 target_cursor.execute("""
                     INSERT INTO ErrorLogs (student_id, word_id, error_type, student_answer, error_date)
                     VALUES (?, ?, ?, ?, ?)
                 """, (student_id, word_id, error_type, student_answer, error_date))
                 synced_count += 1
-                print(f"同步记录: {error_date} - {error_type}")
+                if synced_count <= 10:  # 只显示前10条，避免输出过多
+                    print(f"同步记录: {error_date} - {error_type} - '{student_answer}'")
+                elif synced_count == 11:
+                    print("... (更多记录正在同步)")
             else:
                 skipped_count += 1
         
@@ -90,7 +94,7 @@ def sync_alan_errorlogs():
         
         print(f"\n同步完成:")
         print(f"- 成功同步: {synced_count} 条记录")
-        print(f"- 跳过重复: {skipped_count} 条记录")
+        print(f"- 跳过已存在: {skipped_count} 条记录")
         print(f"- 总计处理: {len(all_source_records)} 条记录")
         
         # 验证同步结果
@@ -101,11 +105,14 @@ def sync_alan_errorlogs():
         # 检查是否完全同步
         if final_count == len(all_source_records):
             print("✅ 同步成功！所有记录都已同步")
-    else:
+        else:
             print(f"⚠️  同步可能不完整，目标数据库记录数({final_count})与源数据库记录数({len(all_source_records)})不一致")
+            print("注意：这可能是因为源数据库中有重复记录，目标数据库只保留了一份")
         
     except Exception as e:
         print(f"同步过程中发生错误: {e}")
+        import traceback
+        traceback.print_exc()
         if 'target_conn' in locals():
             target_conn.rollback()
     finally:
@@ -119,7 +126,7 @@ if __name__ == "__main__":
     print(f"当前时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("-" * 50)
     
-    sync_alan_errorlogs()
+    sync_alan_errorlogs_final()
     
     print("-" * 50)
     print("同步完成！") 

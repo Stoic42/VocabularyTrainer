@@ -56,35 +56,37 @@ def setup_logger(app):
     for handler in app.logger.handlers[:]:
         app.logger.removeHandler(handler)
     
+    # 使用更安全的日志配置，避免文件权限冲突
     try:
-        # 使用更安全的日志配置
-        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=5, delay=True)
+        # 使用带时间戳的日志文件名，避免多进程冲突
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_filename = f'logs/app_{timestamp}.log'
+        
+        file_handler = RotatingFileHandler(log_filename, maxBytes=10240, backupCount=3, delay=True)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
         ))
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
-    except (PermissionError, OSError) as e:
-        # 如果无法访问日志文件，使用带时间戳的新文件名
-        import datetime
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        try:
-            file_handler = RotatingFileHandler(f'logs/app_{timestamp}.log', maxBytes=10240, backupCount=5, delay=True)
-            file_handler.setFormatter(logging.Formatter(
-                '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-            ))
-            file_handler.setLevel(logging.INFO)
-            app.logger.addHandler(file_handler)
-            print(f"警告: 无法访问原始日志文件。已创建新的日志文件: app_{timestamp}.log")
-        except Exception as fallback_error:
-            # 如果连备用日志文件也无法创建，使用控制台日志
-            console_handler = logging.StreamHandler()
-            console_handler.setFormatter(logging.Formatter(
-                '%(asctime)s %(levelname)s: %(message)s'
-            ))
-            console_handler.setLevel(logging.INFO)
-            app.logger.addHandler(console_handler)
-            print(f"警告: 无法创建任何日志文件，将使用控制台日志。错误: {fallback_error}")
+        
+        # 同时添加控制台处理器
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s'
+        ))
+        console_handler.setLevel(logging.INFO)
+        app.logger.addHandler(console_handler)
+        
+    except Exception as e:
+        # 如果文件日志失败，只使用控制台日志
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s'
+        ))
+        console_handler.setLevel(logging.INFO)
+        app.logger.addHandler(console_handler)
+        print(f"警告: 无法创建日志文件，将使用控制台日志。错误: {e}")
     
     app.logger.setLevel(logging.INFO)
     app.logger.info('应用启动')
@@ -1263,6 +1265,103 @@ def get_fix_mess_display_new_js():
 
 # --- SRS (Spaced Repetition System) API Endpoints ---
 
+# 新增：SRS验证池管理
+def add_to_verification_pool(student_id, word_id, claimed_grade):
+    """将高评分单词添加到验证池"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 创建验证池表（如果不存在）
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS SRSVerificationPool (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER NOT NULL,
+                word_id INTEGER NOT NULL,
+                claimed_grade INTEGER NOT NULL,
+                added_date DATE DEFAULT (date('now')),
+                verification_date DATE,
+                verification_result TEXT,
+                FOREIGN KEY (student_id) REFERENCES Users (id),
+                FOREIGN KEY (word_id) REFERENCES Words (word_id)
+            )
+        """)
+        
+        # 检查是否已在验证池中
+        cursor.execute("""
+            SELECT id FROM SRSVerificationPool 
+            WHERE student_id = ? AND word_id = ? AND verification_date IS NULL
+        """, (student_id, word_id))
+        
+        if not cursor.fetchone():
+            # 添加到验证池
+            cursor.execute("""
+                INSERT INTO SRSVerificationPool (student_id, word_id, claimed_grade)
+                VALUES (?, ?, ?)
+            """, (student_id, word_id, claimed_grade))
+            
+            app.logger.info(f"单词添加到验证池: student_id={student_id}, word_id={word_id}, claimed_grade={claimed_grade}")
+        
+        conn.commit()
+        conn.close()
+        
+    except Exception as e:
+        app.logger.error(f"添加验证池失败: {e}")
+
+def get_verification_candidates(student_id, limit=5):
+    """获取需要验证的单词候选"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 获取验证池中的单词
+        cursor.execute("""
+            SELECT vp.word_id, vp.claimed_grade, w.spelling, w.meaning_cn
+            FROM SRSVerificationPool vp
+            JOIN Words w ON vp.word_id = w.word_id
+            WHERE vp.student_id = ? AND vp.verification_date IS NULL
+            ORDER BY vp.added_date ASC
+            LIMIT ?
+        """, (student_id, limit))
+        
+        candidates = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        return candidates
+        
+    except Exception as e:
+        app.logger.error(f"获取验证候选失败: {e}")
+        return []
+
+def record_verification_result(student_id, word_id, verification_result, actual_grade=None):
+    """记录验证结果"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 更新验证结果
+        cursor.execute("""
+            UPDATE SRSVerificationPool 
+            SET verification_date = date('now'), verification_result = ?
+            WHERE student_id = ? AND word_id = ? AND verification_date IS NULL
+        """, (verification_result, student_id, word_id))
+        
+        # 如果验证失败，重置SRS进度
+        if verification_result == 'failed' and actual_grade is not None:
+            cursor.execute("""
+                UPDATE StudentWordProgress 
+                SET repetitions = 0, interval = 1, next_review_date = date('now')
+                WHERE student_id = ? AND word_id = ?
+            """, (student_id, word_id))
+            
+            app.logger.info(f"验证失败，重置SRS进度: student_id={student_id}, word_id={word_id}")
+        
+        conn.commit()
+        conn.close()
+        
+    except Exception as e:
+        app.logger.error(f"记录验证结果失败: {e}")
+
 @app.route('/api/srs/progress', methods=['GET'])
 def get_srs_progress():
     """获取用户的SRS学习进度"""
@@ -1372,18 +1471,39 @@ def update_srs_progress():
     """更新单词的SRS进度"""
     try:
         student_id = session.get('user_id', -1)
+        app.logger.info(f"更新SRS进度请求: student_id={student_id}")
+        
         if student_id == -1:
+            app.logger.warning("未登录用户尝试更新SRS进度")
             return jsonify({'error': '请先登录'}), 401
         
         data = request.get_json()
+        if not data:
+            app.logger.error("请求数据为空")
+            return jsonify({'error': '请求数据为空'}), 400
+            
         word_id = data.get('word_id')
         grade = data.get('grade', 3)  # 0-5的评分
         
+        app.logger.info(f"更新SRS进度参数: word_id={word_id}, grade={grade}")
+        
         if not word_id:
+            app.logger.error("缺少单词ID")
             return jsonify({'error': '缺少单词ID'}), 400
+        
+        if not isinstance(grade, int) or grade < 1 or grade > 5:
+            app.logger.error(f"无效的评分: {grade}")
+            return jsonify({'error': '评分必须在1-5之间'}), 400
         
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        # 验证单词是否存在
+        cursor.execute("SELECT word_id FROM Words WHERE word_id = ?", (word_id,))
+        if not cursor.fetchone():
+            app.logger.error(f"单词不存在: word_id={word_id}")
+            conn.close()
+            return jsonify({'error': '单词不存在'}), 404
         
         # 获取当前进度
         cursor.execute("""
@@ -1397,11 +1517,16 @@ def update_srs_progress():
             # 创建新进度记录
             repetitions = 0
             interval = 1
+            app.logger.info(f"创建新的SRS进度记录: student_id={student_id}, word_id={word_id}")
         else:
             repetitions = progress[0] or 0
             interval = progress[1] or 1
+            app.logger.info(f"更新现有SRS进度: student_id={student_id}, word_id={word_id}, 当前repetitions={repetitions}, interval={interval}")
         
         # 根据评分更新间隔（简化的SuperMemo算法）
+        old_repetitions = repetitions
+        old_interval = interval
+        
         if grade >= 3:  # 记得
             repetitions += 1
             if repetitions == 1:
@@ -1421,6 +1546,8 @@ def update_srs_progress():
         from datetime import datetime, timedelta
         next_review_date = (datetime.now() + timedelta(days=interval)).strftime('%Y-%m-%d')
         
+        app.logger.info(f"SRS算法更新: grade={grade}, repetitions: {old_repetitions}->{repetitions}, interval: {old_interval}->{interval}, next_review={next_review_date}")
+        
         # 更新或插入进度
         cursor.execute("""
             INSERT OR REPLACE INTO StudentWordProgress 
@@ -1431,16 +1558,24 @@ def update_srs_progress():
         conn.commit()
         conn.close()
         
+        # 方案A: 抽查校准机制 - 如果学生评为高分数，添加到验证池
+        if grade >= 4:  # 评为4-5分的单词需要验证
+            add_to_verification_pool(student_id, word_id, grade)
+            app.logger.info(f"高评分单词已添加到验证池: word_id={word_id}, grade={grade}")
+        
+        app.logger.info(f"SRS进度更新成功: student_id={student_id}, word_id={word_id}")
+        
         return jsonify({
             'message': '进度更新成功',
             'new_interval': interval,
             'new_repetitions': repetitions,
-            'next_review_date': next_review_date
+            'next_review_date': next_review_date,
+            'needs_verification': grade >= 4  # 告知前端是否需要验证
         })
         
     except Exception as e:
-        app.logger.error(f"更新SRS进度时出错: {e}")
-        return jsonify({'error': '更新进度失败'}), 500
+        app.logger.error(f"更新SRS进度时出错: {e}", exc_info=True)
+        return jsonify({'error': f'更新进度失败: {str(e)}'}), 500
 
 @app.route('/api/srs/mastery-stats', methods=['GET'])
 def get_mastery_stats():
@@ -1510,6 +1645,154 @@ def get_mastery_stats():
     except Exception as e:
         app.logger.error(f"获取掌握度统计时出错: {e}")
         return jsonify({'error': '获取掌握度统计失败'}), 500
+
+# 新增：SRS验证测试API
+@app.route('/api/srs/verification-test', methods=['GET'])
+def get_verification_test():
+    """获取SRS验证测试"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        # 获取验证候选
+        candidates = get_verification_candidates(student_id, limit=3)
+        
+        if not candidates:
+            return jsonify({'message': '没有需要验证的单词'}), 200
+        
+        # 随机选择一个进行验证
+        import random
+        test_word = random.choice(candidates)
+        
+        return jsonify({
+            'verification_test': {
+                'word_id': test_word['word_id'],
+                'meaning': test_word['meaning_cn'],
+                'claimed_grade': test_word['claimed_grade'],
+                'test_type': 'spelling'  # 拼写测试
+            }
+        })
+        
+    except Exception as e:
+        app.logger.error(f"获取验证测试失败: {e}")
+        return jsonify({'error': '获取验证测试失败'}), 500
+
+@app.route('/api/srs/submit-verification', methods=['POST'])
+def submit_verification():
+    """提交验证测试结果"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        data = request.get_json()
+        word_id = data.get('word_id')
+        user_answer = data.get('answer', '').strip()
+        
+        if not word_id:
+            return jsonify({'error': '缺少单词ID'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 获取正确拼写
+        cursor.execute("SELECT spelling FROM Words WHERE word_id = ?", (word_id,))
+        word = cursor.fetchone()
+        
+        if not word:
+            conn.close()
+            return jsonify({'error': '单词不存在'}), 404
+        
+        correct_spelling = word['spelling']
+        valid_spellings = [s.strip().lower() for s in correct_spelling.split('/')]
+        
+        # 处理逗号分隔的拼写变体
+        expanded_spellings = []
+        for spelling in valid_spellings:
+            if ',' in spelling:
+                comma_variants = [v.strip().lower() for v in spelling.split(',')]
+                expanded_spellings.extend(comma_variants)
+            else:
+                expanded_spellings.append(spelling)
+        
+        valid_spellings = expanded_spellings
+        
+        # 判断答案是否正确
+        is_correct = user_answer.lower() in valid_spellings
+        
+        # 记录验证结果
+        verification_result = 'passed' if is_correct else 'failed'
+        record_verification_result(student_id, word_id, verification_result)
+        
+        conn.close()
+        
+        app.logger.info(f"验证测试结果: student_id={student_id}, word_id={word_id}, result={verification_result}")
+        
+        return jsonify({
+            'message': '验证完成',
+            'is_correct': is_correct,
+            'correct_spelling': correct_spelling,
+            'verification_result': verification_result
+        })
+        
+    except Exception as e:
+        app.logger.error(f"提交验证失败: {e}")
+        return jsonify({'error': '提交验证失败'}), 500
+
+@app.route('/api/srs/verification-stats', methods=['GET'])
+def get_verification_stats():
+    """获取验证统计信息（方案D：透明化报表）"""
+    try:
+        student_id = session.get('user_id', -1)
+        if student_id == -1:
+            return jsonify({'error': '请先登录'}), 401
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 获取验证统计
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total_verifications,
+                COUNT(CASE WHEN verification_result = 'passed' THEN 1 END) as passed_count,
+                COUNT(CASE WHEN verification_result = 'failed' THEN 1 END) as failed_count,
+                AVG(claimed_grade) as avg_claimed_grade
+            FROM SRSVerificationPool 
+            WHERE student_id = ? AND verification_date IS NOT NULL
+        """, (student_id,))
+        
+        stats = cursor.fetchone()
+        
+        # 获取最近的验证记录
+        cursor.execute("""
+            SELECT vp.word_id, vp.claimed_grade, vp.verification_result, vp.verification_date,
+                   w.spelling, w.meaning_cn
+            FROM SRSVerificationPool vp
+            JOIN Words w ON vp.word_id = w.word_id
+            WHERE vp.student_id = ? AND vp.verification_date IS NOT NULL
+            ORDER BY vp.verification_date DESC
+            LIMIT 20
+        """, (student_id,))
+        
+        recent_verifications = [dict(row) for row in cursor.fetchall()]
+        
+        conn.close()
+        
+        return jsonify({
+            'stats': {
+                'total_verifications': stats[0] or 0,
+                'passed_count': stats[1] or 0,
+                'failed_count': stats[2] or 0,
+                'avg_claimed_grade': round(stats[3] or 0, 1),
+                'honesty_rate': round((stats[1] or 0) / max(stats[0] or 1, 1) * 100, 1)
+            },
+            'recent_verifications': recent_verifications
+        })
+        
+    except Exception as e:
+        app.logger.error(f"获取验证统计失败: {e}")
+        return jsonify({'error': '获取验证统计失败'}), 500
 
 # --- 启动命令 ---
 if __name__ == '__main__':

@@ -1,0 +1,5 @@
+2025-07-14 23:38:41,505 INFO: 应用启动 [in D:\Projects\VocabularyTrainer\app.py:92]
+2025-07-14 23:38:42,710 INFO: 获取错误历史记录: student_id=3, limit=500, book_id=None, list_id=None, date_from=2025-06-14, date_to=2025-07-14, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:620]
+2025-07-14 23:38:43,292 INFO: 获取错误历史记录: student_id=3, limit=500, book_id=None, list_id=None, date_from=2025-06-14, date_to=2025-07-14, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:620]
+2025-07-14 23:38:47,556 INFO: 获取错误历史记录: student_id=3, limit=500, book_id=None, list_id=None, date_from=2025-06-14, date_to=2025-07-14, sort_by=error_count, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:620]
+2025-07-14 23:39:22,579 INFO: 获取错误历史记录: student_id=3, limit=500, book_id=None, list_id=None, date_from=2025-06-14, date_to=2025-07-14, sort_by=error_date, sort_order=desc [in D:\Projects\VocabularyTrainer\app.py:620]
