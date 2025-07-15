@@ -43,4 +43,26 @@
 - 后端：Python + Flask
 - 数据库：SQLite
 - 前端：HTML, CSS, JavaScript
-- 部署：本地部署，支持Windows环境
+- 部署：支持本地Windows环境和Linux云服务器部署
+
+## 部署说明
+
+### 本地部署 (Windows)
+1. 克隆项目到本地
+2. 创建并激活Python虚拟环境
+3. 安装依赖: `pip install -r requirements.txt`
+4. 运行应用: `python app.py`
+
+### 云服务器部署 (Linux)
+1. 使用Git克隆项目到服务器
+2. 配置Python虚拟环境并安装依赖
+3. 配置Nginx作为反向代理
+4. 使用Gunicorn运行应用
+5. 详细步骤请参考 `docs/deployment/` 目录下的部署文档
+
+## 部署文档
+
+详细的部署指南位于 `docs/deployment/` 目录：
+- `DEPLOYMENTV2.md`: 完整的生产环境部署指南
+- `DEPLOYMENTV3.md`: 生产环境更新指南
+- `DEPLOYMENT.md`: 基础部署参考

@@ -1,7 +1,20 @@
 import sqlite3
+import os
+import sys
+
+# 添加scripts目录到Python路径，确保能导入utils模块
+current_dir = os.path.dirname(os.path.abspath(__file__))
+scripts_dir = os.path.dirname(current_dir)
+if scripts_dir not in sys.path:
+    sys.path.insert(0, scripts_dir)
+
+from utils import get_database_path
+
+# 获取数据库路径
+db_path = get_database_path()
 
 # 连接到数据库
-conn = sqlite3.connect('vocabulary.db')
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # 获取高中英语词汇词书的ID

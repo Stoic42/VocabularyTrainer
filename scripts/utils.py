@@ -28,8 +28,14 @@ def get_project_root():
 
 def get_database_path():
     """
-    获取数据库文件的完整路径
+    获取数据库文件的完整路径，优先读取环境变量DATABASE_PATH
     """
+    # 优先读取环境变量
+    db_path = os.environ.get('DATABASE_PATH')
+    if db_path and os.path.exists(db_path):
+        return db_path
+    
+    # 如果没有环境变量或文件不存在，使用默认路径
     project_root = get_project_root()
     return os.path.join(project_root, 'vocabulary.db')
 

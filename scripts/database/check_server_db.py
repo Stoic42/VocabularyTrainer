@@ -5,11 +5,23 @@
 """
 
 import sqlite3
+import os
+import sys
+
+# 添加scripts目录到Python路径，确保能导入utils模块
+current_dir = os.path.dirname(os.path.abspath(__file__))
+scripts_dir = os.path.dirname(current_dir)
+if scripts_dir not in sys.path:
+    sys.path.insert(0, scripts_dir)
+
+from utils import get_database_path
 
 def check_server_errorlogs():
     """检查服务器数据库的ErrorLogs表"""
     
-    server_db = "vocabulary_server.db"
+    # 获取项目根目录路径
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    server_db = os.path.join(project_root, "vocabulary_server.db")
     
     try:
         conn = sqlite3.connect(server_db)

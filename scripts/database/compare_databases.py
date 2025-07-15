@@ -7,7 +7,16 @@
 
 import sqlite3
 import os
+import sys
 from datetime import datetime
+
+# 添加scripts目录到Python路径，确保能导入utils模块
+current_dir = os.path.dirname(os.path.abspath(__file__))
+scripts_dir = os.path.dirname(current_dir)
+if scripts_dir not in sys.path:
+    sys.path.insert(0, scripts_dir)
+
+from utils import get_database_path
 
 def get_db_connection(db_path):
     """创建数据库连接"""
@@ -193,8 +202,10 @@ def sync_new_users(local_db, server_db):
 
 def main():
     """主函数"""
-    local_db = "vocabulary.db"
-    server_db = "vocabulary_server.db"
+    # 获取数据库路径
+    local_db = get_database_path()
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    server_db = os.path.join(project_root, "vocabulary_server.db")
     
     if not os.path.exists(local_db):
         print(f"错误: 本地数据库 {local_db} 不存在")
@@ -204,7 +215,7 @@ def main():
         print(f"错误: 服务器数据库 {server_db} 不存在")
         return
     
-    print("开始对比本地和服务器数据库...")
+    print("=== 数据库对比工具 ===")
     print(f"本地数据库: {local_db}")
     print(f"服务器数据库: {server_db}")
     
@@ -214,14 +225,14 @@ def main():
     for table in tables_to_compare:
         compare_tables(local_db, server_db, table)
     
-    # 同步新用户数据
-    sync_new_users(local_db, server_db)
+    # 询问是否同步新用户数据
+    print("\n" + "="*50)
+    response = input("是否要同步新用户数据到本地数据库？(y/n): ").strip().lower()
     
-    print("\n=== 对比完成 ===")
-    print("建议:")
-    print("1. 如果Words表内容不同，说明服务器使用的是旧版本")
-    print("2. 新用户数据已同步到本地数据库")
-    print("3. 可以安全地更新服务器代码")
+    if response in ['y', 'yes', '是']:
+        sync_new_users(local_db, server_db)
+    else:
+        print("跳过数据同步")
 
 if __name__ == "__main__":
     main() 
