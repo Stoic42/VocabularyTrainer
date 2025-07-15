@@ -1,0 +1,42 @@
+# ======================================================================
+# 词汇训练营 - 生产环境配置文件模板
+# ======================================================================
+# 重要：请将此文件复制为 .env 并填写正确的生产环境配置
+# ======================================================================
+
+# 数据库配置
+DATABASE_PATH=/var/www/vocabulary/vocabulary.db
+
+# Flask应用配置
+SECRET_KEY=your_very_secure_secret_key_here_change_this_immediately
+FLASK_ENV=production
+DEBUG=False
+
+# 服务器配置
+HOST=0.0.0.0
+PORT=5000
+
+# 日志配置
+LOG_LEVEL=INFO
+LOG_DIR=/var/www/vocabulary/logs
+
+# 音频文件配置
+AUDIO_DIR=/var/www/vocabulary/wordlists
+TTS_CACHE_DIR=/var/www/vocabulary/wordlists/tts_cache
+
+# 静态文件配置
+STATIC_FOLDER=/var/www/vocabulary/assets
+WORDLISTS_BASE_DIR=/var/www/vocabulary/wordlists
+
+# 安全配置
+SESSION_COOKIE_SECURE=True
+SESSION_COOKIE_HTTPONLY=True
+PERMANENT_SESSION_LIFETIME=3600
+
+# 管理员账户配置（首次部署后请修改）
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+
+# 应用信息
+APP_NAME=Lumi单词训练营
+APP_VERSION=2.0.0 
