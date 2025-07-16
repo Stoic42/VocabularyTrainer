@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lumi Vocabulary Trainer</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,15 +12,37 @@
     <style>
         /* 您编写的所有精美CSS样式，我们完全保留 */
         :root {
-            --primary-color: #FFB347; /* 明亮的橙黄色 */
-            --hover-color: #FF9F1C;   /* 深橙色 */
-            --error-color: #4f2b4b;    /* 深紫色 */
-            --text-color: #2D3436;     /* 更深的文字颜色 */
-            --bg-color: #FFF8E7;       /* 温暖的米色背景 */
-            --accent-color: #FF7B54;   /* 活力珊瑚橙 */
+            --primary-color: #FFB347;
+            /* 明亮的橙黄色 */
+            --hover-color: #FF9F1C;
+            /* 深橙色 */
+            --error-color: #4f2b4b;
+            /* 深紫色 */
+            --text-color: #2D3436;
+            /* 更深的文字颜色 */
+            --bg-color: #FFF8E7;
+            /* 温暖的米色背景 */
+            --accent-color: #FF7B54;
+            /* 活力珊瑚橙 */
             --border-radius: 8px;
+
+            /* Responsive breakpoints */
+            --mobile-max: 767px;
+            --tablet-min: 768px;
+            --tablet-max: 1024px;
+            --desktop-min: 1025px;
+
+            /* Responsive spacing */
+            --spacing-xs: 5px;
+            --spacing-sm: 10px;
+            --spacing-md: 15px;
+            --spacing-lg: 20px;
+            --spacing-xl: 30px;
+
+            /* Touch target minimum size */
+            --touch-target-min: 44px;
         }
-        
+
         /* 认证表单样式 */
         .auth-form {
             background-color: white;
@@ -26,10 +50,18 @@
             border-radius: var(--border-radius);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 100%;
+            margin: 0 auto;
             transition: all 0.3s ease;
         }
         
+        @media (min-width: 480px) {
+            .auth-form {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+
         .auth-form h2 {
             text-align: center;
             margin-bottom: 25px;
@@ -38,7 +70,7 @@
             font-weight: 600;
             position: relative;
         }
-        
+
         .auth-form h2::after {
             content: '';
             position: absolute;
@@ -50,7 +82,7 @@
             background-color: var(--primary-color);
             border-radius: 3px;
         }
-        
+
         .auth-input {
             width: 100%;
             padding: 12px;
@@ -61,13 +93,13 @@
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
-        
+
         .auth-input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
         }
-        
+
         .auth-button {
             width: 100%;
             margin-bottom: 10px;
@@ -83,18 +115,18 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .auth-button:hover {
             background-color: var(--hover-color);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-        
+
         .auth-button:active {
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .auth-button::after {
             content: '';
             position: absolute;
@@ -105,11 +137,11 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: all 0.6s ease;
         }
-        
+
         .auth-button:hover::after {
             left: 100%;
         }
-        
+
         .auth-link {
             color: var(--primary-color);
             text-decoration: none;
@@ -118,11 +150,11 @@
             padding-bottom: 2px;
             transition: all 0.3s ease;
         }
-        
+
         .auth-link:hover {
             color: var(--hover-color);
         }
-        
+
         .auth-link::after {
             content: '';
             position: absolute;
@@ -133,11 +165,11 @@
             background-color: var(--hover-color);
             transition: width 0.3s ease;
         }
-        
+
         .auth-link:hover::after {
             width: 100%;
         }
-        
+
         .auth-error {
             color: var(--error-color);
             font-size: 0.9em;
@@ -149,7 +181,7 @@
             border-left: 3px solid var(--error-color);
             transition: all 0.3s ease;
         }
-        
+
         .auth-notification {
             color: var(--success-color);
             font-size: 0.9em;
@@ -162,25 +194,251 @@
             animation: fadeIn 0.5s ease;
             transition: opacity 0.5s ease;
         }
-        
+
         @media (max-width: 480px) {
             .auth-link {
                 display: inline-block;
                 margin-top: 5px;
                 font-size: 1.1em;
             }
-            
+
             .auth-form {
                 padding: 20px;
             }
         }
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
+
+        /* Base responsive utilities */
+        .container-fluid {
+            width: 100%;
+            padding: 0 var(--spacing-md);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .d-block {
+            display: block;
+        }
+
+        .d-inline-block {
+            display: inline-block;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .d-grid {
+            display: grid;
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .h-100 {
+            height: 100%;
+        }
+
+        /* Responsive spacing utilities */
+        .p-xs {
+            padding: var(--spacing-xs);
+        }
+
+        .p-sm {
+            padding: var(--spacing-sm);
+        }
+
+        .p-md {
+            padding: var(--spacing-md);
+        }
+
+        .p-lg {
+            padding: var(--spacing-lg);
+        }
+
+        .p-xl {
+            padding: var(--spacing-xl);
+        }
+
+        .m-xs {
+            margin: var(--spacing-xs);
+        }
+
+        .m-sm {
+            margin: var(--spacing-sm);
+        }
+
+        .m-md {
+            margin: var(--spacing-md);
+        }
+
+        .m-lg {
+            margin: var(--spacing-lg);
+        }
+
+        .m-xl {
+            margin: var(--spacing-xl);
+        }
+
+        /* Touch-friendly utilities */
+        .touch-target {
+            min-height: var(--touch-target-min);
+            min-width: var(--touch-target-min);
+        }
+
+        /* Responsive grid utilities */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 calc(-1 * var(--spacing-sm));
+        }
+
+        .col {
+            flex: 1;
+            padding: 0 var(--spacing-sm);
+        }
+
+        .col-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .col-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+
+        .col-3 {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        /* Mobile-first responsive breakpoints */
+        @media (min-width: 768px) {
+            .container-fluid {
+                padding: 0 var(--spacing-lg);
+            }
+
+            .col-md-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .col-md-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .col-md-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+
+            .col-md-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+
+            .d-md-block {
+                display: block;
+            }
+
+            .d-md-inline-block {
+                display: inline-block;
+            }
+
+            .d-md-flex {
+                display: flex;
+            }
+
+            .d-md-grid {
+                display: grid;
+            }
+
+            .d-md-none {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .container-fluid {
+                padding: 0 var(--spacing-xl);
+            }
+
+            .col-lg-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .col-lg-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .col-lg-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+
+            .col-lg-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+
+            .d-lg-block {
+                display: block;
+            }
+
+            .d-lg-inline-block {
+                display: inline-block;
+            }
+
+            .d-lg-flex {
+                display: flex;
+            }
+
+            .d-lg-grid {
+                display: grid;
+            }
+
+            .d-lg-none {
+                display: none;
+            }
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             font-family: 'Noto Sans SC', system-ui, sans-serif;
             background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            color: var(--text-color); line-height: 1.6; overflow-x: hidden;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
             position: relative;
         }
+
         body::before {
             content: "";
             position: absolute;
@@ -194,49 +452,155 @@
             opacity: 0.05;
             z-index: -1;
         }
+
         #app-container {
-            max-width: 800px; margin: 40px auto; padding: 30px;
+            max-width: 90%;
+            margin: 5% auto;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: var(--border-radius);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            position: relative; backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .header { text-align: center; margin-bottom: 30px; }
-        button, .btn {
-            background-color: var(--primary-color); color: white; border: none;
-            padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer;
-            transition: all 0.3s ease; font-weight: 500;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        @media (min-width: 768px) {
+            #app-container {
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 30px;
+            }
         }
-        button:hover, .btn:hover {
-            background-color: var(--hover-color); transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
         }
-        .btn { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-        #play-uk-btn, #play-us-btn {
-            background-color: var(--bg-color); color: var(--text-color);
-            margin: 0 5px; padding: 8px 15px; font-size: 0.9em;
+        
+        .header h1 {
+            margin: 15px 0;
+            font-size: 1.8em;
         }
+        
+        .header-user-info {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive header layout */
+        @media (max-width: 767px) {
+            .header {
+                text-align: center;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+                margin: 10px 0 20px 0;
+            }
+            
+            .header-user-info {
+                position: static;
+                justify-content: center;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid #eee;
+            }
+            
+            .logo-container img {
+                height: 60px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+            
+            .header-user-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .logo-container img {
+                height: 50px !important;
+            }
+        }
+
+        button,
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover,
+        .btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #play-uk-btn,
+        #play-us-btn {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0 5px;
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
         input[type="text"] {
-            width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e9ecef;
-            border-radius: var(--border-radius); font-size: 1em;
-            transition: border-color 0.3s ease; box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
         }
+
         input[type="text"]:focus {
-            outline: none; border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(255,179,71,0.1);
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.1);
         }
-        #quiz-area, #results-area { 
-            margin-top: 20px; padding: 20px; border-radius: var(--border-radius); 
-            background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+
+        #quiz-area,
+        #results-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         #quiz-area {
             border: 3px solid var(--primary-color);
             box-shadow: 0 4px 12px rgba(255, 179, 71, 0.2);
             position: relative;
         }
-        
+
         /* 右下角控制按钮样式 */
         .quiz-controls {
             position: absolute;
@@ -249,7 +613,11 @@
             opacity: 0.3;
             transition: opacity 0.3s ease;
         }
-        .quiz-controls:hover { opacity: 1; }
+
+        .quiz-controls:hover {
+            opacity: 1;
+        }
+
         .control-btn {
             width: 40px;
             height: 40px;
@@ -266,13 +634,18 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: relative;
         }
+
         .control-btn:hover {
             background: var(--primary-color);
             color: white;
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3);
         }
-        .control-btn:active { transform: scale(0.95); }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
         .control-btn::after {
             content: attr(title);
             position: absolute;
@@ -290,7 +663,11 @@
             transition: opacity 0.3s ease;
             z-index: 1000;
         }
-        .control-btn:hover::after { opacity: 1; }
+
+        .control-btn:hover::after {
+            opacity: 1;
+        }
+
         .control-btn::before {
             content: '';
             position: absolute;
@@ -303,11 +680,28 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
-        .control-btn:hover::before { opacity: 1; }
-        #results-area { display: none; }
-        #error-list { list-style-type: none; padding-left: 0; }
-        #error-list li { margin: 10px 0; padding: 10px; background: #fff5f5; border-radius: var(--border-radius); border-left: 4px solid var(--error-color); }
-        
+
+        .control-btn:hover::before {
+            opacity: 1;
+        }
+
+        #results-area {
+            display: none;
+        }
+
+        #error-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #error-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff5f5;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--error-color);
+        }
+
         /* 拼写变体样式 */
         .spelling-variant {
             display: inline-block;
@@ -318,94 +712,191 @@
             border-radius: 3px;
             font-weight: bold;
         }
-        
+
         /* 拼写提示样式 */
         .spelling-tip {
             animation: fadeInOut 3s ease-in-out;
         }
-        
+
         @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
-        .list-selector { margin: 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .list-selector label { font-weight: 500; }
+
+        .list-selector {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .list-selector label {
+            font-weight: 500;
+        }
+
         select {
-            min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: var(--border-radius);
-            font-size: 16px; background-color: white; cursor: pointer;
-            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            min-width: 150px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: white;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
         }
+
         .lumi-reaction {
-            position: fixed; 
-            bottom: 3vh; /* 使用视口高度的百分比 */
+            position: fixed;
+            bottom: 3vh;
+            /* 使用视口高度的百分比 */
             left: 50%;
-            width: calc(min(20vh, 20vw, 200px)); /* 根据视口高度、宽度和最大像素值取最小值 */
-            height: calc(min(20vh, 20vw, 200px)); /* 保持宽高比例一致 */
+            width: calc(min(20vh, 20vw, 200px));
+            /* 根据视口高度、宽度和最大像素值取最小值 */
+            height: calc(min(20vh, 20vw, 200px));
+            /* 保持宽高比例一致 */
             transform: translateX(-50%);
             transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 9999; opacity: 1;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
+            z-index: 9999;
+            opacity: 1;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             pointer-events: none;
         }
-        
+
         /* 当窗口高度较低时，将 Lumi 移到右下角 */
         .lumi-reaction.corner {
             left: auto;
             right: 2vw;
             bottom: 2vh;
             transform: none;
-            width: calc(min(15vh, 15vw, 150px)); /* 在角落时稍微缩小 */
+            width: calc(min(15vh, 15vw, 150px));
+            /* 在角落时稍微缩小 */
             height: calc(min(15vh, 15vw, 150px));
-            opacity: 0.8; /* 稍微降低透明度 */
+            opacity: 0.8;
+            /* 稍微降低透明度 */
         }
-        
+
         /* 角落模式下的动画 */
-        .lumi-reaction.corner.active { 
-            animation: lumiFloatCorner 15s ease-in-out infinite alternate; 
+        .lumi-reaction.corner.active {
+            animation: lumiFloatCorner 15s ease-in-out infinite alternate;
         }
-        .lumi-reaction.corner.bounce { 
-            animation: lumiJumpCorner 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; 
+
+        .lumi-reaction.corner.bounce {
+            animation: lumiJumpCorner 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important;
         }
-        
+
         /* 当窗口高度极低时，隐藏 Lumi */
         .lumi-reaction.hidden {
             opacity: 0;
             visibility: hidden;
         }
-        .lumi-reaction.active { opacity: 1; animation: lumiFloat 15s ease-in-out infinite alternate; }
-        .lumi-reaction.bounce { animation: lumiJump 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important; }
+
+        .lumi-reaction.active {
+            opacity: 1;
+            animation: lumiFloat 15s ease-in-out infinite alternate;
+        }
+
+        .lumi-reaction.bounce {
+            animation: lumiJump 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards !important;
+        }
+
         /* 中心位置的动画 */
-        @keyframes lumiJump { 
-            0% { transform: translateX(-50%) scale(1); } 
-            50% { transform: translateX(-50%) scale(1.1) translateY(-1vh); } /* 使用视口高度的百分比 */ 
-            100% { transform: translateX(-50%) scale(1); } 
+        @keyframes lumiJump {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.1) translateY(-1vh);
+            }
+
+            /* 使用视口高度的百分比 */
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
         }
-        @keyframes lumiFloat { 
-            0% { transform: translateX(-50%); } 
-            25% { transform: translate(calc(-50% - 0.5vw), 0.5vh); } /* 使用视口宽度和高度的百分比 */ 
-            50% { transform: translate(calc(-50% + 0.5vw), -0.5vh); } 
-            75% { transform: translate(calc(-50% - 0.3vw), 0.3vh); } 
-            100% { transform: translateX(-50%); } 
+
+        @keyframes lumiFloat {
+            0% {
+                transform: translateX(-50%);
+            }
+
+            25% {
+                transform: translate(calc(-50% - 0.5vw), 0.5vh);
+            }
+
+            /* 使用视口宽度和高度的百分比 */
+            50% {
+                transform: translate(calc(-50% + 0.5vw), -0.5vh);
+            }
+
+            75% {
+                transform: translate(calc(-50% - 0.3vw), 0.3vh);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
-        
+
         /* 角落位置的动画 */
-        @keyframes lumiJumpCorner { 
-            0% { transform: scale(1); } 
-            50% { transform: scale(1.1) translateY(-1vh); } 
-            100% { transform: scale(1); } 
+        @keyframes lumiJumpCorner {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1) translateY(-1vh);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
-        @keyframes lumiFloatCorner { 
-            0% { transform: none; } 
-            25% { transform: translate(-0.5vw, 0.5vh); } 
-            50% { transform: translate(0.5vw, -0.5vh); } 
-            75% { transform: translate(-0.3vw, 0.3vh); } 
-            100% { transform: none; } 
+
+        @keyframes lumiFloatCorner {
+            0% {
+                transform: none;
+            }
+
+            25% {
+                transform: translate(-0.5vw, 0.5vh);
+            }
+
+            50% {
+                transform: translate(0.5vw, -0.5vh);
+            }
+
+            75% {
+                transform: translate(-0.3vw, 0.3vh);
+            }
+
+            100% {
+                transform: none;
+            }
         }
-        
+
         /* 开关按钮样式 */
         .switch {
             position: relative;
@@ -414,11 +905,13 @@
             height: 24px;
             margin-left: 10px;
         }
+
         .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -430,6 +923,7 @@
             transition: .4s;
             border-radius: 24px;
         }
+
         .slider:before {
             position: absolute;
             content: "";
@@ -441,12 +935,15 @@
             transition: .4s;
             border-radius: 50%;
         }
-        input:checked + .slider {
+
+        input:checked+.slider {
             background-color: var(--primary-color);
         }
-        input:checked + .slider:before {
+
+        input:checked+.slider:before {
             transform: translateX(26px);
         }
+
         .lumi-toggle-container {
             display: flex;
             align-items: center;
@@ -454,14 +951,17 @@
         }
     </style>
 </head>
+
 <body>
-    <div id="auth-container" style="max-width: 400px; margin: 40px auto; padding: 20px; background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
+    <div id="auth-container"
+        style="max-width: 400px; margin: 40px auto; padding: 20px; background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
         <div class="header">
-            <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+            <div class="logo-container"
+                style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
                 <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px;">
             </div>
         </div>
-        
+
         <div id="login-form" class="auth-form">
             <h2>用户登录</h2>
             <div style="margin-bottom: 15px;">
@@ -474,9 +974,10 @@
             </div>
             <div id="login-error" class="auth-error"></div>
             <button id="login-btn" class="auth-button">登录</button>
-            <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register" class="auth-link">立即注册</a></p>
+            <p style="text-align: center; margin-top: 15px;">还没有账号? <a href="#" id="show-register"
+                    class="auth-link">立即注册</a></p>
         </div>
-        
+
         <div id="register-form" class="auth-form" style="display: none;">
             <h2>用户注册</h2>
             <div style="margin-bottom: 15px;">
@@ -493,18 +994,20 @@
             </div>
             <div id="register-error" class="auth-error"></div>
             <button id="register-btn" class="auth-button">注册</button>
-            <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login" class="auth-link">返回登录</a></p>
+            <p style="text-align: center; margin-top: 15px;">已有账号? <a href="#" id="show-login"
+                    class="auth-link">返回登录</a></p>
         </div>
     </div>
-    
+
     <div id="app-container" style="display: none;">
         <div class="header">
-            <div class="logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+            <div class="logo-container"
+                style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
                 <img src="/assets/img/Logo/orange-theme-logo.svg" alt="烛梦教育" style="height: 80px; margin-right: 15px;">
             </div>
             <h1>烛梦单词考核</h1>
-            <div style="text-align: right; margin-top: -40px;">
-                <span id="user-info" style="margin-right: 10px;"></span>
+            <div class="header-user-info">
+                <span id="user-info"></span>
                 <a href="#" id="logout-btn" style="color: var(--primary-color);">退出登录</a>
             </div>
         </div>
@@ -544,7 +1047,8 @@
         </div>
 
         <!-- 错词复习模式统计信息 -->
-        <div id="error-stats-container" style="display: none; margin-top: 15px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+        <div id="error-stats-container"
+            style="display: none; margin-top: 15px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
             <h3 style="margin: 0 0 10px 0; color: #856404;">错词复习统计</h3>
             <div id="error-stats-content">
                 <p>正在加载统计信息...</p>
@@ -552,33 +1056,41 @@
         </div>
 
         <!-- SRS掌握度显示区域 -->
-        <div id="srs-mastery-container" style="display: none; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
+        <div id="srs-mastery-container"
+            style="display: none; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; color: white; font-size: 1.2em;">📚 智能学习进度</h3>
-                <button id="srs-review-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">
+                <button id="srs-review-btn"
+                    style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">
                     🔄 智能复习
                 </button>
             </div>
             <div id="srs-stats-content">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div
+                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
                         <div style="font-size: 1.5em; font-weight: bold;" id="srs-total-words">0</div>
                         <div style="font-size: 0.8em; opacity: 0.8;">总单词</div>
                     </div>
-                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                    <div
+                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
                         <div style="font-size: 1.5em; font-weight: bold;" id="srs-learned-words">0</div>
                         <div style="font-size: 0.8em; opacity: 0.8;">已学习</div>
                     </div>
-                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                    <div
+                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
                         <div style="font-size: 1.5em; font-weight: bold;" id="srs-due-words">0</div>
                         <div style="font-size: 0.8em; opacity: 0.8;">待复习</div>
                     </div>
-                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                    <div
+                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
                         <div style="font-size: 1.5em; font-weight: bold;" id="srs-avg-interval">0</div>
                         <div style="font-size: 0.8em; opacity: 0.8;">平均间隔</div>
                     </div>
                 </div>
-                <div id="srs-recent-words" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                <div id="srs-recent-words"
+                    style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
                     <h4 style="margin: 0 0 10px 0; font-size: 1em;">最近学习的单词</h4>
                     <div id="srs-recent-words-list" style="font-size: 0.9em; line-height: 1.4;">
                         <p style="margin: 0; opacity: 0.8;">正在加载...</p>
@@ -622,33 +1134,40 @@
 
         <!-- SRS复习界面 -->
         <div id="srs-review-area" style="display: none;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                 <h2 style="margin: 0 0 10px 0;">🔄 SRS智能复习</h2>
                 <p style="margin: 0; opacity: 0.9;">优先复习错词，基于你的实际表现智能安排复习计划</p>
             </div>
-            
+
             <!-- SRS复习统计 -->
-            <div id="srs-review-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef;">
+            <div id="srs-review-stats"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div
+                    style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef;">
                     <div style="font-size: 2em; font-weight: bold; color: #667eea;" id="srs-due-count">0</div>
                     <div style="color: #666; font-size: 0.9em;">待复习单词</div>
                 </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef;">
+                <div
+                    style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef;">
                     <div style="font-size: 2em; font-weight: bold; color: #28a745;" id="srs-reviewed-count">0</div>
                     <div style="color: #666; font-size: 0.9em;">已复习单词</div>
                 </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef;">
+                <div
+                    style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef;">
                     <div style="font-size: 2em; font-weight: bold; color: #ffc107;" id="srs-accuracy">0%</div>
                     <div style="color: #666; font-size: 0.9em;">复习准确率</div>
                 </div>
             </div>
-            
+
             <!-- SRS复习控制 -->
             <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center;">
-                <button id="srs-start-btn" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
+                <button id="srs-start-btn"
+                    style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
                     🚀 开始SRS复习
                 </button>
-                <button id="srs-settings-btn" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                <button id="srs-settings-btn"
+                    style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                     ⚙️ 复习设置
                 </button>
                 <div style="margin-left: auto;">
@@ -662,7 +1181,7 @@
                     </select>
                 </div>
             </div>
-            
+
             <!-- SRS复习进度 -->
             <div id="srs-progress-container" style="display: none; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -670,47 +1189,54 @@
                     <span id="srs-progress-text">0 / 0</span>
                 </div>
                 <div style="background: #e9ecef; border-radius: 10px; height: 20px; overflow: hidden;">
-                    <div id="srs-progress-bar" style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                    <div id="srs-progress-bar"
+                        style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 0%; transition: width 0.3s ease;">
+                    </div>
                 </div>
             </div>
-            
+
             <!-- SRS复习卡片 -->
             <div id="srs-card-container" style="display: none;">
-                <div style="background: white; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <div
+                    style="background: white; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <!-- 单词信息 -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                         <div>
                             <h3 id="srs-word-spelling" style="margin: 0 0 10px 0; font-size: 2em; color: #333;"></h3>
                             <p id="srs-word-ipa" style="margin: 0 0 5px 0; color: #666; font-size: 1.1em;"></p>
                             <p id="srs-word-pos" style="margin: 0; color: #888; font-size: 0.9em;"></p>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button id="srs-play-uk-btn" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                            <button id="srs-play-uk-btn"
+                                style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
                                 🇬🇧 英音
                             </button>
-                            <button id="srs-play-us-btn" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                            <button id="srs-play-us-btn"
+                                style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
                                 🇺🇸 美音
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- 中文释义 -->
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="margin: 0 0 10px 0; color: #333;">中文释义</h4>
                         <p id="srs-word-meaning" style="margin: 0; font-size: 1.1em; line-height: 1.6;"></p>
                     </div>
-                    
+
                     <!-- 例句 -->
                     <div id="srs-example-container" style="margin-bottom: 20px;">
                         <h4 style="margin: 0 0 10px 0; color: #333;">例句</h4>
                         <p id="srs-word-example-en" style="margin: 0 0 5px 0; font-style: italic; color: #555;"></p>
                         <p id="srs-word-example-cn" style="margin: 0; color: #777; font-size: 0.9em;"></p>
                     </div>
-                    
+
                     <!-- SRS信息 -->
                     <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="margin: 0 0 10px 0; color: #1976d2;">SRS学习信息</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
                             <div>
                                 <span style="color: #666; font-size: 0.9em;">复习次数:</span>
                                 <span id="srs-repetitions" style="font-weight: bold; color: #1976d2;"></span>
@@ -728,69 +1254,82 @@
                                 <span id="srs-error-count" style="font-weight: bold; color: #dc3545;"></span>
                             </div>
                         </div>
-                        <div id="srs-mastery-level" style="margin-top: 10px; padding: 8px; border-radius: 4px; text-align: center; font-weight: bold; display: none;">
+                        <div id="srs-mastery-level"
+                            style="margin-top: 10px; padding: 8px; border-radius: 4px; text-align: center; font-weight: bold; display: none;">
                             <span id="srs-mastery-text"></span>
                         </div>
                     </div>
-                    
+
                     <!-- 复习评分 -->
                     <div style="text-align: center;">
                         <h4 style="margin: 0 0 15px 0; color: #333;">请评价你的记忆程度</h4>
                         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                            <button class="srs-grade-btn" data-grade="1" style="background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                            <button class="srs-grade-btn" data-grade="1"
+                                style="background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                                 😵 完全忘记
                             </button>
-                            <button class="srs-grade-btn" data-grade="2" style="background: #fd7e14; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                            <button class="srs-grade-btn" data-grade="2"
+                                style="background: #fd7e14; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                                 😕 有点印象
                             </button>
-                            <button class="srs-grade-btn" data-grade="3" style="background: #ffc107; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                            <button class="srs-grade-btn" data-grade="3"
+                                style="background: #ffc107; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                                 🤔 记得一些
                             </button>
-                            <button class="srs-grade-btn" data-grade="4" style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                            <button class="srs-grade-btn" data-grade="4"
+                                style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                                 😊 记得清楚
                             </button>
-                            <button class="srs-grade-btn" data-grade="5" style="background: #20c997; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                            <button class="srs-grade-btn" data-grade="5"
+                                style="background: #20c997; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                                 🎉 非常熟悉
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- SRS验证测试界面 -->
             <div id="srs-verification-container" style="display: none;">
-                <div style="background: white; border: 2px solid #ffc107; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <div
+                    style="background: white; border: 2px solid #ffc107; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h3 style="color: #ffc107; margin-bottom: 10px;">🔍 学习效果验证</h3>
                         <p style="color: #666; font-size: 0.9em;">让我们来验证一下你的学习效果吧！</p>
                     </div>
-                    
+
                     <div id="verification-test-content">
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                             <h4 style="margin: 0 0 10px 0; color: #333;">请根据中文释义拼写单词</h4>
                             <p id="verification-meaning" style="margin: 0; font-size: 1.1em; color: #555;"></p>
                         </div>
-                        
+
                         <div style="margin-bottom: 20px;">
-                            <input type="text" id="verification-answer" placeholder="请输入单词拼写..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1.1em;">
+                            <input type="text" id="verification-answer" placeholder="请输入单词拼写..."
+                                style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1.1em;">
                         </div>
-                        
+
                         <div style="display: flex; gap: 15px; justify-content: center;">
-                            <button id="submit-verification-btn" style="background: #ffc107; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
+                            <button id="submit-verification-btn"
+                                style="background: #ffc107; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
                                 ✅ 提交验证
                             </button>
-                            <button id="skip-verification-btn" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1em;">
+                            <button id="skip-verification-btn"
+                                style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1em;">
                                 ⏭️ 跳过验证
                             </button>
                         </div>
                     </div>
-                    
-                    <div id="verification-result" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px;">
-                        <div id="verification-success" style="display: none; background: #d4edda; border: 1px solid #c3e6cb; color: #155724;">
+
+                    <div id="verification-result"
+                        style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px;">
+                        <div id="verification-success"
+                            style="display: none; background: #d4edda; border: 1px solid #c3e6cb; color: #155724;">
                             <h4 style="margin: 0 0 10px 0;">🎉 验证成功！</h4>
                             <p style="margin: 0;">你的自我评估很准确，继续保持！</p>
                         </div>
-                        <div id="verification-failed" style="display: none; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
+                        <div id="verification-failed"
+                            style="display: none; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
                             <h4 style="margin: 0 0 10px 0;">⚠️ 验证失败</h4>
                             <p style="margin: 0;">正确拼写：<strong id="correct-spelling"></strong></p>
                             <p style="margin: 0; font-size: 0.9em;">系统已自动调整学习计划，这个单词会重新安排复习。</p>
@@ -798,30 +1337,37 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- SRS复习结果 -->
             <div id="srs-results-container" style="display: none;">
-                <div style="background: white; border: 2px solid #28a745; border-radius: 12px; padding: 25px; text-align: center;">
+                <div
+                    style="background: white; border: 2px solid #28a745; border-radius: 12px; padding: 25px; text-align: center;">
                     <h2 style="color: #28a745; margin-bottom: 20px;">🎉 SRS复习完成！</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px;">
                         <div>
-                            <div style="font-size: 2.5em; font-weight: bold; color: #667eea;" id="srs-final-reviewed">0</div>
+                            <div style="font-size: 2.5em; font-weight: bold; color: #667eea;" id="srs-final-reviewed">0
+                            </div>
                             <div style="color: #666;">复习单词数</div>
                         </div>
                         <div>
-                            <div style="font-size: 2.5em; font-weight: bold; color: #28a745;" id="srs-final-accuracy">0%</div>
+                            <div style="font-size: 2.5em; font-weight: bold; color: #28a745;" id="srs-final-accuracy">0%
+                            </div>
                             <div style="color: #666;">平均准确率</div>
                         </div>
                         <div>
-                            <div style="font-size: 2.5em; font-weight: bold; color: #ffc107;" id="srs-final-interval">0</div>
+                            <div style="font-size: 2.5em; font-weight: bold; color: #ffc107;" id="srs-final-interval">0
+                            </div>
                             <div style="color: #666;">平均间隔(天)</div>
                         </div>
                     </div>
-                    
+
                     <!-- 验证统计 -->
-                    <div id="verification-summary" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                    <div id="verification-summary"
+                        style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
                         <h4 style="margin: 0 0 10px 0; color: #333;">📊 学习诚实度统计</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
                             <div>
                                 <span style="color: #666; font-size: 0.9em;">验证通过率:</span>
                                 <span id="verification-rate" style="font-weight: bold; color: #28a745;"></span>
@@ -832,18 +1378,20 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div style="display: flex; gap: 15px; justify-content: center;">
-                        <button id="srs-restart-btn" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
+                        <button id="srs-restart-btn"
+                            style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
                             🔄 继续复习
                         </button>
-                        <button id="srs-back-home-btn" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
+                        <button id="srs-back-home-btn"
+                            style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
                             🏠 返回主页
                         </button>
                     </div>
                 </div>
             </div>
-            
+
             <!-- 右下角控制按钮 -->
             <div id="srs-controls" class="quiz-controls" style="display: none;">
                 <button id="srs-back-home-from-review-btn" class="control-btn" title="返回主页">
@@ -912,31 +1460,45 @@
             <ul id="error-list"></ul>
         </div>
     </div>
-    
+
     <div class="lumi-reaction"></div>
     <audio id="word-audio" style="display: none;"></audio>
 
     <style>
         /* 表单切换动画 */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(10px); }
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
         }
-        
+
         .auth-form {
             animation: fadeIn 0.4s ease forwards;
         }
-        
+
         .auth-form.fade-out {
             animation: fadeOut 0.3s ease forwards;
         }
     </style>
-    
+
     <script>
         // --- 全局变量 ---
         let questions = [];
@@ -956,7 +1518,7 @@
             'wrong': '/assets/img/Lumi/Lumi_Crying.png',
             'celebration': '/assets/img/Lumi/Lumi_Yeah.png'
         };
-        
+
         // 错词清零模式相关变量
         let errorClearModeData = {
             isActive: false,
@@ -968,7 +1530,7 @@
             bookName: '',
             listName: ''
         };
-        
+
         // SRS复习模式相关变量
         let srsReviewData = {
             isActive: false,
@@ -981,7 +1543,7 @@
             verificationTest: null,
             verificationStats: null
         };
-        
+
         // --- DOM 元素缓存 ---
         const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
@@ -1000,7 +1562,7 @@
         const showLoginLink = document.getElementById('show-login');
         const userInfoEl = document.getElementById('user-info');
         const logoutBtn = document.getElementById('logout-btn');
-        
+
         const startBtn = document.getElementById('start-btn');
         const quizArea = document.getElementById('quiz-area');
         const resultsArea = document.getElementById('results-area');
@@ -1037,17 +1599,17 @@
 
 
         // --- 功能函数 ---
-        
+
         // 格式化词性和意思的函数
         function formatPOSAndMeaning(pos, meaning) {
             if (!pos || !meaning) {
                 return { extractedPos: pos || '', formattedMeaning: meaning || '' };
             }
-            
+
             // 提取词性信息
             const posMatch = pos.match(/^([^，。；]*?)(?=[，。；]|$)/);
             const extractedPos = posMatch ? posMatch[1].trim() : pos;
-            
+
             // 格式化意思，将词性信息用斜体显示
             let formattedMeaning = meaning;
             if (extractedPos && extractedPos !== pos) {
@@ -1064,10 +1626,10 @@
                 // 单个词性
                 formattedMeaning = `<em style="color: #007bff; font-weight: bold;">${extractedPos}</em> ${meaning}`;
             }
-            
+
             return { extractedPos, formattedMeaning };
         }
-        
+
         // 检查用户登录状态
         function checkLoginStatus() {
             // 从sessionStorage获取用户信息
@@ -1084,7 +1646,7 @@
                 showAuthInterface();
             }
         }
-        
+
         // 显示认证界面
         function showAuthInterface() {
             authContainer.style.display = 'block';
@@ -1092,7 +1654,7 @@
             loginForm.style.display = 'block';
             registerForm.style.display = 'none';
         }
-        
+
         // 显示应用界面
         function showAppInterface() {
             authContainer.style.display = 'none';
@@ -1100,12 +1662,12 @@
             if (currentUser) {
                 // 清空用户信息元素
                 userInfoEl.innerHTML = '';
-                
+
                 // 创建欢迎文本
                 const welcomeText = document.createElement('span');
                 welcomeText.textContent = `欢迎, ${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '学生'})`;
                 userInfoEl.appendChild(welcomeText);
-                
+
                 // 如果是管理员，添加仪表盘链接
                 if (currentUser.role === 'admin') {
                     const dashboardLink = document.createElement('a');
@@ -1119,10 +1681,10 @@
                     userInfoEl.appendChild(dashboardLink);
                 }
             }
-            
+
             // 检查是否有上次的测试进度
             checkLastQuizProgress();
-            
+
             // 确保 Lumi 开关状态正确
             lumiEnabled = lumiToggle.checked;
             if (!lumiEnabled) {
@@ -1140,7 +1702,7 @@
                     const progress = JSON.parse(savedProgress);
                     const timeDiff = new Date() - new Date(progress.timestamp);
                     const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
-                    
+
                     // 如果进度是24小时内的，显示提示
                     if (hoursDiff < 24) {
                         const progressMsg = document.createElement('div');
@@ -1159,7 +1721,7 @@
                             (${progress.answered_questions}/${progress.total_questions} 题，正确 ${progress.correct_answers} 题)<br>
                             <button onclick="clearProgress()" style="margin-top: 8px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">清除提醒</button>
                         `;
-                        
+
                         // 插入到开始按钮之前
                         const startBtn = document.getElementById('start-btn');
                         startBtn.parentNode.insertBefore(progressMsg, startBtn);
@@ -1176,27 +1738,27 @@
             localStorage.removeItem('quizProgress');
             location.reload();
         }
-        
+
         // 处理登录
         async function handleLogin() {
             const username = loginUsername.value.trim();
             const password = loginPassword.value.trim();
-            
+
             if (!username || !password) {
                 loginError.textContent = '用户名和密码不能为空';
                 loginError.style.display = 'block';
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     // 登录成功
                     currentUser = data.user;
@@ -1216,34 +1778,34 @@
                 loginError.style.display = 'block';
             }
         }
-        
+
         // 处理注册
         async function handleRegister() {
             const username = registerUsername.value.trim();
             const password = registerPassword.value.trim();
             const confirmPassword = registerConfirmPassword.value.trim();
-            
+
             if (!username || !password || !confirmPassword) {
                 registerError.textContent = '所有字段都必须填写';
                 registerError.style.display = 'block';
                 return;
             }
-            
+
             if (password !== confirmPassword) {
                 registerError.textContent = '两次输入的密码不一致';
                 registerError.style.display = 'block';
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     // 注册成功，切换到登录表单
                     registerUsername.value = '';
@@ -1251,24 +1813,24 @@
                     registerConfirmPassword.value = '';
                     registerError.style.display = 'none';
                     loginUsername.value = username; // 自动填充用户名
-                    
+
                     // 添加淡出动画
                     registerForm.classList.add('fade-out');
-                    
+
                     // 等待动画完成后切换表单
-                    setTimeout(function() {
+                    setTimeout(function () {
                         registerForm.style.display = 'none';
                         registerForm.classList.remove('fade-out');
-                        
+
                         // 显示登录表单并添加淡入动画
                         loginForm.style.display = 'block';
-                        
+
                         // 使用更现代的通知而不是 alert
                         const notification = document.createElement('div');
                         notification.className = 'auth-notification';
                         notification.textContent = '注册成功，请登录';
                         loginForm.prepend(notification);
-                        
+
                         // 3秒后自动移除通知
                         setTimeout(() => {
                             notification.style.opacity = '0';
@@ -1286,19 +1848,19 @@
                 registerError.style.display = 'block';
             }
         }
-        
+
         // 处理退出登录
         function handleLogout() {
             // 清除用户信息
             currentUser = null;
             sessionStorage.removeItem('currentUser');
-            
+
             // 重置测试状态
             questions = [];
             currentQuestionIndex = 0;
             userAnswers = [];
             consecutiveCorrect = 0;
-            
+
             // 清除界面状态
             quizArea.style.display = 'none';
             resultsArea.style.display = 'none';
@@ -1306,15 +1868,15 @@
             questionMeaningEl.textContent = '';
             questionIpaEl.textContent = '';
             questionMeaningEnEl.textContent = '';
-            
+
             // 重置详情区域
             wordDetailsContainer.style.display = 'none';
             toggleDetailsBtn.textContent = '显示更多详情';
-            
+
             // 显示登录界面
             showAuthInterface();
         }
-        
+
         // 动态加载词书列表
         async function loadBookLists() {
             try {
@@ -1322,9 +1884,9 @@
                 const response = await fetch('/api/books');
                 if (!response.ok) throw new Error('获取词书列表失败');
                 const books = await response.json();
-                
+
                 bookSelect.innerHTML = ''; // 清空加载中选项
-                
+
                 if (books && books.length > 0) {
                     books.forEach(book => {
                         const option = document.createElement('option');
@@ -1344,20 +1906,20 @@
                 document.getElementById('list-select').innerHTML = '<option value="">加载失败</option>';
             }
         }
-        
+
         // 动态加载单词列表（根据选定的词书）
         async function loadWordLists(bookId) {
             try {
                 const listSelect = document.getElementById('list-select');
                 listSelect.innerHTML = '<option value="">加载中...</option>';
-                
+
                 const url = bookId ? `/api/lists?book_id=${bookId}` : '/api/lists';
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('获取单元列表失败');
                 const lists = await response.json();
-                
+
                 listSelect.innerHTML = ''; // 清空加载中选项
-                
+
                 if (lists && lists.length > 0) {
                     lists.forEach(list => {
                         const option = document.createElement('option');
@@ -1377,25 +1939,25 @@
         // 预处理文本以改进TTS发音
         function preprocessTextForTTS(text) {
             if (!text) return text;
-            
+
             // 替换 "a/an" 为 "a or an"
             text = text.replace(/\ba\/an\b/gi, "a or an");
-            
+
             // 替换其他可能导致TTS发音问题的模式
             text = text.replace(/\b(\w+)\/(\w+)\b/gi, "$1 or $2"); // 将 "word1/word2" 替换为 "word1 or word2"
-            
+
             // 不对单词进行特殊处理，让每个单词使用自己的正确发音
             // 避免像"dare"等单词被错误地发音为"horoscope"的问题
-            
+
             return text;
         }
-        
+
         // TTS 朗读函数
         function playTTS(text) {
             if ('speechSynthesis' in window) {
                 // 预处理文本以改进发音
                 const processedText = preprocessTextForTTS(text);
-                
+
                 const utterance = new SpeechSynthesisUtterance(processedText);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.9;
@@ -1410,7 +1972,7 @@
             // 检查当前学习模式，如果是默写模式则不播放
             const studyMode = document.getElementById('study-mode').value;
             if (studyMode === 'dictation') return;
-            
+
             if (audioPath && audioPath.trim() !== "") {
                 // 尝试使用本地音频文件
                 audioEl.src = audioPath;
@@ -1476,17 +2038,17 @@
         // 自动播放音频序列（英音然后美音）
         function autoPlayAudios() {
             if (!autoPlayEnabled) return;
-            
+
             // 检查当前学习模式，如果是默写模式则不播放
             const studyMode = document.getElementById('study-mode').value;
             if (studyMode === 'dictation') return;
-            
+
             const q = questions[currentQuestionIndex];
-            
+
             // 先播放英音
             if (q.audio_path_uk) {
                 playAudio(q.audio_path_uk, q.spelling);
-                
+
                 // 等待英音播放完毕后播放美音
                 setTimeout(() => {
                     if (q.audio_path_us) {
@@ -1514,49 +2076,49 @@
                 void lumiImg.offsetWidth; // 触发重排以重置动画
                 lumiImg.classList.add('bounce');
             }
-            
+
             // 每次更新 Lumi 状态时检查位置
             checkLumiPosition();
         }
-        
+
         // 检查并调整 Lumi 的位置
         function checkLumiPosition() {
             if (!lumiImg || !lumiEnabled) return;
-            
+
             const quizAreaRect = quizArea.getBoundingClientRect();
             const windowHeight = window.innerHeight;
             const lumiHeight = lumiImg.offsetHeight;
-            
+
             // 保存当前的动画状态
             const wasActive = lumiImg.classList.contains('active');
             const wasBounce = lumiImg.classList.contains('bounce');
-            
+
             // 清除之前的位置类和动画类
             lumiImg.classList.remove('corner', 'hidden', 'active', 'bounce');
-            
+
             // 如果窗口高度小于 700px，完全隐藏 Lumi
             if (windowHeight < 700) {
                 lumiImg.classList.add('hidden');
                 return;
             }
-            
+
             // 如果 quiz-area 在视口中且与 Lumi 有重叠，将 Lumi 移到角落
             let shouldBeInCorner = false;
             if (quizArea.style.display !== 'none') {
                 const lumiBottom = windowHeight - 3 * windowHeight / 100; // 3vh 转换为像素
                 const lumiTop = lumiBottom - lumiHeight;
-                
+
                 // 检查 Lumi 是否与 quiz-area 重叠
                 if (lumiTop < quizAreaRect.bottom && quizAreaRect.top < lumiBottom) {
                     shouldBeInCorner = true;
                 }
             }
-            
+
             // 应用位置类
             if (shouldBeInCorner) {
                 lumiImg.classList.add('corner');
             }
-            
+
             // 恢复动画状态
             if (wasActive) {
                 lumiImg.classList.add('active');
@@ -1572,10 +2134,10 @@
         function displayQuestion() {
             const q = questions[currentQuestionIndex];
             const studyMode = document.getElementById('study-mode').value;
-            
+
             // 使用 formatPOSAndMeaning 函数处理词性和意思
             const { extractedPos, formattedMeaning } = formatPOSAndMeaning(q.pos, q.meaning_cn);
-            
+
             // 显示格式化后的中文释义，包含词性信息
             questionMeaningEl.innerHTML = formattedMeaning || ''; // 使用 innerHTML 以支持 <br> 标签
             questionIpaEl.textContent = q.ipa ? `/${q.ipa}/` : ''; // 音标
@@ -1607,7 +2169,7 @@
                     ${q.book_name && q.list_name ? `，来自：${q.book_name} - ${q.list_name}` : q.list_name ? `，来自：${q.list_name}` : ''}
                 `;
             }
-            
+
             // 移除之前的错误信息（如果有）
             const existingErrorInfo = document.querySelector('.error-info');
             if (existingErrorInfo) existingErrorInfo.remove();
@@ -1623,7 +2185,7 @@
             questionExamOptionsEl.textContent = q.exam_options ? `选项: ${q.exam_options}` : '';
             questionExamExplanationEl.textContent = q.exam_explanation ? `解析: ${q.exam_explanation}` : '';
             questionTipsEl.textContent = q.tips ? `提示: ${q.tips}` : '';
-            
+
             // 如果有错词统计信息，添加到详情容器的最前面
             if (errorInfo) {
                 wordDetailsContainer.insertBefore(errorInfo, wordDetailsContainer.firstChild);
@@ -1639,53 +2201,53 @@
                 wordDetailsContainer.style.display = 'none';
                 toggleDetailsBtn.textContent = '显示更多详情';
             }
-            
+
             currentQNumEl.textContent = currentQuestionIndex + 1;
 
             // 根据学习模式和音频路径决定是否显示音频按钮
             const showAudio = studyMode === 'standard' || studyMode === 'error_review';
-            
+
             // 显示TTS按钮，无论是否有本地音频
             const ttsBtn = document.createElement('button');
             ttsBtn.className = 'audio-btn';
             ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i> TTS';
             ttsBtn.onclick = () => playTTS(q.spelling);
-            
+
             // 清除之前的TTS按钮
             const oldTtsBtn = document.querySelector('.audio-btn.tts-btn');
             if (oldTtsBtn) oldTtsBtn.remove();
-            
+
             // 添加TTS按钮样式
             ttsBtn.classList.add('tts-btn');
             ttsBtn.style.backgroundColor = '#9b59b6';
             ttsBtn.style.marginLeft = '5px';
-            
+
             // 显示音频按钮
             ukBtn.style.display = showAudio && q.audio_path_uk ? 'inline-block' : 'none';
             usBtn.style.display = showAudio && q.audio_path_us ? 'inline-block' : 'none';
-            
+
             if (showAudio) {
                 if (q.audio_path_uk) ukBtn.onclick = () => playAudio(q.audio_path_uk, q.spelling);
                 if (q.audio_path_us) usBtn.onclick = () => playAudio(q.audio_path_us, q.spelling);
-                
+
                 // 添加TTS按钮到音频按钮区域
                 const audioButtonsContainer = ukBtn.parentElement;
                 audioButtonsContainer.appendChild(ttsBtn);
             }
 
             nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? '完成并提交' : '下一题';
-            
+
             // 新题显示后，添加延时控制
             inputEnabled = false; // 禁用"下一个"操作
             nextBtn.disabled = true;
-            
+
             // 0.6秒后启用"下一个"操作
             setTimeout(() => {
                 inputEnabled = true;
                 nextBtn.disabled = false;
                 answerInput.focus();
             }, 600);
-            
+
             // 如果启用了自动播放且支持音频，自动播放音频
             if (autoPlayEnabled && showAudio) {
                 setTimeout(() => autoPlayAudios(), 500); // 延迟500ms后播放，给页面渲染一些时间
@@ -1696,10 +2258,10 @@
         function handleNextQuestion() {
             const currentAnswer = answerInput.value.trim().toLowerCase();
             const correctSpelling = questions[currentQuestionIndex].spelling.trim().toLowerCase();
-            
+
             // 处理斜杠分隔的拼写变体
             const slashSpellings = correctSpelling.split('/');
-            
+
             // 处理逗号分隔的拼写变体
             let validSpellings = [];
             slashSpellings.forEach(spelling => {
@@ -1711,24 +2273,24 @@
                     validSpellings.push(spelling);
                 }
             });
-            
+
             // 移除之前的文字反馈提示（如果有）
             const existingFeedback = document.querySelector('.text-feedback');
             if (existingFeedback) {
                 existingFeedback.parentNode.removeChild(existingFeedback);
             }
-            
+
             if (validSpellings.includes(currentAnswer)) {
                 // 答案正确
                 consecutiveCorrect++; // 连续正确次数+1
-                
+
                 // 根据连续正确的次数，决定Lumi的表情
                 if (consecutiveCorrect >= 3) {
                     updateLumiReaction('celebration'); // 连续3次以上正确，使用庆祝表情
                 } else {
                     updateLumiReaction('correct'); // 普通的正确反馈
                 }
-                
+
                 // 如果启用了即时反馈，显示正确反馈
                 if (instantFeedbackEnabled) {
                     const feedbackEl = document.createElement('div');
@@ -1741,13 +2303,13 @@
                     feedbackEl.style.borderRadius = '4px';
                     answerInput.parentNode.appendChild(feedbackEl);
                 }
-                
+
                 // 如果有多种拼写方式，且用户使用了其中一种，提示其他可能的写法
                 if (validSpellings.length > 1 && currentAnswer !== correctSpelling) {
                     // 创建一个临时提示元素
                     const spellingTip = document.createElement('div');
                     spellingTip.className = 'spelling-tip';
-                    
+
                     // 格式化显示所有可能的拼写形式
                     let formattedSpellings;
                     if (correctSpelling.includes('/') || correctSpelling.includes(',')) {
@@ -1760,17 +2322,17 @@
                         // 否则直接显示原始拼写
                         formattedSpellings = `<strong>${correctSpelling}</strong>`;
                     }
-                    
+
                     spellingTip.innerHTML = `<span style="color: #27ae60">✓ 正确!</span> 该单词还有其他拼写形式: ${formattedSpellings}`;
                     spellingTip.style.marginTop = '10px';
                     spellingTip.style.padding = '8px';
                     spellingTip.style.backgroundColor = '#f0fff4';
                     spellingTip.style.borderLeft = '4px solid #27ae60';
                     spellingTip.style.borderRadius = '4px';
-                    
+
                     // 添加到答案输入框后面
                     answerInput.parentNode.appendChild(spellingTip);
-                    
+
                     // 3秒后自动移除提示
                     setTimeout(() => {
                         if (spellingTip.parentNode) {
@@ -1782,12 +2344,12 @@
                 // 答案错误
                 consecutiveCorrect = 0; // 重置连续正确次数
                 updateLumiReaction('wrong');
-                
+
                 // 如果启用了即时反馈，显示错误反馈和正确答案
                 if (instantFeedbackEnabled) {
                     const feedbackEl = document.createElement('div');
                     feedbackEl.className = 'text-feedback';
-                    
+
                     // 格式化显示所有可能的拼写形式
                     let formattedSpellings;
                     if (correctSpelling.includes('/') || correctSpelling.includes(',')) {
@@ -1799,7 +2361,7 @@
                         // 否则直接显示原始拼写
                         formattedSpellings = `<strong>${correctSpelling}</strong>`;
                     }
-                    
+
                     feedbackEl.innerHTML = `<span style="color: #c0392b">✗ 错误!</span> 正确拼写: ${formattedSpellings}`;
                     feedbackEl.style.marginTop = '10px';
                     feedbackEl.style.padding = '8px';
@@ -1814,7 +2376,7 @@
                 word_id: questions[currentQuestionIndex].word_id,
                 answer: answerInput.value
             });
-            
+
             currentQuestionIndex++;
             answerInput.value = '';
 
@@ -1823,7 +2385,7 @@
             if (textFeedback) {
                 textFeedback.parentNode.removeChild(textFeedback);
             }
-            
+
             if (currentQuestionIndex < questions.length) {
                 // 延迟显示下一题，让用户能看到答题反馈
                 setTimeout(() => {
@@ -1861,10 +2423,10 @@
             const selectedListId = document.getElementById('list-select').value;
             const selectedBookName = document.getElementById('book-select').options[document.getElementById('book-select').selectedIndex]?.text || '未知词书';
             const selectedListName = document.getElementById('list-select').options[document.getElementById('list-select').selectedIndex]?.text || '未知单元';
-            
+
             // 获取模式名称
             let modeName = '';
-            switch(studyMode) {
+            switch (studyMode) {
                 case 'standard':
                     modeName = '标准模式';
                     break;
@@ -1882,14 +2444,14 @@
             if (studyMode === 'error_review') {
                 const correctCount = questions.length - results.error_count;
                 const accuracyRate = Math.round((correctCount / questions.length) * 100);
-                
+
                 // 添加错词复习模式的特殊标题
                 const reviewTitle = document.createElement('h3');
                 reviewTitle.style.color = '#856404';
                 reviewTitle.style.marginBottom = '15px';
                 reviewTitle.innerHTML = `📚 错词复习结果`;
                 resultsArea.insertBefore(reviewTitle, resultsArea.firstChild);
-                
+
                 // 添加统计信息
                 const statsDiv = document.createElement('div');
                 statsDiv.style.cssText = `
@@ -1910,7 +2472,7 @@
                     </ul>
                 `;
                 resultsArea.insertBefore(statsDiv, errorListEl);
-                
+
                 // 根据正确率给出不同的鼓励信息
                 let encouragement = '';
                 if (accuracyRate === 100) {
@@ -1922,7 +2484,7 @@
                 } else {
                     encouragement = '📖 继续努力！这些单词还需要更多练习。';
                 }
-                
+
                 const encouragementDiv = document.createElement('div');
                 encouragementDiv.style.cssText = `
                     background-color: #d4edda;
@@ -1940,14 +2502,14 @@
                 // 标准模式和默写模式的处理
                 const correctCount = questions.length - results.error_count;
                 const accuracyRate = Math.round((correctCount / questions.length) * 100);
-                
+
                 // 添加测试信息标题
                 const testInfoTitle = document.createElement('h3');
                 testInfoTitle.style.color = '#2c3e50';
                 testInfoTitle.style.marginBottom = '15px';
                 testInfoTitle.innerHTML = `📝 考核结果`;
                 resultsArea.insertBefore(testInfoTitle, resultsArea.firstChild);
-                
+
                 // 添加测试信息
                 const testInfoDiv = document.createElement('div');
                 testInfoDiv.style.cssText = `
@@ -1971,7 +2533,7 @@
                     </ul>
                 `;
                 resultsArea.insertBefore(testInfoDiv, errorListEl);
-                
+
                 // 根据正确率给出不同的鼓励信息
                 let encouragement = '';
                 if (accuracyRate === 100) {
@@ -1987,7 +2549,7 @@
                 } else {
                     encouragement = '📖 需要加强练习！建议重新学习这个单元的单词。';
                 }
-                
+
                 const encouragementDiv = document.createElement('div');
                 encouragementDiv.style.cssText = `
                     background-color: #d4edda;
@@ -2006,10 +2568,10 @@
             if (results.error_details && results.error_details.length > 0) {
                 results.error_details.forEach(err => {
                     const li = document.createElement('li');
-                    
+
                     // 处理斜杠分隔的拼写变体
                     const slashSpellings = err.correct_spelling.split('/');
-                    
+
                     // 处理逗号分隔的拼写变体
                     let allSpellings = [];
                     slashSpellings.forEach(spelling => {
@@ -2021,9 +2583,9 @@
                             allSpellings.push(spelling.trim());
                         }
                     });
-                    
+
                     let correctSpellingDisplay = '';
-                    
+
                     if (allSpellings.length > 1) {
                         // 如果有多种拼写形式，以更友好的方式显示
                         correctSpellingDisplay = allSpellings.map(s => `<span class="spelling-variant">${s}</span>`).join(' 或 ');
@@ -2032,7 +2594,7 @@
                         // 单一拼写形式
                         li.innerHTML = `<strong>正确:</strong> ${err.correct_spelling} / <strong>你的答案:</strong> <span style="color: #c0392b;">${err.your_answer}</span>`;
                     }
-                    
+
                     errorListEl.appendChild(li);
                 });
             } else {
@@ -2048,12 +2610,12 @@
                 backBtn.id = 'back-btn';
                 backBtn.textContent = studyMode === 'error_review' ? '继续复习其他错词' : '返回开始界面';
                 backBtn.style.marginTop = '20px';
-                backBtn.onclick = function() { 
+                backBtn.onclick = function () {
                     if (studyMode === 'error_review') {
                         // 错词复习模式：重新加载错词
                         location.reload();
                     } else {
-                        location.reload(); 
+                        location.reload();
                     }
                 };
                 resultsArea.appendChild(backBtn);
@@ -2061,14 +2623,51 @@
         }
 
         // --- 事件监听器 ---
-        
+
         // 页面加载时执行
         document.addEventListener('DOMContentLoaded', () => {
+            // 设备检测和响应式样式调整
+            function applyResponsiveStyles() {
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+                const authContainer = document.getElementById('auth-container');
+                
+                if (isMobile && authContainer) {
+                    // 移动端：不对称设计，右侧留更多空间
+                    authContainer.style.maxWidth = 'calc(100% - 60px)';
+                    authContainer.style.margin = '20px 40px 20px 20px'; // 右侧40px，左侧20px
+                    
+                    // 调整 auth-form 的样式
+                    const authForms = document.querySelectorAll('.auth-form');
+                    authForms.forEach(form => {
+                        form.style.maxWidth = 'calc(100% - 20px)';
+                        form.style.marginLeft = '10px'; // 轻微向右偏移
+                    });
+                } else if (authContainer) {
+                    // 桌面端：恢复原来的紧凑错落设计
+                    authContainer.style.maxWidth = '400px';
+                    authContainer.style.margin = '40px auto';
+                    
+                    // 恢复 auth-form 的原始样式
+                    const authForms = document.querySelectorAll('.auth-form');
+                    authForms.forEach(form => {
+                        form.style.maxWidth = '400px';
+                        form.style.marginLeft = '0';
+                        form.style.margin = '0 auto';
+                    });
+                }
+            }
+            
+            // 初始应用样式
+            applyResponsiveStyles();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', applyResponsiveStyles);
+            
             Object.values(lumiImages).forEach(path => { (new Image()).src = path; }); // 预加载图片
             updateLumiReaction('welcome');
             loadBookLists(); // 加载词书列表，而不是直接加载单词列表
             checkLoginStatus();
-            
+
             // 初始化错词复习模式和错词清零模式的设置
             const selectedMode = document.getElementById('study-mode').value;
             if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
@@ -2077,26 +2676,26 @@
                 countSelectContainer.style.display = 'none';
                 countSelect.value = 'all';
             }
-            
+
             // 初始化Lumi开关状态
             lumiEnabled = lumiToggle.checked;
             if (!lumiEnabled) {
                 lumiImg.classList.remove('active');
             }
-            
+
             // 初始检查 Lumi 位置
             checkLumiPosition();
-            
+
             // 添加窗口大小变化事件监听器
             window.addEventListener('resize', checkLumiPosition);
-            
+
             // 初始化自动播放开关状态
             autoPlayEnabled = autoPlayToggle.checked;
-            
+
             // 错词清零模式现在通过学习模式选择器控制，无需初始化toggle状态
-            
+
             // 添加词书选择变化事件监听器
-            document.getElementById('book-select').addEventListener('change', function() {
+            document.getElementById('book-select').addEventListener('change', function () {
                 const selectedBookId = this.value;
                 if (selectedBookId) {
                     loadWordLists(selectedBookId);
@@ -2112,58 +2711,58 @@
                     loadErrorStats();
                 }
             });
-            
+
             // 添加认证相关事件监听器
             loginBtn.addEventListener('click', async () => {
                 await handleLogin();
                 loadSRSMastery();
             });
-            
+
             // 添加回车键登录功能
-            loginPassword.addEventListener('keypress', function(event) {
+            loginPassword.addEventListener('keypress', function (event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();
                     handleLogin();
                 }
             });
-            
-            loginUsername.addEventListener('keypress', function(event) {
+
+            loginUsername.addEventListener('keypress', function (event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();
                     handleLogin();
                 }
             });
             registerBtn.addEventListener('click', handleRegister);
-            
+
             // 显示注册表单，隐藏登录表单
-            showRegisterLink.addEventListener('click', function(e) {
+            showRegisterLink.addEventListener('click', function (e) {
                 e.preventDefault();
-                
+
                 // 添加淡出动画
                 loginForm.classList.add('fade-out');
-                
+
                 // 等待动画完成后切换表单
-                setTimeout(function() {
+                setTimeout(function () {
                     loginForm.style.display = 'none';
                     loginForm.classList.remove('fade-out');
-                    
+
                     // 显示注册表单并添加淡入动画
                     registerForm.style.display = 'block';
                 }, 300);
             });
-            
+
             // 显示登录表单，隐藏注册表单
-            showLoginLink.addEventListener('click', function(e) {
+            showLoginLink.addEventListener('click', function (e) {
                 e.preventDefault();
-                
+
                 // 添加淡出动画
                 registerForm.classList.add('fade-out');
-                
+
                 // 等待动画完成后切换表单
-                setTimeout(function() {
+                setTimeout(function () {
                     registerForm.style.display = 'none';
                     registerForm.classList.remove('fade-out');
-                    
+
                     // 显示登录表单并添加淡入动画
                     loginForm.style.display = 'block';
                 }, 300);
@@ -2174,9 +2773,9 @@
             });
             loadSRSMastery(); // 加载SRS掌握度
         });
-        
+
         // Lumi开关事件监听
-        lumiToggle.addEventListener('change', function() {
+        lumiToggle.addEventListener('change', function () {
             lumiEnabled = this.checked;
             if (lumiEnabled) {
                 // 根据当前状态更新 Lumi 反应
@@ -2196,9 +2795,9 @@
                 lumiImg.classList.remove('active');
             }
         });
-        
+
         // 自动播放开关事件监听
-        autoPlayToggle.addEventListener('change', function() {
+        autoPlayToggle.addEventListener('change', function () {
             autoPlayEnabled = this.checked;
             // 保存到localStorage
             localStorage.setItem('autoPlayEnabled', autoPlayEnabled);
@@ -2207,9 +2806,9 @@
                 autoPlayAudios();
             }
         });
-        
+
         // 即时反馈开关事件监听
-        document.getElementById('instant-feedback-toggle').addEventListener('change', function() {
+        document.getElementById('instant-feedback-toggle').addEventListener('change', function () {
             instantFeedbackEnabled = this.checked;
             // 保存到localStorage
             localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
@@ -2218,7 +2817,7 @@
 
 
         // 学习模式变化事件监听
-        document.getElementById('study-mode').addEventListener('change', function() {
+        document.getElementById('study-mode').addEventListener('change', function () {
             const selectedMode = this.value;
             const errorStatsContainer = document.getElementById('error-stats-container');
             const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)'); // 数量选择器容器
@@ -2226,7 +2825,7 @@
             const srsReviewArea = document.getElementById('srs-review-area');
             const srsMasteryContainer = document.getElementById('srs-mastery-container');
             const quizArea = document.getElementById('quiz-area');
-            
+
             if (selectedMode === 'error_review') {
                 // 显示错词统计容器
                 errorStatsContainer.style.display = 'block';
@@ -2240,7 +2839,7 @@
                 srsReviewArea.style.display = 'none';
                 srsMasteryContainer.style.display = 'none';
                 quizArea.style.display = 'none';
-                
+
                 // 显示start-btn
                 startBtn.style.display = 'inline-block';
             } else if (selectedMode === 'error_clear') {
@@ -2254,10 +2853,10 @@
                 srsReviewArea.style.display = 'none';
                 srsMasteryContainer.style.display = 'none';
                 quizArea.style.display = 'none';
-                
+
                 // 显示start-btn
                 startBtn.style.display = 'inline-block';
-                
+
                 // 显示错词清零模式特殊提示
                 setTimeout(() => {
                     const errorStatsContent = document.getElementById('error-stats-content');
@@ -2267,7 +2866,7 @@
                         if (existingNote) {
                             existingNote.remove();
                         }
-                        
+
                         const clearModeNote = document.createElement('div');
                         clearModeNote.className = 'error-clear-note';
                         clearModeNote.style.cssText = `
@@ -2289,20 +2888,20 @@
                 errorStatsContainer.style.display = 'none';
                 quizArea.style.display = 'none';
                 countSelectContainer.style.display = 'none';
-                
+
                 // 显示start-btn，保持与其他模式一致
                 startBtn.style.display = 'inline-block';
-                
+
                 // 隐藏SRS复习区域，等待用户点击开始后显示
                 srsReviewArea.style.display = 'none';
-                
+
                 // 检查用户是否已登录
                 if (!currentUser) {
                     alert('请先登录后使用SRS复习功能');
                     this.value = 'standard'; // 重置为标准模式
                     return;
                 }
-                
+
                 // 加载SRS掌握度信息
                 loadSRSMastery();
             } else {
@@ -2312,20 +2911,20 @@
                 countSelectContainer.style.display = 'block';
                 srsReviewArea.style.display = 'none';
                 quizArea.style.display = 'none';
-                
+
                 // 显示start-btn
                 startBtn.style.display = 'inline-block';
             }
         });
 
         // 单元选择变化事件监听（用于错词复习模式和错词清零模式）
-        document.getElementById('list-select').addEventListener('change', function() {
+        document.getElementById('list-select').addEventListener('change', function () {
             const selectedMode = document.getElementById('study-mode').value;
             if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
                 // 立即显示加载状态
                 const errorStatsContent = document.getElementById('error-stats-content');
                 errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
-                
+
                 // 立即加载错词统计信息
                 loadErrorStats();
             }
@@ -2344,7 +2943,7 @@
                 border-radius: 8px;
                 box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             `;
-            
+
             // 创建标题
             const title = document.createElement('h1');
             title.textContent = '【错词清零模式】历史错词循环考核';
@@ -2354,7 +2953,7 @@
                 padding-bottom: 10px;
                 text-align: center;
             `;
-            
+
             // 创建轮次标题
             const roundTitle = document.createElement('h2');
             roundTitle.id = 'error-clear-round-title';
@@ -2364,7 +2963,7 @@
                 padding-bottom: 10px;
                 text-align: center;
             `;
-            
+
             // 创建说明
             const instructions = document.createElement('p');
             instructions.className = 'instructions';
@@ -2377,15 +2976,15 @@
                 padding: 10px;
                 margin: 20px 0;
             `;
-            
+
             // 创建表单
             const form = document.createElement('form');
             form.id = 'error-clear-form';
-            
+
             // 创建单词列表容器
             const wordListContainer = document.createElement('div');
             wordListContainer.id = 'error-clear-word-list';
-            
+
             // 创建提交按钮
             const submitBtn = document.createElement('button');
             submitBtn.type = 'submit';
@@ -2404,13 +3003,13 @@
                 width: 100%;
                 transition: background-color 0.2s;
             `;
-            submitBtn.addEventListener('mouseenter', function() {
+            submitBtn.addEventListener('mouseenter', function () {
                 this.style.backgroundColor = 'var(--hover-color)';
             });
-            submitBtn.addEventListener('mouseleave', function() {
+            submitBtn.addEventListener('mouseleave', function () {
                 this.style.backgroundColor = 'var(--primary-color)';
             });
-            
+
             // 创建结果容器
             const resultContainer = document.createElement('div');
             resultContainer.id = 'error-clear-result';
@@ -2422,7 +3021,7 @@
                 border-radius: 8px;
                 display: none;
             `;
-            
+
             // 组装界面
             form.appendChild(wordListContainer);
             form.appendChild(submitBtn);
@@ -2431,15 +3030,15 @@
             errorClearContainer.appendChild(instructions);
             errorClearContainer.appendChild(form);
             errorClearContainer.appendChild(resultContainer);
-            
+
             // 替换主容器内容
             const appContainer = document.getElementById('app-container');
             appContainer.innerHTML = '';
             appContainer.appendChild(errorClearContainer);
-            
+
             // 生成第一轮考核
             generateErrorClearQuiz();
-            
+
             // 添加表单提交事件
             form.addEventListener('submit', handleErrorClearSubmit);
         }
@@ -2449,11 +3048,11 @@
             const wordListContainer = document.getElementById('error-clear-word-list');
             const roundTitle = document.getElementById('error-clear-round-title');
             const resultContainer = document.getElementById('error-clear-result');
-            
+
             // 清空容器
             wordListContainer.innerHTML = '';
             resultContainer.style.display = 'none';
-            
+
             // 更新标题
             const currentWords = errorClearModeData.currentQuestions;
             let titleText = `第 ${errorClearModeData.currentRound} 轮考核 (剩余 ${currentWords.length} 词)`;
@@ -2461,7 +3060,7 @@
                 titleText = `错词清零考核 (共 ${currentWords.length} 词)`;
             }
             roundTitle.textContent = titleText;
-            
+
             // 生成单词列表
             currentWords.forEach((word, index) => {
                 const wordBox = document.createElement('div');
@@ -2474,16 +3073,16 @@
                     padding: 10px 0;
                     border-bottom: 1px dashed #ccc;
                 `;
-                
+
                 const inputId = `error-clear-word-${index}`;
-                
+
                 // 创建标签容器
                 const tagContainer = document.createElement('div');
                 tagContainer.style.cssText = `
                     display: block;
                     margin-bottom: 5px;
                 `;
-                
+
                 // 添加标签
                 const bookTag = document.createElement('span');
                 bookTag.textContent = `词书: ${word.book_name}`;
@@ -2497,7 +3096,7 @@
                     white-space: nowrap;
                     background-color: #17a2b8;
                 `;
-                
+
                 const listTag = document.createElement('span');
                 listTag.textContent = `单元: ${word.list_name}`;
                 listTag.style.cssText = `
@@ -2510,7 +3109,7 @@
                     white-space: nowrap;
                     background-color: #28a745;
                 `;
-                
+
                 const countTag = document.createElement('span');
                 countTag.textContent = `错过 ${word.error_count} 次`;
                 countTag.style.cssText = `
@@ -2523,7 +3122,7 @@
                     white-space: nowrap;
                     background-color: #dc3545;
                 `;
-                
+
                 const dateTag = document.createElement('span');
                 dateTag.textContent = `上次: ${word.last_error_date}`;
                 dateTag.style.cssText = `
@@ -2536,12 +3135,12 @@
                     white-space: nowrap;
                     background-color: #6c757d;
                 `;
-                
+
                 tagContainer.appendChild(bookTag);
                 tagContainer.appendChild(listTag);
                 tagContainer.appendChild(countTag);
                 tagContainer.appendChild(dateTag);
-                
+
                 // 创建标签
                 const label = document.createElement('label');
                 label.htmlFor = inputId;
@@ -2551,7 +3150,7 @@
                     margin-right: 15px;
                     line-height: 1.5;
                 `;
-                
+
                 const itemNum = document.createElement('span');
                 itemNum.textContent = `${index + 1}. `;
                 itemNum.style.cssText = `
@@ -2559,7 +3158,7 @@
                     margin-right: 5px;
                     color: #005a9c;
                 `;
-                
+
                 const pos = document.createElement('span');
                 pos.textContent = word.pos || '';
                 pos.style.cssText = `
@@ -2567,10 +3166,10 @@
                     color: #007bff;
                     font-weight: bold;
                 `;
-                
+
                 const meaning = document.createElement('span');
                 meaning.textContent = ` ${word.meaning_cn || ''}`;
-                
+
                 const ipa = document.createElement('span');
                 // 优先使用数据库中的IPA字段
                 const ipaText = word.ipa ? `/${word.ipa}/` : '';
@@ -2582,14 +3181,14 @@
                         margin-left: 8px;
                     `;
                 }
-                
+
                 label.appendChild(itemNum);
                 label.appendChild(tagContainer);
                 label.appendChild(pos);
                 label.appendChild(meaning);
                 label.appendChild(ipa);
                 label.appendChild(document.createTextNode('：'));
-                
+
                 // 创建输入框
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -2602,7 +3201,7 @@
                     border-radius: 4px;
                     font-size: 16px;
                 `;
-                
+
                 // 添加鼠标激活时播放音频的功能
                 input.addEventListener('focus', () => {
                     if (word.audio_path_us || word.audio_path_uk) {
@@ -2620,12 +3219,12 @@
                         ttsAudio.play().catch(ttsError => console.log('TTS失败:', ttsError));
                     }
                 });
-                
+
                 wordBox.appendChild(label);
                 wordBox.appendChild(input);
                 wordListContainer.appendChild(wordBox);
             });
-            
+
             // 聚焦第一个输入框
             if (wordListContainer.querySelector('input')) {
                 wordListContainer.querySelector('input').focus();
@@ -2635,24 +3234,24 @@
         // 处理错词清零模式提交
         function handleErrorClearSubmit(event) {
             event.preventDefault();
-            
+
             const currentWords = errorClearModeData.currentQuestions;
             const incorrectWords = [];
             let correctCount = 0;
             const resultDetails = [];
-            
+
             // 检查每个答案
             currentWords.forEach((word, index) => {
                 const inputElement = document.getElementById(`error-clear-word-${index}`);
                 const userAnswer = inputElement.value.trim();
                 const correctAnswer = word.spelling;
-                
+
                 const resultLine = {
                     word: word.spelling,
                     userAnswer: userAnswer,
                     isCorrect: userAnswer.toLowerCase() === correctAnswer.toLowerCase()
                 };
-                
+
                 if (resultLine.isCorrect) {
                     correctCount++;
                 } else {
@@ -2660,10 +3259,10 @@
                     // 记录错误到数据库
                     recordError(word, userAnswer);
                 }
-                
+
                 resultDetails.push(resultLine);
             });
-            
+
             // 保存本轮结果
             errorClearModeData.roundResults.push({
                 round: errorClearModeData.currentRound,
@@ -2672,15 +3271,15 @@
                 incorrectWords: [...incorrectWords],
                 resultDetails: resultDetails
             });
-            
+
             // 显示本轮结果
             showErrorClearRoundResult();
-            
+
             // 准备下一轮
             if (incorrectWords.length > 0) {
                 errorClearModeData.currentQuestions = incorrectWords;
                 errorClearModeData.currentRound++;
-                
+
                 // 延迟显示下一轮，给用户足够时间查看结果
                 setTimeout(() => {
                     generateErrorClearQuiz();
@@ -2697,13 +3296,13 @@
         function showErrorClearRoundResult() {
             const resultContainer = document.getElementById('error-clear-result');
             const currentRound = errorClearModeData.roundResults[errorClearModeData.roundResults.length - 1];
-            
+
             const overallPercentage = Math.round((currentRound.correctCount / currentRound.totalWords) * 100);
-            
+
             // 获取当前选择的词书和单元信息（从保存的数据中获取）
             const selectedBookName = errorClearModeData.bookName || '未知词书';
             const selectedListName = errorClearModeData.listName || '未知单元';
-            
+
             resultContainer.innerHTML = `
                 <!-- 添加测试信息 -->
                 <div style="background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; color: #0c5460;">
@@ -2729,15 +3328,15 @@
                 <div style="margin-bottom: 15px;">
                     <p><strong>详细结果：</strong></p>
                     ${currentRound.resultDetails.map(detail => {
-                        if (detail.isCorrect) {
-                            return `<p style="color: var(--primary-color); font-weight: bold;">✔ 正确: ${detail.word}</p>`;
-                        } else {
-                            return `<p>✘ 错误: "${detail.word}" — 你的答案: <span style="color: var(--error-color); text-decoration: line-through;">${detail.userAnswer || '（未填写）'}</span></p>`;
-                        }
-                    }).join('')}
+                if (detail.isCorrect) {
+                    return `<p style="color: var(--primary-color); font-weight: bold;">✔ 正确: ${detail.word}</p>`;
+                } else {
+                    return `<p>✘ 错误: "${detail.word}" — 你的答案: <span style="color: var(--error-color); text-decoration: line-through;">${detail.userAnswer || '（未填写）'}</span></p>`;
+                }
+            }).join('')}
                 </div>
             `;
-            
+
             resultContainer.style.display = 'block';
         }
 
@@ -2746,11 +3345,11 @@
             const appContainer = document.getElementById('app-container');
             const totalRounds = errorClearModeData.roundResults.length;
             const totalWords = errorClearModeData.originalQuestions.length;
-            
+
             // 获取当前选择的词书和单元信息（从保存的数据中获取）
             const selectedBookName = errorClearModeData.bookName || '未知词书';
             const selectedListName = errorClearModeData.listName || '未知单元';
-            
+
             appContainer.innerHTML = `
                 <div style="max-width: 800px; margin: 0 auto; background: var(--bg-color); padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;">
                     <h1 style="color: var(--primary-color); margin-bottom: 20px;">🎉 恭喜！错词清零完成！</h1>
@@ -2779,13 +3378,13 @@
                     <div style="margin-top: 30px;">
                         <h3 style="color: var(--primary-color); margin-bottom: 15px;">各轮次表现</h3>
                         ${errorClearModeData.roundResults.map((round, index) => {
-                            const percentage = Math.round((round.correctCount / round.totalWords) * 100);
-                            return `
+                const percentage = Math.round((round.correctCount / round.totalWords) * 100);
+                return `
                                 <div style="background: var(--bg-color); border: 1px solid var(--primary-color); border-radius: 5px; padding: 10px; margin: 10px 0; text-align: left;">
                                     <strong>第 ${round.round} 轮：</strong> 答对 ${round.correctCount} / ${round.totalWords} 个，正确率 ${percentage}%
                                 </div>
                             `;
-                        }).join('')}
+            }).join('')}
                     </div>
                     <div style="margin-top: 30px;">
                         <button onclick="location.reload()" style="margin-right: 15px; padding: 12px 25px; background: var(--primary-color); border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; transition: background-color 0.2s;">
@@ -2821,7 +3420,7 @@
                     student_answer: userAnswer,
                     list_id: word.list_id
                 });
-                
+
                 const response = await fetch('/api/record-error', {
                     method: 'POST',
                     headers: {
@@ -2833,7 +3432,7 @@
                         list_id: word.list_id
                     })
                 });
-                
+
                 if (!response.ok) {
                     console.error('记录错误失败:', response.statusText);
                     const errorData = await response.text();
@@ -2850,7 +3449,7 @@
         // 保存当前测试进度的函数
         async function saveQuizProgress() {
             if (userAnswers.length === 0) return;
-            
+
             try {
                 const progress = {
                     list_id: document.getElementById('list-select').value,
@@ -2861,19 +3460,19 @@
                     progress_percentage: Math.round((userAnswers.length / questions.length) * 100),
                     timestamp: new Date().toISOString()
                 };
-                
+
                 // 保存到localStorage作为备份
                 localStorage.setItem('quizProgress', JSON.stringify(progress));
-                
+
                 console.log('测试进度已保存:', progress);
-                
+
                 // 这里可以添加发送到服务器的逻辑
                 // const response = await fetch('/api/save-progress', {
                 //     method: 'POST',
                 //     headers: { 'Content-Type': 'application/json' },
                 //     body: JSON.stringify(progress)
                 // });
-                
+
             } catch (error) {
                 console.error('保存进度时出错:', error);
             }
@@ -2883,15 +3482,15 @@
         async function loadErrorStats() {
             const selectedListId = document.getElementById('list-select').value;
             const errorStatsContent = document.getElementById('error-stats-content');
-            
+
             if (!selectedListId) {
                 errorStatsContent.innerHTML = '<p style="color: #856404;">请先选择一个单词列表</p>';
                 return;
             }
-            
+
             // 立即显示加载状态
             errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
-            
+
             try {
                 const response = await fetch(`/api/error-stats?list_id=${selectedListId}`);
                 if (!response.ok) {
@@ -2902,9 +3501,9 @@
                     }
                     return;
                 }
-                
+
                 const stats = await response.json();
-                
+
                 if (stats.error_words_count === 0) {
                     errorStatsContent.innerHTML = `
                         <p style="color: #28a745; font-weight: bold;">🎉 恭喜！</p>
@@ -2933,16 +3532,16 @@
         async function loadSRSMastery() {
             const srsContainer = document.getElementById('srs-mastery-container');
             const srsStatsContent = document.getElementById('srs-stats-content');
-            
+
             // 检查用户是否已登录
             if (!currentUser) {
                 srsContainer.style.display = 'none';
                 return;
             }
-            
+
             // 注意：容器的显示/隐藏现在由学习模式变化事件控制
             // 这里只负责加载数据，不控制显示状态
-            
+
             try {
                 const response = await fetch('/api/srs/progress');
                 if (!response.ok) {
@@ -2953,24 +3552,24 @@
                         throw new Error('获取SRS进度失败');
                     }
                 }
-                
+
                 const data = await response.json();
                 const stats = data.stats;
                 const recentWords = data.recent_words;
-                
+
                 // 更新统计数据
                 document.getElementById('srs-total-words').textContent = stats.total_words;
                 document.getElementById('srs-learned-words').textContent = stats.learned_words;
                 document.getElementById('srs-due-words').textContent = stats.due_words;
                 document.getElementById('srs-avg-interval').textContent = stats.avg_interval + '天';
-                
+
                 // 更新最近学习的单词
                 const recentWordsList = document.getElementById('srs-recent-words-list');
                 if (recentWords && recentWords.length > 0) {
                     const wordsHtml = recentWords.slice(0, 5).map(word => {
                         let masteryLevel = '';
                         let levelColor = '';
-                        
+
                         if (word.repetitions === 0) {
                             masteryLevel = '🔴 不熟悉';
                             levelColor = '#ffcdd2';
@@ -2987,7 +3586,7 @@
                             masteryLevel = '🔵 精通';
                             levelColor = '#bbdefb';
                         }
-                        
+
                         return `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px;">
                                 <span><strong>${word.spelling}</strong> - ${word.meaning_cn}</span>
@@ -2999,7 +3598,7 @@
                 } else {
                     recentWordsList.innerHTML = '<p style="margin: 0; opacity: 0.8;">还没有学习记录</p>';
                 }
-                
+
             } catch (error) {
                 console.error('加载SRS掌握度时出错:', error);
                 // 错误时不自动隐藏容器，让学习模式变化事件来控制
@@ -3011,12 +3610,12 @@
             const selectedListId = document.getElementById('list-select').value;
             const selectedCount = document.getElementById('count-select').value;
             const selectedMode = document.getElementById('study-mode').value;
-            
+
             if (!selectedListId) {
                 alert('请先选择一个单词列表！');
                 return;
             }
-            
+
             // SRS模式下的特殊处理
             if (selectedMode === 'srs_review') {
                 await handleSRSStart();
@@ -3036,7 +3635,7 @@
                             throw new Error('获取错词统计失败');
                         }
                     }
-                    
+
                     const stats = await statsResponse.json();
                     if (stats.error_words_count === 0) {
                         alert('恭喜！在这个列表中你还没有犯过任何错误。请尝试其他模式或选择其他列表。');
@@ -3061,14 +3660,14 @@
                     throw new Error('网络请求失败');
                 }
                 questions = await response.json();
-                
+
                 if (questions && questions.length > 0) {
                     // 错词清零模式特殊处理
                     if (selectedMode === 'error_clear') {
                         // 获取当前选择的词书和单元信息
                         const selectedBookName = document.getElementById('book-select').options[document.getElementById('book-select').selectedIndex]?.text || '未知词书';
                         const selectedListName = document.getElementById('list-select').options[document.getElementById('list-select').selectedIndex]?.text || '未知单元';
-                        
+
                         // 初始化错词清零模式数据
                         errorClearModeData = {
                             isActive: true,
@@ -3080,7 +3679,7 @@
                             bookName: selectedBookName,
                             listName: selectedListName
                         };
-                        
+
                         // 隐藏所有控制元素
                         document.querySelector('.list-selector').style.display = 'none';
                         startBtn.style.display = 'none';
@@ -3089,12 +3688,12 @@
                         document.querySelector('.lumi-toggle-container').style.display = 'none';
                         document.querySelector('.auto-play-container').style.display = 'none';
                         document.querySelector('.feedback-container').style.display = 'none';
-                        
+
                         // 显示错词清零模式界面
                         showErrorClearModeInterface();
                         return;
                     }
-                    
+
                     // 其他模式（标准模式、默写模式、错词复习模式）
                     document.querySelector('.list-selector').style.display = 'none';
                     startBtn.style.display = 'none';
@@ -3122,7 +3721,7 @@
         });
 
         // 退出测试按钮
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.id === 'exit-quiz-btn') {
                 if (confirm('确定要退出当前测试吗？\n\n⚠️ 警告：\n• 当前进度将丢失\n• 已答题目不会保存\n• 需要重新开始测试\n\n是否继续退出？')) {
                     // 保存当前进度
@@ -3130,7 +3729,7 @@
                         saveQuizProgress();
                         console.log('已答题目数量:', userAnswers.length);
                     }
-                    
+
                     // 重置测试状态
                     resetQuizState();
                 }
@@ -3138,14 +3737,14 @@
         });
 
         // 返回主页按钮
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.id === 'back-home-btn' || e.target.id === 'back-home-from-clear-btn') {
                 if (confirm('确定要返回主页吗？\n\n当前测试进度将丢失。')) {
                     // 保存当前进度
                     if (userAnswers.length > 0) {
                         saveQuizProgress();
                     }
-                    
+
                     resetQuizState();
                 }
             }
@@ -3169,10 +3768,10 @@
                 bookName: '',
                 listName: ''
             };
-            
+
             // 重置SRS复习数据
             resetSRSReview();
-            
+
             // 显示所有控制元素
             document.querySelector('.list-selector').style.display = 'flex';
             startBtn.style.display = 'inline-block';
@@ -3182,15 +3781,15 @@
             document.querySelector('.lumi-toggle-container').style.display = 'flex';
             document.querySelector('.auto-play-container').style.display = 'flex';
             document.querySelector('.feedback-container').style.display = 'flex';
-            
+
             // 隐藏测试区域和SRS复习区域
             quizArea.style.display = 'none';
             resultsArea.style.display = 'none';
             document.getElementById('srs-review-area').style.display = 'none';
-            
+
             // 重置学习模式为标准模式
             document.getElementById('study-mode').value = 'standard';
-            
+
             // 清空输入框和问题显示
             answerInput.value = '';
             questionMeaningEl.textContent = '';
@@ -3198,11 +3797,11 @@
             questionMeaningEnEl.textContent = '';
             questionExampleEnEl.textContent = '';
             questionExampleCnEl.textContent = '';
-            
+
             // 重置详情区域
             wordDetailsContainer.style.display = 'none';
             toggleDetailsBtn.textContent = '显示更多详情';
-            
+
             // 清空详情内容
             questionDerivativesEl.textContent = '';
             questionRootEtymologyEl.textContent = '';
@@ -3214,17 +3813,17 @@
             questionExamOptionsEl.textContent = '';
             questionExamExplanationEl.textContent = '';
             questionTipsEl.textContent = '';
-            
+
             // 重置Lumi状态
             updateLumiReaction('welcome');
-            
+
             // 重新加载错词统计
             loadErrorStats();
             document.getElementById('srs-mastery-container').style.display = 'block';
         }
 
         // 下一步按钮和回车键
-        nextBtn.addEventListener('click', function() {
+        nextBtn.addEventListener('click', function () {
             if (inputEnabled) {
                 handleNextQuestion();
             }
@@ -3234,7 +3833,7 @@
             if (wordDetailsContainer.style.display === 'none') {
                 wordDetailsContainer.style.display = 'block';
                 toggleDetailsBtn.textContent = '隐藏更多详情';
-                
+
                 // 调试信息：检查详情内容是否为空
                 const detailsContent = [
                     document.getElementById('question-derivatives').textContent,
@@ -3248,7 +3847,7 @@
                     document.getElementById('question-exam-explanation').textContent,
                     document.getElementById('question-tips').textContent
                 ];
-                
+
                 const hasContent = detailsContent.some(text => text.trim() !== '');
                 if (!hasContent) {
                     // 如果所有详情内容都为空，显示提示信息
@@ -3259,11 +3858,11 @@
                     noContentMsg.style.fontStyle = 'italic';
                     noContentMsg.style.textAlign = 'center';
                     noContentMsg.style.padding = '10px';
-                    
+
                     // 清除之前的提示（如果有）
                     const oldMsg = document.getElementById('no-details-msg');
                     if (oldMsg) oldMsg.remove();
-                    
+
                     wordDetailsContainer.appendChild(noContentMsg);
                 }
             } else {
@@ -3271,7 +3870,7 @@
                 toggleDetailsBtn.textContent = '显示更多详情';
             }
         });
-        answerInput.addEventListener('keydown', function(event) {
+        answerInput.addEventListener('keydown', function (event) {
             if (event.keyCode === 13 && inputEnabled) {
                 event.preventDefault();
                 handleNextQuestion();
@@ -3283,7 +3882,7 @@
             // 将多个词性用斜杠分隔，避免换行
             return pos.replace(/[；;]/g, ' / ');
         }
-        
+
         // SRS复习相关函数
         async function loadSRSDueWords() {
             try {
@@ -3292,14 +3891,14 @@
                 if (!response.ok) {
                     throw new Error('获取待复习单词失败');
                 }
-                
+
                 const data = await response.json();
                 srsReviewData.dueWords = data.due_words;
                 srsReviewData.totalDueWords = data.due_words.length;
-                
+
                 // 更新统计显示
                 document.getElementById('srs-due-count').textContent = srsReviewData.totalDueWords;
-                
+
                 return srsReviewData.dueWords.length > 0;
             } catch (error) {
                 console.error('加载SRS待复习单词失败:', error);
@@ -3307,44 +3906,44 @@
                 return false;
             }
         }
-        
+
         function startSRSReview() {
             if (srsReviewData.dueWords.length === 0) {
                 alert('没有需要复习的单词！');
                 return;
             }
-            
+
             srsReviewData.isActive = true;
             srsReviewData.currentWordIndex = 0;
             srsReviewData.reviewedWords = [];
             srsReviewData.grades = [];
-            
+
             // 显示复习界面
             document.getElementById('srs-progress-container').style.display = 'block';
             document.getElementById('srs-card-container').style.display = 'block';
             document.getElementById('srs-controls').style.display = 'block';
-            
+
             // 隐藏开始按钮
             document.getElementById('srs-start-btn').style.display = 'none';
-            
+
             // 显示第一个单词
             displaySRSWord();
         }
-        
+
         function displaySRSWord() {
             if (srsReviewData.currentWordIndex >= srsReviewData.dueWords.length) {
                 finishSRSReview();
                 return;
             }
-            
+
             const word = srsReviewData.dueWords[srsReviewData.currentWordIndex];
-            
+
             // 更新进度
             const progress = ((srsReviewData.currentWordIndex + 1) / srsReviewData.dueWords.length) * 100;
             document.getElementById('srs-progress-bar').style.width = progress + '%';
-            document.getElementById('srs-progress-text').textContent = 
+            document.getElementById('srs-progress-text').textContent =
                 `${srsReviewData.currentWordIndex + 1} / ${srsReviewData.dueWords.length}`;
-            
+
             // 显示单词信息
             document.getElementById('srs-word-spelling').textContent = word.spelling;
             document.getElementById('srs-word-ipa').textContent = word.ipa || '';
@@ -3352,12 +3951,12 @@
             document.getElementById('srs-word-meaning').textContent = word.meaning_cn;
             document.getElementById('srs-word-example-en').textContent = word.exam_sentence || '';
             document.getElementById('srs-word-example-cn').textContent = word.exam_sentence_cn || '';
-            
+
             // 显示SRS信息
             document.getElementById('srs-repetitions').textContent = word.repetitions || 0;
             document.getElementById('srs-interval').textContent = `${word.interval || 1}天`;
             document.getElementById('srs-next-review').textContent = word.next_review_date || '今天';
-            
+
             // 显示错词信息（如果有）
             const errorInfo = document.getElementById('srs-error-info');
             const errorCount = document.getElementById('srs-error-count');
@@ -3367,16 +3966,16 @@
             } else {
                 errorInfo.style.display = 'none';
             }
-            
+
             // 显示掌握度级别
             const masteryLevel = document.getElementById('srs-mastery-level');
             const masteryText = document.getElementById('srs-mastery-text');
             const repetitions = word.repetitions || 0;
-            
+
             let levelText = '';
             let bgColor = '';
             let textColor = '';
-            
+
             if (repetitions === 0) {
                 levelText = '🔴 不熟悉';
                 bgColor = '#ffebee';
@@ -3398,12 +3997,12 @@
                 bgColor = '#e3f2fd';
                 textColor = '#1565c0';
             }
-            
+
             masteryText.textContent = levelText;
             masteryLevel.style.backgroundColor = bgColor;
             masteryLevel.style.color = textColor;
             masteryLevel.style.display = 'block';
-            
+
             // 设置音频按钮
             if (word.audio_path_uk) {
                 let ukAudioPath = word.audio_path_uk;
@@ -3422,7 +4021,7 @@
                 document.getElementById('srs-play-uk-btn').onclick = () => playAudio(`/api/tts/${word.spelling}`);
                 document.getElementById('srs-play-uk-btn').style.display = 'inline-block';
             }
-            
+
             if (word.audio_path_us) {
                 let usAudioPath = word.audio_path_us;
                 if (!usAudioPath.startsWith('http') && !usAudioPath.startsWith('/api/tts/')) {
@@ -3440,7 +4039,7 @@
                 document.getElementById('srs-play-us-btn').onclick = () => playAudio(`/api/tts/${word.spelling}`);
                 document.getElementById('srs-play-us-btn').style.display = 'inline-block';
             }
-            
+
             // 隐藏例句容器如果没有例句
             const exampleContainer = document.getElementById('srs-example-container');
             if (!word.exam_sentence && !word.exam_sentence_cn) {
@@ -3449,13 +4048,13 @@
                 exampleContainer.style.display = 'block';
             }
         }
-        
+
         async function handleSRSGrade(grade) {
             const word = srsReviewData.dueWords[srsReviewData.currentWordIndex];
-            
+
             try {
                 console.log('正在更新SRS进度:', { word_id: word.word_id, grade: grade });
-                
+
                 // 更新SRS进度
                 const response = await fetch('/api/srs/update-progress', {
                     method: 'POST',
@@ -3467,51 +4066,51 @@
                         grade: grade
                     })
                 });
-                
+
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
                     console.error('API响应错误:', response.status, errorData);
                     throw new Error(`更新SRS进度失败: ${response.status} - ${errorData.error || '未知错误'}`);
                 }
-                
+
                 const result = await response.json();
                 console.log('SRS进度更新成功:', result);
-                
+
                 // 记录复习结果
                 srsReviewData.reviewedWords.push(word);
                 srsReviewData.grades.push(grade);
-                
+
                 // 更新统计
                 updateSRSReviewStats();
-                
+
                 // 移动到下一个单词
                 srsReviewData.currentWordIndex++;
                 displaySRSWord();
-                
+
             } catch (error) {
                 console.error('更新SRS进度失败:', error);
                 alert(`更新学习进度失败: ${error.message}\n请检查网络连接或重新登录后重试`);
             }
         }
-        
+
         function updateSRSReviewStats() {
             const reviewedCount = srsReviewData.reviewedWords.length;
-            const avgGrade = srsReviewData.grades.length > 0 ? 
+            const avgGrade = srsReviewData.grades.length > 0 ?
                 srsReviewData.grades.reduce((a, b) => a + b, 0) / srsReviewData.grades.length : 0;
             const accuracy = Math.round((avgGrade / 5) * 100);
-            
+
             document.getElementById('srs-reviewed-count').textContent = reviewedCount;
             document.getElementById('srs-accuracy').textContent = accuracy + '%';
         }
-        
+
         function finishSRSReview() {
             srsReviewData.isActive = false;
-            
+
             // 隐藏复习界面
             document.getElementById('srs-progress-container').style.display = 'none';
             document.getElementById('srs-card-container').style.display = 'none';
             document.getElementById('srs-controls').style.display = 'none';
-            
+
             // 检查是否需要验证测试
             const highGradeWords = srsReviewData.grades.filter(grade => grade >= 4).length;
             if (highGradeWords > 0) {
@@ -3522,42 +4121,42 @@
                 showSRSResults();
             }
         }
-        
+
         async function startVerificationTest() {
             try {
                 const response = await fetch('/api/srs/verification-test');
                 if (!response.ok) {
                     throw new Error('获取验证测试失败');
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (data.message === '没有需要验证的单词') {
                     showSRSResults();
                     return;
                 }
-                
+
                 srsReviewData.verificationTest = data.verification_test;
-                
+
                 // 显示验证测试界面
                 document.getElementById('verification-meaning').textContent = srsReviewData.verificationTest.meaning;
                 document.getElementById('verification-answer').value = '';
                 document.getElementById('verification-result').style.display = 'none';
                 document.getElementById('srs-verification-container').style.display = 'block';
-                
+
             } catch (error) {
                 console.error('启动验证测试失败:', error);
                 showSRSResults();
             }
         }
-        
+
         async function submitVerification() {
             const answer = document.getElementById('verification-answer').value.trim();
             if (!answer) {
                 alert('请输入单词拼写');
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/srs/submit-verification', {
                     method: 'POST',
@@ -3569,20 +4168,20 @@
                         answer: answer
                     })
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('提交验证失败');
                 }
-                
+
                 const result = await response.json();
-                
+
                 // 显示验证结果
                 const resultContainer = document.getElementById('verification-result');
                 const successDiv = document.getElementById('verification-success');
                 const failedDiv = document.getElementById('verification-failed');
-                
+
                 resultContainer.style.display = 'block';
-                
+
                 if (result.is_correct) {
                     successDiv.style.display = 'block';
                     failedDiv.style.display = 'none';
@@ -3591,60 +4190,60 @@
                     failedDiv.style.display = 'block';
                     document.getElementById('correct-spelling').textContent = result.correct_spelling;
                 }
-                
+
                 // 3秒后显示最终结果
                 setTimeout(() => {
                     showSRSResults();
                 }, 3000);
-                
+
             } catch (error) {
                 console.error('提交验证失败:', error);
                 alert('验证失败，请重试');
             }
         }
-        
+
         function skipVerification() {
             showSRSResults();
         }
-        
+
         async function showSRSResults() {
             // 隐藏验证测试界面
             document.getElementById('srs-verification-container').style.display = 'none';
-            
+
             // 显示结果
             const reviewedCount = srsReviewData.reviewedWords.length;
-            const avgGrade = srsReviewData.grades.length > 0 ? 
+            const avgGrade = srsReviewData.grades.length > 0 ?
                 srsReviewData.grades.reduce((a, b) => a + b, 0) / srsReviewData.grades.length : 0;
             const accuracy = Math.round((avgGrade / 5) * 100);
-            const avgInterval = srsReviewData.reviewedWords.length > 0 ? 
+            const avgInterval = srsReviewData.reviewedWords.length > 0 ?
                 Math.round(srsReviewData.reviewedWords.reduce((sum, word) => sum + (word.interval || 1), 0) / srsReviewData.reviewedWords.length) : 0;
-            
+
             document.getElementById('srs-final-reviewed').textContent = reviewedCount;
             document.getElementById('srs-final-accuracy').textContent = accuracy + '%';
             document.getElementById('srs-final-interval').textContent = avgInterval;
-            
+
             // 加载验证统计
             try {
                 const response = await fetch('/api/srs/verification-stats');
                 if (response.ok) {
                     const data = await response.json();
                     srsReviewData.verificationStats = data.stats;
-                    
+
                     document.getElementById('verification-rate').textContent = data.stats.honesty_rate + '%';
                     document.getElementById('avg-claimed-grade').textContent = data.stats.avg_claimed_grade;
                 }
             } catch (error) {
                 console.error('加载验证统计失败:', error);
             }
-            
+
             document.getElementById('srs-results-container').style.display = 'block';
         }
-        
+
         // SRS开始处理函数
         async function handleSRSStart() {
             const wordLimit = parseInt(document.getElementById('srs-word-limit').value);
             srsReviewData.wordLimit = wordLimit;
-            
+
             const hasWords = await loadSRSDueWords();
             if (hasWords) {
                 // 隐藏所有不相干的div，就像其他学习模式一样
@@ -3656,53 +4255,53 @@
                 document.querySelector('.lumi-toggle-container').style.display = 'none';
                 document.querySelector('.auto-play-container').style.display = 'none';
                 document.querySelector('.feedback-container').style.display = 'none';
-                
+
                 // 显示SRS复习区域
                 document.getElementById('srs-review-area').style.display = 'block';
-                
+
                 // 开始SRS复习
                 startSRSReview();
             } else {
                 alert('没有需要复习的单词！');
             }
         }
-        
+
         function resetSRSReview() {
             srsReviewData.isActive = false;
             srsReviewData.dueWords = [];
             srsReviewData.currentWordIndex = 0;
             srsReviewData.reviewedWords = [];
             srsReviewData.grades = [];
-            
+
             // 隐藏所有SRS界面
             document.getElementById('srs-progress-container').style.display = 'none';
             document.getElementById('srs-card-container').style.display = 'none';
             document.getElementById('srs-controls').style.display = 'none';
             document.getElementById('srs-results-container').style.display = 'none';
-            
+
             // 显示开始按钮
             document.getElementById('srs-start-btn').style.display = 'inline-block';
         }
-        
+
         // SRS复习按钮事件
         document.getElementById('srs-review-btn').addEventListener('click', async () => {
             // 直接进入SRS复习流程
             await handleSRSStart();
         });
-        
+
         // SRS复习相关事件监听
         document.getElementById('srs-start-btn').addEventListener('click', async () => {
             await handleSRSStart();
         });
-        
+
         // SRS评分按钮事件
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.classList.contains('srs-grade-btn')) {
                 const grade = parseInt(e.target.dataset.grade);
                 handleSRSGrade(grade);
             }
         });
-        
+
         // SRS复习结果按钮事件
         document.getElementById('srs-restart-btn').addEventListener('click', async () => {
             document.getElementById('srs-results-container').style.display = 'none';
@@ -3711,14 +4310,14 @@
                 startSRSReview();
             }
         });
-        
+
         document.getElementById('srs-back-home-btn').addEventListener('click', () => {
             resetSRSReview();
             resetQuizState();
             // 确保SRS复习区域被隐藏
             document.getElementById('srs-review-area').style.display = 'none';
         });
-        
+
         // SRS复习控制按钮事件
         document.getElementById('srs-back-home-from-review-btn').addEventListener('click', () => {
             if (confirm('确定要返回主页吗？当前复习进度将丢失。')) {
@@ -3728,7 +4327,7 @@
                 document.getElementById('srs-review-area').style.display = 'none';
             }
         });
-        
+
         document.getElementById('srs-exit-review-btn').addEventListener('click', () => {
             if (confirm('确定要退出SRS复习吗？当前复习进度将丢失。')) {
                 resetSRSReview();
@@ -3736,13 +4335,13 @@
                 document.getElementById('srs-review-area').style.display = 'none';
             }
         });
-        
+
         // 验证测试相关事件监听
         document.getElementById('submit-verification-btn').addEventListener('click', submitVerification);
         document.getElementById('skip-verification-btn').addEventListener('click', skipVerification);
-        
+
         // 验证测试输入框回车事件
-        document.getElementById('verification-answer').addEventListener('keydown', function(event) {
+        document.getElementById('verification-answer').addEventListener('keydown', function (event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitVerification();
@@ -3751,14 +4350,14 @@
     </script>
     <script src="/fix_mess_display_new.js"></script>
     <script src="/fix_content_display.js"></script>
-    
+
     <!-- Console error filtering script -->
     <script>
         // Filter out external console errors to reduce noise
-        (function() {
+        (function () {
             const originalConsoleError = console.error;
             const originalConsoleLog = console.log;
-            
+
             // List of external scripts to filter out
             const externalScripts = [
                 'enable_copy.js',
@@ -3767,32 +4366,33 @@
                 'mixpanel',
                 'api-js.mixpanel.com'
             ];
-            
-            console.error = function(...args) {
+
+            console.error = function (...args) {
                 const message = args.join(' ');
-                const shouldFilter = externalScripts.some(script => 
+                const shouldFilter = externalScripts.some(script =>
                     message.includes(script)
                 );
-                
+
                 if (!shouldFilter) {
                     originalConsoleError.apply(console, args);
                 }
             };
-            
-            console.log = function(...args) {
+
+            console.log = function (...args) {
                 const message = args.join(' ');
-                const shouldFilter = externalScripts.some(script => 
+                const shouldFilter = externalScripts.some(script =>
                     message.includes(script)
                 );
-                
+
                 if (!shouldFilter) {
                     originalConsoleLog.apply(console, args);
                 }
             };
-            
+
             // Add a note about filtered messages
             console.log('🔧 Console filtering active - external errors hidden');
         })();
     </script>
 </body>
+
 </html>
