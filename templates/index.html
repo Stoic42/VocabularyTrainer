@@ -41,72 +41,105 @@
 
             /* Touch target minimum size */
             --touch-target-min: 44px;
-            
+
             /* Responsive typography scale */
-            --font-size-xs: 0.75rem;   /* 12px */
-            --font-size-sm: 0.875rem;  /* 14px */
-            --font-size-base: 1rem;    /* 16px */
-            --font-size-lg: 1.125rem;  /* 18px */
-            --font-size-xl: 1.25rem;   /* 20px */
-            --font-size-2xl: 1.5rem;   /* 24px */
-            --font-size-3xl: 1.875rem; /* 30px */
-            --font-size-4xl: 2.25rem;  /* 36px */
-            
+            --font-size-xs: 0.75rem;
+            /* 12px */
+            --font-size-sm: 0.875rem;
+            /* 14px */
+            --font-size-base: 1rem;
+            /* 16px */
+            --font-size-lg: 1.125rem;
+            /* 18px */
+            --font-size-xl: 1.25rem;
+            /* 20px */
+            --font-size-2xl: 1.5rem;
+            /* 24px */
+            --font-size-3xl: 1.875rem;
+            /* 30px */
+            --font-size-4xl: 2.25rem;
+            /* 36px */
+
             /* Line heights */
             --line-height-tight: 1.25;
             --line-height-normal: 1.5;
             --line-height-relaxed: 1.75;
         }
-        
+
         /* Base typography */
-        body, html {
+        body,
+        html {
             font-size: var(--font-size-base);
             line-height: var(--line-height-normal);
         }
-        
+
         /* Responsive typography */
-        h1 { 
-            font-size: var(--font-size-3xl); 
+        h1 {
+            font-size: var(--font-size-3xl);
             line-height: var(--line-height-tight);
         }
-        h2 { 
-            font-size: var(--font-size-2xl); 
+
+        h2 {
+            font-size: var(--font-size-2xl);
             line-height: var(--line-height-tight);
         }
-        h3 { 
-            font-size: var(--font-size-xl); 
+
+        h3 {
+            font-size: var(--font-size-xl);
             line-height: var(--line-height-tight);
         }
-        h4 { 
-            font-size: var(--font-size-lg); 
+
+        h4 {
+            font-size: var(--font-size-lg);
             line-height: var(--line-height-normal);
         }
-        
+
         /* Small text */
-        .text-xs { font-size: var(--font-size-xs); }
-        .text-sm { font-size: var(--font-size-sm); }
-        .text-base { font-size: var(--font-size-base); }
-        .text-lg { font-size: var(--font-size-lg); }
-        .text-xl { font-size: var(--font-size-xl); }
-        
+        .text-xs {
+            font-size: var(--font-size-xs);
+        }
+
+        .text-sm {
+            font-size: var(--font-size-sm);
+        }
+
+        .text-base {
+            font-size: var(--font-size-base);
+        }
+
+        .text-lg {
+            font-size: var(--font-size-lg);
+        }
+
+        .text-xl {
+            font-size: var(--font-size-xl);
+        }
+
         /* Mobile typography adjustments */
         @media (max-width: 767px) {
             :root {
-                --font-size-3xl: 1.5rem;   /* 24px on mobile */
-                --font-size-2xl: 1.25rem;  /* 20px on mobile */
-                --font-size-xl: 1.125rem;  /* 18px on mobile */
+                --font-size-3xl: 1.5rem;
+                /* 24px on mobile */
+                --font-size-2xl: 1.25rem;
+                /* 20px on mobile */
+                --font-size-xl: 1.125rem;
+                /* 18px on mobile */
             }
-            
-            body, html {
-                font-size: 16px; /* Prevent iOS zoom */
+
+            body,
+            html {
+                font-size: 16px;
+                /* Prevent iOS zoom */
             }
         }
-        
+
         /* Very small screens */
         @media (max-width: 480px) {
             :root {
-                --font-size-3xl: 1.375rem; /* 22px on small mobile */
-                --font-size-2xl: 1.125rem; /* 18px on small mobile */
+                --font-size-3xl: 1.375rem;
+                /* 22px on small mobile */
+                --font-size-2xl: 1.125rem;
+                /* 18px on small mobile */
             }
         }
 
@@ -121,7 +154,7 @@
             margin: 0 auto;
             transition: all 0.3s ease;
         }
-        
+
         @media (min-width: 480px) {
             .auth-form {
                 max-width: 400px;
@@ -152,14 +185,17 @@
 
         .auth-input {
             width: 100%;
-            padding: 15px 12px; /* 增加垂直padding以满足触摸目标 */
+            padding: 15px 12px;
+            /* 增加垂直padding以满足触摸目标 */
             margin: 10px 0;
             border: 2px solid #e9ecef;
             border-radius: var(--border-radius);
-            font-size: 16px; /* 防止iOS缩放 */
+            font-size: 16px;
+            /* 防止iOS缩放 */
             box-sizing: border-box;
             transition: all 0.3s ease;
-            min-height: var(--touch-target-min); /* 确保触摸目标大小 */
+            min-height: var(--touch-target-min);
+            /* 确保触摸目标大小 */
         }
 
         .auth-input:focus {
@@ -546,12 +582,12 @@
             margin-bottom: 30px;
             position: relative;
         }
-        
+
         .header h1 {
             margin: 15px 0;
             font-size: 1.8em;
         }
-        
+
         .header-user-info {
             position: absolute;
             top: 0;
@@ -561,18 +597,18 @@
             gap: 10px;
             font-size: 0.9em;
         }
-        
+
         /* Responsive header layout */
         @media (max-width: 767px) {
             .header {
                 text-align: center;
             }
-            
+
             .header h1 {
                 font-size: 1.5em;
                 margin: 10px 0 20px 0;
             }
-            
+
             .header-user-info {
                 position: static;
                 justify-content: center;
@@ -580,22 +616,22 @@
                 padding-top: 15px;
                 border-top: 1px solid #eee;
             }
-            
+
             .logo-container img {
                 height: 60px !important;
             }
         }
-        
+
         @media (max-width: 480px) {
             .header h1 {
                 font-size: 1.3em;
             }
-            
+
             .header-user-info {
                 flex-direction: column;
                 gap: 8px;
             }
-            
+
             .logo-container img {
                 height: 50px !important;
             }
@@ -642,7 +678,7 @@
         .btn {
             gap: 8px;
         }
-        
+
         /* Button container for consistent layout */
         .button-container {
             display: flex;
@@ -652,16 +688,16 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        
+
         /* Secondary button variant */
         .btn-secondary {
             background-color: #3498db;
         }
-        
+
         .btn-secondary:hover {
             background-color: #2980b9;
         }
-        
+
         /* Mobile button container optimization */
         @media (max-width: 767px) {
             .button-container {
@@ -671,14 +707,14 @@
                 margin-top: 15px;
                 margin-bottom: 15px;
             }
-            
+
             .button-container button,
             .button-container .btn {
                 width: 100%;
                 justify-content: center;
             }
         }
-        
+
         /* Small mobile screens */
         @media (max-width: 480px) {
             .button-container {
@@ -687,9 +723,10 @@
                 margin-bottom: 10px;
             }
         }
-        
+
         /* 移动端按钮优化 */
         @media (max-width: 767px) {
+
             button,
             .btn {
                 padding: 15px 20px;
@@ -697,9 +734,10 @@
                 min-height: var(--touch-target-min);
                 margin: 5px 0;
             }
-            
+
             /* 禁用移动端悬停效果 */
             @media (hover: none) {
+
                 button:hover,
                 .btn:hover {
                     transform: none;
@@ -747,26 +785,28 @@
             box-shadow: 0 4px 12px rgba(255, 179, 71, 0.2);
             position: relative;
         }
-        
+
         /* 移动端测验区域优化 */
         @media (max-width: 767px) {
+
             #quiz-area,
             #results-area {
                 margin-top: 15px;
                 padding: 15px;
                 border-radius: var(--border-radius);
             }
-            
+
             #quiz-area {
-                border-width: 2px; /* 减少边框宽度 */
+                border-width: 2px;
+                /* 减少边框宽度 */
             }
-            
+
             /* 测验区域内的标题和内容 */
             #quiz-area h2 {
                 font-size: var(--font-size-lg);
                 margin-bottom: 10px;
             }
-            
+
             /* 音频按钮在移动端的优化 */
             #play-uk-btn,
             #play-us-btn {
@@ -775,9 +815,10 @@
                 min-height: var(--touch-target-min);
             }
         }
-        
+
         /* 很小屏幕的额外优化 */
         @media (max-width: 480px) {
+
             #quiz-area,
             #results-area {
                 margin-top: 10px;
@@ -820,7 +861,7 @@
             min-width: var(--touch-target-min);
             min-height: var(--touch-target-min);
         }
-        
+
         /* 移动端优化 */
         @media (max-width: 767px) {
             .quiz-controls {
@@ -828,14 +869,14 @@
                 right: 15px;
                 gap: 12px;
             }
-            
+
             .control-btn {
                 width: 48px;
                 height: 48px;
                 min-width: 48px;
                 min-height: 48px;
             }
-            
+
             /* 移动端隐藏悬停提示 */
             .control-btn::after,
             .control-btn::before {
@@ -951,15 +992,15 @@
             gap: 15px;
             flex-wrap: wrap;
         }
-        
-        .list-selector > div {
+
+        .list-selector>div {
             display: flex;
             flex-direction: column;
             gap: 5px;
             flex: 1;
             min-width: 200px;
         }
-        
+
         /* 移动端：垂直堆叠 */
         @media (max-width: 767px) {
             .list-selector {
@@ -967,16 +1008,16 @@
                 align-items: stretch;
                 gap: 20px;
             }
-            
-            .list-selector > div {
+
+            .list-selector>div {
                 min-width: 100%;
                 flex: none;
             }
         }
-        
+
         /* 平板端：两列布局 */
         @media (min-width: 768px) and (max-width: 1024px) {
-            .list-selector > div {
+            .list-selector>div {
                 flex: 1 1 calc(50% - 10px);
                 min-width: calc(50% - 10px);
             }
@@ -1005,24 +1046,25 @@
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
-        
+
         select:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
         }
-        
+
         select:hover {
             border-color: var(--primary-color);
         }
-        
+
         /* 移动端优化 */
         @media (max-width: 767px) {
             select {
                 width: 100%;
                 min-width: 100%;
                 padding: 15px;
-                font-size: 16px; /* 防止iOS缩放 */
+                font-size: 16px;
+                /* 防止iOS缩放 */
                 min-height: var(--touch-target-min);
             }
         }
@@ -1057,6 +1099,44 @@
             height: calc(min(15vh, 15vw, 150px));
             opacity: 0.8;
             /* 稍微降低透明度 */
+        }
+
+        /* 移动端优化：统一使用右下角缩小模式 */
+        @media (max-width: 767px) {
+            .lumi-reaction {
+                /* 移动端统一使用右下角位置，和答题时保持一致 */
+                bottom: 2vh !important;
+                top: auto !important;
+                right: 2vw !important;
+                left: auto !important;
+                transform: none !important;
+                width: calc(min(15vh, 15vw, 150px)) !important;
+                height: calc(min(15vh, 15vw, 150px)) !important;
+                /* opacity: 0.7 !important; */
+                z-index: 1000 !important;
+                /* 降低层级避免遮挡重要内容 */
+            }
+
+            /* 移动端测验模式：保持右下角但稍微调整位置避免与控制按钮冲突 */
+            .lumi-reaction.quiz-mode {
+                bottom: 8vh !important;
+                /* 稍微上移避免与测验控制按钮重叠 */
+                /* opacity: 0.6 !important; */
+            }
+        }
+
+        /* 移动端极小屏幕：进一步缩小 */
+        @media (max-width: 480px) {
+            .lumi-reaction {
+                width: calc(min(12vh, 12vw, 80px)) !important;
+                height: calc(min(12vh, 12vw, 80px)) !important;
+                bottom: 1.5vh !important;
+                /* opacity: 0.5 !important; */
+            }
+
+            .lumi-reaction.quiz-mode {
+                bottom: 6vh !important;
+            }
         }
 
         /* 角落模式下的动画 */
@@ -1165,12 +1245,12 @@
             gap: var(--spacing-md);
             margin: var(--spacing-md) 0;
         }
-        
+
         /* Mobile-first: Single column layout */
         .stats-container {
             grid-template-columns: 1fr;
         }
-        
+
         /* Small mobile screens: Maintain single column */
         @media (max-width: 480px) {
             .stats-container {
@@ -1178,28 +1258,28 @@
                 margin: var(--spacing-sm) 0;
             }
         }
-        
+
         /* Large mobile/small tablet: Two columns */
         @media (min-width: 481px) and (max-width: 767px) {
             .stats-container {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
+
         /* Tablet: Three columns */
         @media (min-width: 768px) and (max-width: 1024px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        
+
         /* Desktop: Four columns */
         @media (min-width: 1025px) {
             .stats-container {
                 grid-template-columns: repeat(4, 1fr);
             }
         }
-        
+
         /* Statistics card styling */
         .stats-card {
             background: rgba(255, 255, 255, 0.1);
@@ -1212,41 +1292,41 @@
             flex-direction: column;
             justify-content: center;
         }
-        
+
         .stats-card:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: translateY(-2px);
         }
-        
+
         .stats-card-value {
             font-size: var(--font-size-2xl);
             font-weight: bold;
             line-height: var(--line-height-tight);
             margin-bottom: 5px;
         }
-        
+
         .stats-card-label {
             font-size: var(--font-size-sm);
             opacity: 0.8;
             line-height: var(--line-height-normal);
         }
-        
+
         /* Mobile optimization for stats cards */
         @media (max-width: 767px) {
             .stats-card {
                 padding: var(--spacing-sm);
                 min-height: 70px;
             }
-            
+
             .stats-card-value {
                 font-size: var(--font-size-xl);
             }
-            
+
             .stats-card-label {
                 font-size: var(--font-size-xs);
             }
         }
-        
+
         /* SRS Mastery Container Responsive Enhancements */
         #srs-mastery-container {
             margin-top: var(--spacing-md);
@@ -1255,14 +1335,14 @@
             border-radius: var(--border-radius);
             color: white;
         }
-        
+
         #srs-mastery-container .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: var(--spacing-md);
             margin-bottom: var(--spacing-md);
         }
-        
+
         /* SRS Review Button Styling */
         #srs-review-btn {
             background: rgba(255, 255, 255, 0.2);
@@ -1279,37 +1359,37 @@
             justify-content: center;
             white-space: nowrap;
         }
-        
+
         #srs-review-btn:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-1px);
         }
-        
+
         /* Mobile optimization for SRS mastery */
         @media (max-width: 767px) {
             #srs-mastery-container {
                 margin-top: var(--spacing-sm);
                 padding: var(--spacing-sm);
             }
-            
+
             #srs-mastery-container .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: var(--spacing-sm);
                 margin-bottom: var(--spacing-sm);
             }
-            
+
             #srs-mastery-container h3 {
                 font-size: var(--font-size-lg);
                 margin-bottom: var(--spacing-sm);
             }
-            
+
             #srs-review-btn {
                 padding: 10px 15px;
                 font-size: var(--font-size-sm);
                 min-width: 120px;
             }
         }
-        
+
         /* Tablet optimization for SRS mastery */
         @media (min-width: 768px) and (max-width: 1024px) {
             #srs-mastery-container .stats-grid {
@@ -1317,7 +1397,7 @@
                 gap: var(--spacing-md);
             }
         }
-        
+
         /* Desktop optimization for SRS mastery */
         @media (min-width: 1025px) {
             #srs-mastery-container .stats-grid {
@@ -1325,14 +1405,14 @@
                 gap: var(--spacing-lg);
             }
         }
-        
+
         /* Very small screens: Stack SRS stats vertically */
         @media (max-width: 480px) {
             #srs-mastery-container .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
-        
+
         /* Error Stats Container Responsive Design */
         #error-stats-container {
             margin-top: var(--spacing-md);
@@ -1341,70 +1421,70 @@
             border: 1px solid #ffeaa7;
             border-radius: var(--border-radius);
         }
-        
+
         @media (max-width: 767px) {
             #error-stats-container {
                 margin-top: var(--spacing-sm);
                 padding: var(--spacing-sm);
             }
-            
+
             #error-stats-container h3 {
                 font-size: var(--font-size-lg);
                 margin-bottom: var(--spacing-sm);
             }
         }
-        
+
         /* Recent words section responsive design */
         #srs-recent-words {
             background: rgba(255, 255, 255, 0.1);
             padding: var(--spacing-md);
             border-radius: var(--border-radius);
         }
-        
+
         #srs-recent-words h4 {
             margin: 0 0 10px 0;
             font-size: var(--font-size-base);
             color: white;
         }
-        
+
         #srs-recent-words-list {
             font-size: var(--font-size-sm);
             line-height: var(--line-height-normal);
         }
-        
+
         #srs-recent-words-list p {
             margin: 0;
             opacity: 0.8;
         }
-        
+
         @media (max-width: 767px) {
             #srs-recent-words {
                 padding: var(--spacing-sm);
             }
-            
+
             #srs-recent-words h4 {
                 font-size: var(--font-size-sm);
                 margin-bottom: var(--spacing-xs);
             }
-            
+
             #srs-recent-words-list {
                 font-size: var(--font-size-xs);
                 line-height: var(--line-height-relaxed);
             }
         }
-        
+
         /* Very small screens optimization */
         @media (max-width: 480px) {
             #srs-recent-words {
                 padding: 8px;
             }
-            
+
             #srs-recent-words h4 {
                 font-size: var(--font-size-xs);
                 margin-bottom: 5px;
             }
         }
-        
+
         /* Header responsive layout for SRS container */
         .srs-header {
             display: flex;
@@ -1414,18 +1494,18 @@
             flex-wrap: wrap;
             gap: var(--spacing-sm);
         }
-        
+
         @media (max-width: 480px) {
             .srs-header {
                 flex-direction: column;
                 align-items: stretch;
                 text-align: center;
             }
-            
+
             .srs-header h3 {
                 margin-bottom: var(--spacing-xs);
             }
-            
+
             #srs-review-btn {
                 width: 100%;
                 margin-top: var(--spacing-xs);
@@ -3155,9 +3235,9 @@
                 const screenWidth = window.innerWidth;
                 const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 const authContainer = document.getElementById('auth-container');
-                
+
                 console.log('Screen width:', screenWidth); // 调试信息
-                
+
                 if (authContainer) {
                     if (screenWidth <= 480) {
                         console.log('Applying mobile styles (≤480px)'); // 调试信息
@@ -3165,7 +3245,7 @@
                         authContainer.style.maxWidth = '80%';
                         authContainer.style.margin = '10% auto';
                         authContainer.style.padding = '15px'; // 减少padding
-                        
+
                         // 确保所有认证表单完全包裹在容器内并居中
                         const authForms = document.querySelectorAll('.auth-form');
                         authForms.forEach(form => {
@@ -3187,7 +3267,7 @@
                         authContainer.style.maxWidth = 'calc(100% - 60px)';
                         authContainer.style.margin = '20px 40px 20px 20px';
                         authContainer.style.padding = '20px';
-                        
+
                         const authForms = document.querySelectorAll('.auth-form');
                         authForms.forEach(form => {
                             form.style.maxWidth = 'calc(100% - 20px)';
@@ -3200,7 +3280,7 @@
                         authContainer.style.maxWidth = '400px';
                         authContainer.style.margin = '40px auto';
                         authContainer.style.padding = '20px';
-                        
+
                         const authForms = document.querySelectorAll('.auth-form');
                         authForms.forEach(form => {
                             form.style.maxWidth = '400px';
@@ -3213,13 +3293,13 @@
                     console.log('Auth container not found!'); // 调试信息
                 }
             }
-            
+
             // 初始应用样式
             applyResponsiveStyles();
-            
+
             // 监听窗口大小变化
             window.addEventListener('resize', applyResponsiveStyles);
-            
+
             Object.values(lumiImages).forEach(path => { (new Image()).src = path; }); // 预加载图片
             updateLumiReaction('welcome');
             loadBookLists(); // 加载词书列表，而不是直接加载单词列表
