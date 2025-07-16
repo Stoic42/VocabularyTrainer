@@ -2628,32 +2628,65 @@
         document.addEventListener('DOMContentLoaded', () => {
             // 设备检测和响应式样式调整
             function applyResponsiveStyles() {
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+                const screenWidth = window.innerWidth;
+                const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 const authContainer = document.getElementById('auth-container');
                 
-                if (isMobile && authContainer) {
-                    // 移动端：不对称设计，右侧留更多空间
-                    authContainer.style.maxWidth = 'calc(100% - 60px)';
-                    authContainer.style.margin = '20px 40px 20px 20px'; // 右侧40px，左侧20px
-                    
-                    // 调整 auth-form 的样式
-                    const authForms = document.querySelectorAll('.auth-form');
-                    authForms.forEach(form => {
-                        form.style.maxWidth = 'calc(100% - 20px)';
-                        form.style.marginLeft = '10px'; // 轻微向右偏移
-                    });
-                } else if (authContainer) {
-                    // 桌面端：恢复原来的紧凑错落设计
-                    authContainer.style.maxWidth = '400px';
-                    authContainer.style.margin = '40px auto';
-                    
-                    // 恢复 auth-form 的原始样式
-                    const authForms = document.querySelectorAll('.auth-form');
-                    authForms.forEach(form => {
-                        form.style.maxWidth = '400px';
-                        form.style.marginLeft = '0';
-                        form.style.margin = '0 auto';
-                    });
+                console.log('Screen width:', screenWidth); // 调试信息
+                
+                if (authContainer) {
+                    if (screenWidth <= 480) {
+                        console.log('Applying mobile styles (≤480px)'); // 调试信息
+                        // 很窄的手机屏幕：对称居中设计，给橙色背景留更多空间
+                        authContainer.style.maxWidth = '80%';
+                        authContainer.style.margin = '10% auto';
+                        authContainer.style.padding = '15px'; // 减少padding
+                        
+                        // 确保所有认证表单完全包裹在容器内并居中
+                        const authForms = document.querySelectorAll('.auth-form');
+                        authForms.forEach(form => {
+                            form.style.maxWidth = '100%';
+                            form.style.width = '100%';
+                            form.style.margin = '0';
+                            form.style.marginLeft = '0';
+                            form.style.marginRight = '0';
+                            form.style.left = 'auto';
+                            form.style.right = 'auto';
+                            form.style.transform = 'none';
+                            form.style.position = 'relative';
+                            form.style.boxSizing = 'border-box';
+                            form.style.padding = '15px'; // 减少padding避免溢出
+                        });
+                    } else if (screenWidth <= 768) {
+                        console.log('Applying tablet styles (481px-768px)'); // 调试信息
+                        // 中等宽度移动设备：轻微不对称设计
+                        authContainer.style.maxWidth = 'calc(100% - 60px)';
+                        authContainer.style.margin = '20px 40px 20px 20px';
+                        authContainer.style.padding = '20px';
+                        
+                        const authForms = document.querySelectorAll('.auth-form');
+                        authForms.forEach(form => {
+                            form.style.maxWidth = 'calc(100% - 20px)';
+                            form.style.marginLeft = '10px';
+                            form.style.padding = '20px';
+                        });
+                    } else {
+                        console.log('Applying desktop styles (≥769px)'); // 调试信息
+                        // 桌面端：原来的紧凑错落设计
+                        authContainer.style.maxWidth = '400px';
+                        authContainer.style.margin = '40px auto';
+                        authContainer.style.padding = '20px';
+                        
+                        const authForms = document.querySelectorAll('.auth-form');
+                        authForms.forEach(form => {
+                            form.style.maxWidth = '400px';
+                            form.style.margin = '0 auto';
+                            form.style.marginLeft = '0';
+                            form.style.padding = '30px';
+                        });
+                    }
+                } else {
+                    console.log('Auth container not found!'); // 调试信息
                 }
             }
             
