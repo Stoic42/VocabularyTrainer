@@ -615,6 +615,21 @@
             min-height: var(--touch-target-min);
             min-width: var(--touch-target-min);
             box-sizing: border-box;
+            /* 确保一致的显示方式和字体 */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-family: inherit;
+            text-decoration: none;
+            vertical-align: middle;
+            /* 强制设置固定高度确保完全一致 */
+            height: 48px;
+            line-height: 1;
+            /* 重置所有可能影响高度的默认样式 */
+            margin: 0;
+            border: 0;
+            outline: 0;
         }
 
         button:hover,
@@ -625,10 +640,52 @@
         }
 
         .btn {
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
             gap: 8px;
+        }
+        
+        /* Button container for consistent layout */
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Secondary button variant */
+        .btn-secondary {
+            background-color: #3498db;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Mobile button container optimization */
+        @media (max-width: 767px) {
+            .button-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .button-container button,
+            .button-container .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Small mobile screens */
+        @media (max-width: 480px) {
+            .button-container {
+                gap: 8px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
         }
         
         /* 移动端按钮优化 */
@@ -1102,6 +1159,212 @@
             }
         }
 
+        /* Statistics Container Responsive Grid System */
+        .stats-container {
+            display: grid;
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+        }
+        
+        /* Mobile-first: Single column layout */
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        /* Small mobile screens: Maintain single column */
+        @media (max-width: 480px) {
+            .stats-container {
+                gap: var(--spacing-sm);
+                margin: var(--spacing-sm) 0;
+            }
+        }
+        
+        /* Large mobile/small tablet: Two columns */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Tablet: Three columns */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .stats-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Desktop: Four columns */
+        @media (min-width: 1025px) {
+            .stats-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* Statistics card styling */
+        .stats-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .stats-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .stats-card-value {
+            font-size: var(--font-size-2xl);
+            font-weight: bold;
+            line-height: var(--line-height-tight);
+            margin-bottom: 5px;
+        }
+        
+        .stats-card-label {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+            line-height: var(--line-height-normal);
+        }
+        
+        /* Mobile optimization for stats cards */
+        @media (max-width: 767px) {
+            .stats-card {
+                padding: var(--spacing-sm);
+                min-height: 70px;
+            }
+            
+            .stats-card-value {
+                font-size: var(--font-size-xl);
+            }
+            
+            .stats-card-label {
+                font-size: var(--font-size-xs);
+            }
+        }
+        
+        /* SRS Mastery Container Responsive Enhancements */
+        #srs-mastery-container {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--border-radius);
+            color: white;
+        }
+        
+        #srs-mastery-container .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Mobile optimization for SRS mastery */
+        @media (max-width: 767px) {
+            #srs-mastery-container {
+                margin-top: var(--spacing-sm);
+                padding: var(--spacing-sm);
+            }
+            
+            #srs-mastery-container .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-sm);
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            #srs-mastery-container h3 {
+                font-size: var(--font-size-lg);
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            #srs-review-btn {
+                padding: 8px 12px;
+                font-size: var(--font-size-sm);
+            }
+        }
+        
+        /* Very small screens: Stack SRS stats vertically */
+        @media (max-width: 480px) {
+            #srs-mastery-container .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Error Stats Container Responsive Design */
+        #error-stats-container {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: var(--border-radius);
+        }
+        
+        @media (max-width: 767px) {
+            #error-stats-container {
+                margin-top: var(--spacing-sm);
+                padding: var(--spacing-sm);
+            }
+            
+            #error-stats-container h3 {
+                font-size: var(--font-size-lg);
+                margin-bottom: var(--spacing-sm);
+            }
+        }
+        
+        /* Recent words section responsive design */
+        #srs-recent-words {
+            background: rgba(255, 255, 255, 0.1);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+        
+        @media (max-width: 767px) {
+            #srs-recent-words {
+                padding: var(--spacing-sm);
+            }
+            
+            #srs-recent-words h4 {
+                font-size: var(--font-size-base);
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            #srs-recent-words-list {
+                font-size: var(--font-size-sm);
+                line-height: var(--line-height-normal);
+            }
+        }
+        
+        /* Header responsive layout for SRS container */
+        .srs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+        
+        @media (max-width: 480px) {
+            .srs-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .srs-header h3 {
+                margin-bottom: var(--spacing-xs);
+            }
+            
+            #srs-review-btn {
+                width: 100%;
+                margin-top: var(--spacing-xs);
+            }
+        }
+
         /* 开关按钮样式 */
         .switch {
             position: relative;
@@ -1252,8 +1515,7 @@
         </div>
 
         <!-- 错词复习模式统计信息 -->
-        <div id="error-stats-container"
-            style="display: none; margin-top: 15px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+        <div id="error-stats-container" style="display: none;">
             <h3 style="margin: 0 0 10px 0; color: #856404;">错词复习统计</h3>
             <div id="error-stats-content">
                 <p>正在加载统计信息...</p>
@@ -1261,43 +1523,36 @@
         </div>
 
         <!-- SRS掌握度显示区域 -->
-        <div id="srs-mastery-container"
-            style="display: none; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: white; font-size: 1.2em;">📚 智能学习进度</h3>
+        <div id="srs-mastery-container" style="display: none;">
+            <div class="srs-header">
+                <h3 style="margin: 0; color: white;">📚 智能学习进度</h3>
                 <button id="srs-review-btn"
                     style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">
                     🔄 智能复习
                 </button>
             </div>
             <div id="srs-stats-content">
-                <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                    <div
-                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-total-words">0</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">总单词</div>
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-card-value" id="srs-total-words">0</div>
+                        <div class="stats-card-label">总单词</div>
                     </div>
-                    <div
-                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-learned-words">0</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">已学习</div>
+                    <div class="stats-card">
+                        <div class="stats-card-value" id="srs-learned-words">0</div>
+                        <div class="stats-card-label">已学习</div>
                     </div>
-                    <div
-                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-due-words">0</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">待复习</div>
+                    <div class="stats-card">
+                        <div class="stats-card-value" id="srs-due-words">0</div>
+                        <div class="stats-card-label">待复习</div>
                     </div>
-                    <div
-                        style="text-align: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                        <div style="font-size: 1.5em; font-weight: bold;" id="srs-avg-interval">0</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">平均间隔</div>
+                    <div class="stats-card">
+                        <div class="stats-card-value" id="srs-avg-interval">0</div>
+                        <div class="stats-card-label">平均间隔</div>
                     </div>
                 </div>
-                <div id="srs-recent-words"
-                    style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                    <h4 style="margin: 0 0 10px 0; font-size: 1em;">最近学习的单词</h4>
-                    <div id="srs-recent-words-list" style="font-size: 0.9em; line-height: 1.4;">
+                <div id="srs-recent-words">
+                    <h4 style="margin: 0 0 10px 0;">最近学习的单词</h4>
+                    <div id="srs-recent-words-list">
                         <p style="margin: 0; opacity: 0.8;">正在加载...</p>
                     </div>
                 </div>
@@ -1332,9 +1587,9 @@
 
 
 
-        <div style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 20px; align-items: center;">
+        <div class="button-container">
             <button id="start-btn">开始测试</button>
-            <a href="/error-history" class="btn" style="background-color: #3498db;">查看错误历史</a>
+            <a href="/error-history" class="btn btn-secondary">查看错误历史</a>
         </div>
 
         <!-- SRS复习界面 -->
