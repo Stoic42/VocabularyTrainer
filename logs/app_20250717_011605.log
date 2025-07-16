@@ -1,0 +1,2 @@
+2025-07-17 01:16:05,375 INFO: 应用启动 [in /var/www/vocabulary/app.py:92]
+2025-07-17 01:17:42,457 ERROR: TTS生成失败: hello, 错误: Failed to connect. Probable cause: Unknown [in /var/www/vocabulary/app.py:155]

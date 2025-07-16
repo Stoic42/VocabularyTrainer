@@ -1,0 +1,1744 @@
+[2025-07-15 18:48:10 +0800] [305483] [INFO] Starting gunicorn 23.0.0
+[2025-07-15 18:48:10 +0800] [305483] [INFO] Listening at: http://127.0.0.1:8000 (305483)
+[2025-07-15 18:48:10 +0800] [305483] [INFO] Using worker: sync
+[2025-07-15 18:48:10 +0800] [305485] [INFO] Booting worker with pid: 305485
+[2025-07-15 18:48:10 +0800] [305486] [INFO] Booting worker with pid: 305486
+[2025-07-15 18:48:10 +0800] [305487] [INFO] Booting worker with pid: 305487
+[2025-07-15 21:12:27 +0800] [305483] [CRITICAL] WORKER TIMEOUT (pid:305486)
+[2025-07-15 21:12:27 +0800] [305486] [ERROR] Error handling request /api/tts/oc-
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-15 21:12:27 +0800] [305486] [INFO] Worker exiting (pid: 305486)
+[2025-07-15 21:12:28 +0800] [350192] [INFO] Booting worker with pid: 350192
+[2025-07-15 21:25:20 +0800] [305483] [CRITICAL] WORKER TIMEOUT (pid:305485)
+[2025-07-15 21:25:20 +0800] [305485] [ERROR] Error handling request /api/tts/em-
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-15 21:25:20 +0800] [305485] [INFO] Worker exiting (pid: 305485)
+[2025-07-15 21:25:20 +0800] [354748] [INFO] Booting worker with pid: 354748
+[2025-07-16 01:17:51 +0800] [305483] [INFO] Handling signal: term
+[2025-07-16 01:17:51 +0800] [354748] [INFO] Worker exiting (pid: 354748)
+[2025-07-16 01:17:51 +0800] [350192] [INFO] Worker exiting (pid: 350192)
+[2025-07-16 01:17:51 +0800] [305487] [INFO] Worker exiting (pid: 305487)
+[2025-07-16 01:17:51 +0800] [305483] [INFO] Shutting down: Master
+[2025-07-16 01:17:52 +0800] [428018] [INFO] Starting gunicorn 23.0.0
+[2025-07-16 01:17:52 +0800] [428018] [INFO] Listening at: http://127.0.0.1:8000 (428018)
+[2025-07-16 01:17:52 +0800] [428018] [INFO] Using worker: sync
+[2025-07-16 01:17:52 +0800] [428049] [INFO] Booting worker with pid: 428049
+[2025-07-16 01:17:52 +0800] [428055] [INFO] Booting worker with pid: 428055
+[2025-07-16 01:17:52 +0800] [428057] [INFO] Booting worker with pid: 428057
+[2025-07-16 16:02:32 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:428055)
+[2025-07-16 16:02:32 +0800] [428055] [ERROR] Error handling request /api/tts/ambi-
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 16:02:32 +0800] [428055] [INFO] Worker exiting (pid: 428055)
+[2025-07-16 16:02:32 +0800] [613276] [INFO] Booting worker with pid: 613276
+[2025-07-16 16:02:58 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:428049)
+[2025-07-16 16:02:58 +0800] [428049] [ERROR] Error handling request /api/tts/se-
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 16:02:58 +0800] [428049] [INFO] Worker exiting (pid: 428049)
+[2025-07-16 16:02:58 +0800] [613349] [INFO] Booting worker with pid: 613349
+[2025-07-16 16:03:07 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:428057)
+[2025-07-16 16:03:07 +0800] [428057] [ERROR] Error handling request /api/tts/cata-
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 16:03:07 +0800] [428057] [INFO] Worker exiting (pid: 428057)
+[2025-07-16 16:03:07 +0800] [613399] [INFO] Booting worker with pid: 613399
+[2025-07-16 21:09:13 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:613399)
+[2025-07-16 21:09:13 +0800] [613399] [ERROR] Error handling request /api/tts/seize
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:09:13 +0800] [613399] [INFO] Worker exiting (pid: 613399)
+[2025-07-16 21:09:13 +0800] [677725] [INFO] Booting worker with pid: 677725
+[2025-07-16 21:16:57 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:613276)
+[2025-07-16 21:16:57 +0800] [613276] [ERROR] Error handling request /api/tts/forgive
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:16:57 +0800] [613276] [INFO] Worker exiting (pid: 613276)
+[2025-07-16 21:16:58 +0800] [679332] [INFO] Booting worker with pid: 679332
+[2025-07-16 21:27:11 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:613349)
+[2025-07-16 21:27:11 +0800] [613349] [ERROR] Error handling request /api/tts/possession
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:27:11 +0800] [613349] [INFO] Worker exiting (pid: 613349)
+[2025-07-16 21:27:11 +0800] [681470] [INFO] Booting worker with pid: 681470
+[2025-07-16 21:28:09 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:679332)
+[2025-07-16 21:28:09 +0800] [679332] [ERROR] Error handling request /api/tts/mental
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:28:09 +0800] [679332] [INFO] Worker exiting (pid: 679332)
+[2025-07-16 21:28:09 +0800] [681667] [INFO] Booting worker with pid: 681667
+[2025-07-16 21:28:15 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:677725)
+[2025-07-16 21:28:15 +0800] [677725] [ERROR] Error handling request /api/tts/corporation
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:28:15 +0800] [677725] [INFO] Worker exiting (pid: 677725)
+[2025-07-16 21:28:16 +0800] [681683] [INFO] Booting worker with pid: 681683
+[2025-07-16 21:28:36 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:681470)
+[2025-07-16 21:28:36 +0800] [681470] [ERROR] Error handling request /api/tts/relief
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:28:36 +0800] [681470] [INFO] Worker exiting (pid: 681470)
+[2025-07-16 21:28:36 +0800] [681769] [INFO] Booting worker with pid: 681769
+[2025-07-16 21:33:07 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:681769)
+[2025-07-16 21:33:07 +0800] [681769] [ERROR] Error handling request /api/tts/cupboard
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:33:07 +0800] [681769] [INFO] Worker exiting (pid: 681769)
+[2025-07-16 21:33:07 +0800] [682711] [INFO] Booting worker with pid: 682711
+[2025-07-16 21:33:40 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:681683)
+[2025-07-16 21:33:40 +0800] [681683] [ERROR] Error handling request /api/tts/social
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:33:40 +0800] [681683] [INFO] Worker exiting (pid: 681683)
+[2025-07-16 21:33:40 +0800] [682830] [INFO] Booting worker with pid: 682830
+[2025-07-16 21:33:45 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:681667)
+[2025-07-16 21:33:45 +0800] [681667] [ERROR] Error handling request /api/tts/chase
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:33:45 +0800] [681667] [INFO] Worker exiting (pid: 681667)
+[2025-07-16 21:33:45 +0800] [682839] [INFO] Booting worker with pid: 682839
+[2025-07-16 21:34:20 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:682830)
+[2025-07-16 21:34:20 +0800] [682830] [ERROR] Error handling request /api/tts/assistant
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:34:20 +0800] [682830] [INFO] Worker exiting (pid: 682830)
+[2025-07-16 21:34:20 +0800] [682962] [INFO] Booting worker with pid: 682962
+[2025-07-16 21:34:23 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:682711)
+[2025-07-16 21:34:23 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:682839)
+[2025-07-16 21:34:23 +0800] [682711] [ERROR] Error handling request /api/tts/physics
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:34:23 +0800] [682839] [ERROR] Error handling request /api/tts/twelfth
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:34:23 +0800] [682711] [INFO] Worker exiting (pid: 682711)
+[2025-07-16 21:34:23 +0800] [682839] [INFO] Worker exiting (pid: 682839)
+[2025-07-16 21:34:23 +0800] [682973] [INFO] Booting worker with pid: 682973
+[2025-07-16 21:34:23 +0800] [682974] [INFO] Booting worker with pid: 682974
+[2025-07-16 21:34:50 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:682962)
+[2025-07-16 21:34:50 +0800] [682962] [ERROR] Error handling request /api/tts/zigzag
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:34:50 +0800] [682962] [INFO] Worker exiting (pid: 682962)
+[2025-07-16 21:34:51 +0800] [683074] [INFO] Booting worker with pid: 683074
+[2025-07-16 21:40:47 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:683074)
+[2025-07-16 21:40:47 +0800] [683074] [ERROR] Error handling request /api/tts/elbow
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:40:47 +0800] [683074] [INFO] Worker exiting (pid: 683074)
+[2025-07-16 21:40:47 +0800] [684324] [INFO] Booting worker with pid: 684324
+[2025-07-16 21:41:11 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:682974)
+[2025-07-16 21:41:11 +0800] [682974] [ERROR] Error handling request /api/tts/least
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:41:11 +0800] [682974] [INFO] Worker exiting (pid: 682974)
+[2025-07-16 21:41:11 +0800] [684409] [INFO] Booting worker with pid: 684409
+[2025-07-16 21:41:20 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:682973)
+[2025-07-16 21:41:20 +0800] [682973] [ERROR] Error handling request /api/tts/February
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:41:20 +0800] [682973] [INFO] Worker exiting (pid: 682973)
+[2025-07-16 21:41:20 +0800] [684433] [INFO] Booting worker with pid: 684433
+[2025-07-16 21:41:33 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684324)
+[2025-07-16 21:41:33 +0800] [684324] [ERROR] Error handling request /api/tts/Japan
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:41:33 +0800] [684324] [INFO] Worker exiting (pid: 684324)
+[2025-07-16 21:41:34 +0800] [684493] [INFO] Booting worker with pid: 684493
+[2025-07-16 21:42:01 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684409)
+[2025-07-16 21:42:01 +0800] [684409] [ERROR] Error handling request /api/tts/operate
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:42:01 +0800] [684409] [INFO] Worker exiting (pid: 684409)
+[2025-07-16 21:42:01 +0800] [684579] [INFO] Booting worker with pid: 684579
+[2025-07-16 21:42:47 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684433)
+[2025-07-16 21:42:47 +0800] [684433] [ERROR] Error handling request /api/tts/in
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:42:47 +0800] [684433] [INFO] Worker exiting (pid: 684433)
+[2025-07-16 21:42:47 +0800] [684742] [INFO] Booting worker with pid: 684742
+[2025-07-16 21:42:50 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684579)
+[2025-07-16 21:42:50 +0800] [684579] [ERROR] Error handling request /api/tts/terrorist
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:42:50 +0800] [684579] [INFO] Worker exiting (pid: 684579)
+[2025-07-16 21:42:50 +0800] [684751] [INFO] Booting worker with pid: 684751
+[2025-07-16 21:43:08 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684493)
+[2025-07-16 21:43:08 +0800] [684493] [ERROR] Error handling request /api/tts/raise
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:43:08 +0800] [684493] [INFO] Worker exiting (pid: 684493)
+[2025-07-16 21:43:08 +0800] [684816] [INFO] Booting worker with pid: 684816
+[2025-07-16 21:46:30 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684751)
+[2025-07-16 21:46:30 +0800] [684751] [ERROR] Error handling request /api/tts/Australia
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:46:30 +0800] [684751] [INFO] Worker exiting (pid: 684751)
+[2025-07-16 21:46:30 +0800] [685530] [INFO] Booting worker with pid: 685530
+[2025-07-16 21:47:14 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684742)
+[2025-07-16 21:47:14 +0800] [684742] [ERROR] Error handling request /api/tts/retire
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:47:14 +0800] [684742] [INFO] Worker exiting (pid: 684742)
+[2025-07-16 21:47:14 +0800] [685665] [INFO] Booting worker with pid: 685665
+[2025-07-16 21:47:34 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:685530)
+[2025-07-16 21:47:34 +0800] [685530] [ERROR] Error handling request /api/tts/wheat
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:47:34 +0800] [685530] [INFO] Worker exiting (pid: 685530)
+[2025-07-16 21:47:34 +0800] [685746] [INFO] Booting worker with pid: 685746
+[2025-07-16 21:55:34 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:684816)
+[2025-07-16 21:55:34 +0800] [684816] [ERROR] Error handling request /api/tts/prevent
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:55:34 +0800] [684816] [INFO] Worker exiting (pid: 684816)
+[2025-07-16 21:55:34 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:685746)
+[2025-07-16 21:55:34 +0800] [685746] [ERROR] Error handling request /api/tts/lookout
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:55:34 +0800] [685746] [INFO] Worker exiting (pid: 685746)
+[2025-07-16 21:55:34 +0800] [687444] [INFO] Booting worker with pid: 687444
+[2025-07-16 21:55:34 +0800] [687445] [INFO] Booting worker with pid: 687445
+[2025-07-16 21:56:24 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687445)
+[2025-07-16 21:56:24 +0800] [687445] [ERROR] Error handling request /api/tts/seek
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:56:24 +0800] [687445] [INFO] Worker exiting (pid: 687445)
+[2025-07-16 21:56:24 +0800] [687604] [INFO] Booting worker with pid: 687604
+[2025-07-16 21:56:29 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687444)
+[2025-07-16 21:56:29 +0800] [687444] [ERROR] Error handling request /api/tts/rest
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:56:29 +0800] [687444] [INFO] Worker exiting (pid: 687444)
+[2025-07-16 21:56:29 +0800] [687641] [INFO] Booting worker with pid: 687641
+[2025-07-16 21:56:33 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:685665)
+[2025-07-16 21:56:33 +0800] [685665] [ERROR] Error handling request /api/tts/mister
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:56:33 +0800] [685665] [INFO] Worker exiting (pid: 685665)
+[2025-07-16 21:56:33 +0800] [687656] [INFO] Booting worker with pid: 687656
+[2025-07-16 21:56:55 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687604)
+[2025-07-16 21:56:55 +0800] [687604] [ERROR] Error handling request /api/tts/forbid
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:56:55 +0800] [687604] [INFO] Worker exiting (pid: 687604)
+[2025-07-16 21:56:55 +0800] [687724] [INFO] Booting worker with pid: 687724
+[2025-07-16 21:57:15 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687656)
+[2025-07-16 21:57:15 +0800] [687656] [ERROR] Error handling request /api/tts/therefore
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:57:15 +0800] [687656] [INFO] Worker exiting (pid: 687656)
+[2025-07-16 21:57:15 +0800] [687798] [INFO] Booting worker with pid: 687798
+[2025-07-16 21:57:32 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687641)
+[2025-07-16 21:57:32 +0800] [687641] [ERROR] Error handling request /api/tts/flag
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:57:32 +0800] [687641] [INFO] Worker exiting (pid: 687641)
+[2025-07-16 21:57:32 +0800] [687876] [INFO] Booting worker with pid: 687876
+[2025-07-16 21:59:26 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687798)
+[2025-07-16 21:59:26 +0800] [687798] [ERROR] Error handling request /api/tts/barbecue
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:59:26 +0800] [687798] [INFO] Worker exiting (pid: 687798)
+[2025-07-16 21:59:27 +0800] [688250] [INFO] Booting worker with pid: 688250
+[2025-07-16 21:59:54 +0800] [428018] [CRITICAL] WORKER TIMEOUT (pid:687876)
+[2025-07-16 21:59:54 +0800] [687876] [ERROR] Error handling request /api/tts/aggressive
+Traceback (most recent call last):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/var/www/vocabulary/app.py", line 137, in get_tts_audio
+    tts.save(filepath)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 335, in save
+    self.write_to_fp(f)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 316, in write_to_fp
+    for idx, decoded in enumerate(self.stream()):
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gtts/tts.py", line 268, in stream
+    r = s.send(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+  File "/var/www/vocabulary/venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-16 21:59:54 +0800] [687876] [INFO] Worker exiting (pid: 687876)
+[2025-07-16 21:59:54 +0800] [688348] [INFO] Booting worker with pid: 688348
+[2025-07-17 01:16:03 +0800] [688250] [INFO] Worker exiting (pid: 688250)
+[2025-07-17 01:16:03 +0800] [688348] [INFO] Worker exiting (pid: 688348)
+[2025-07-17 01:16:03 +0800] [687724] [INFO] Worker exiting (pid: 687724)
+[2025-07-17 01:16:03 +0800] [428018] [INFO] Handling signal: term
+[2025-07-17 01:16:04 +0800] [428018] [INFO] Shutting down: Master
+[2025-07-17 01:16:05 +0800] [730574] [INFO] Starting gunicorn 23.0.0
+[2025-07-17 01:16:05 +0800] [730574] [INFO] Listening at: http://127.0.0.1:8000 (730574)
+[2025-07-17 01:16:05 +0800] [730574] [INFO] Using worker: sync
+[2025-07-17 01:16:05 +0800] [730613] [INFO] Booting worker with pid: 730613
+[2025-07-17 01:16:05 +0800] [730617] [INFO] Booting worker with pid: 730617
+[2025-07-17 01:16:05 +0800] [730621] [INFO] Booting worker with pid: 730621
