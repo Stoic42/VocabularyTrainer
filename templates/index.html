@@ -1263,6 +1263,28 @@
             margin-bottom: var(--spacing-md);
         }
         
+        /* SRS Review Button Styling */
+        #srs-review-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            min-height: var(--touch-target-min);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        
+        #srs-review-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
         /* Mobile optimization for SRS mastery */
         @media (max-width: 767px) {
             #srs-mastery-container {
@@ -1282,8 +1304,25 @@
             }
             
             #srs-review-btn {
-                padding: 8px 12px;
+                padding: 10px 15px;
                 font-size: var(--font-size-sm);
+                min-width: 120px;
+            }
+        }
+        
+        /* Tablet optimization for SRS mastery */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            #srs-mastery-container .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: var(--spacing-md);
+            }
+        }
+        
+        /* Desktop optimization for SRS mastery */
+        @media (min-width: 1025px) {
+            #srs-mastery-container .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: var(--spacing-lg);
             }
         }
         
@@ -1322,19 +1361,47 @@
             border-radius: var(--border-radius);
         }
         
+        #srs-recent-words h4 {
+            margin: 0 0 10px 0;
+            font-size: var(--font-size-base);
+            color: white;
+        }
+        
+        #srs-recent-words-list {
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-normal);
+        }
+        
+        #srs-recent-words-list p {
+            margin: 0;
+            opacity: 0.8;
+        }
+        
         @media (max-width: 767px) {
             #srs-recent-words {
                 padding: var(--spacing-sm);
             }
             
             #srs-recent-words h4 {
-                font-size: var(--font-size-base);
-                margin-bottom: var(--spacing-sm);
+                font-size: var(--font-size-sm);
+                margin-bottom: var(--spacing-xs);
             }
             
             #srs-recent-words-list {
-                font-size: var(--font-size-sm);
-                line-height: var(--line-height-normal);
+                font-size: var(--font-size-xs);
+                line-height: var(--line-height-relaxed);
+            }
+        }
+        
+        /* Very small screens optimization */
+        @media (max-width: 480px) {
+            #srs-recent-words {
+                padding: 8px;
+            }
+            
+            #srs-recent-words h4 {
+                font-size: var(--font-size-xs);
+                margin-bottom: 5px;
             }
         }
         
@@ -1526,10 +1593,7 @@
         <div id="srs-mastery-container" style="display: none;">
             <div class="srs-header">
                 <h3 style="margin: 0; color: white;">📚 智能学习进度</h3>
-                <button id="srs-review-btn"
-                    style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">
-                    🔄 智能复习
-                </button>
+                <button id="srs-review-btn">🔄 智能复习</button>
             </div>
             <div id="srs-stats-content">
                 <div class="stats-grid">
@@ -1551,9 +1615,9 @@
                     </div>
                 </div>
                 <div id="srs-recent-words">
-                    <h4 style="margin: 0 0 10px 0;">最近学习的单词</h4>
+                    <h4>最近学习的单词</h4>
                     <div id="srs-recent-words-list">
-                        <p style="margin: 0; opacity: 0.8;">正在加载...</p>
+                        <p>正在加载...</p>
                     </div>
                 </div>
             </div>
