@@ -2115,7 +2115,7 @@
 
         let currentUser = null; // 当前登录用户
         let inputEnabled = true; // 输入控制状态
-        
+
         // 页面状态管理
         let pageState = {
             currentMode: 'home', // home, quiz, results, srs_review
@@ -2126,7 +2126,7 @@
             quizProgress: null,
             lastActivity: Date.now()
         };
-        
+
         const lumiImages = {
             'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
             'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
@@ -2160,59 +2160,18 @@
             verificationStats: null
         };
 
-        // --- DOM 元素缓存 ---
-        const authContainer = document.getElementById('auth-container');
-        const appContainer = document.getElementById('app-container');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const loginUsername = document.getElementById('login-username');
-        const loginPassword = document.getElementById('login-password');
-        const loginError = document.getElementById('login-error');
-        const loginBtn = document.getElementById('login-btn');
-        const registerUsername = document.getElementById('register-username');
-        const registerPassword = document.getElementById('register-password');
-        const registerConfirmPassword = document.getElementById('register-confirm-password');
-        const registerError = document.getElementById('register-error');
-        const registerBtn = document.getElementById('register-btn');
-        const showRegisterLink = document.getElementById('show-register');
-        const showLoginLink = document.getElementById('show-login');
-        const userInfoEl = document.getElementById('user-info');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        const startBtn = document.getElementById('start-btn');
-        const quizArea = document.getElementById('quiz-area');
-        const resultsArea = document.getElementById('results-area');
-        const questionMeaningEl = document.getElementById('question-meaning');
-        const questionIpaEl = document.getElementById('question-ipa');
-        const questionMeaningEnEl = document.getElementById('question-meaning-en');
-        const questionExampleEnEl = document.getElementById('question-example-en');
-        const questionExampleCnEl = document.getElementById('question-example-cn');
-        const currentQNumEl = document.getElementById('current-q-num');
-        const totalQNumEl = document.getElementById('total-q-num');
-        const answerInput = document.getElementById('answer-input');
-        const nextBtn = document.getElementById('next-btn');
-        const audioEl = document.getElementById('word-audio');
-        const ukBtn = document.getElementById('play-uk-btn');
-        const usBtn = document.getElementById('play-us-btn');
-
-        const toggleDetailsBtn = document.getElementById('toggle-details-btn');
-        const wordDetailsContainer = document.getElementById('word-details-container');
-
-        const questionDerivativesEl = document.getElementById('question-derivatives');
-        const questionRootEtymologyEl = document.getElementById('question-root-etymology');
-        const questionMnemonicEl = document.getElementById('question-mnemonic');
-        const questionComparisonEl = document.getElementById('question-comparison');
-        const questionCollocationEl = document.getElementById('question-collocation');
-        const questionExamSentenceEl = document.getElementById('question-exam-sentence');
-        const questionExamYearSourceEl = document.getElementById('question-exam-year-source');
-        const questionExamOptionsEl = document.getElementById('question-exam-options');
-        const questionExamExplanationEl = document.getElementById('question-exam-explanation');
-        const questionTipsEl = document.getElementById('question-tips');
-        const lumiImg = document.querySelector('.lumi-reaction');
-        const lumiToggle = document.getElementById('lumi-toggle');
-        const autoPlayToggle = document.getElementById('auto-play-toggle');
-        const instantFeedbackToggle = document.getElementById('instant-feedback-toggle');
-
+        // DOM elements - will be cached inside DOMContentLoaded
+        let authContainer, appContainer, loginForm, registerForm;
+        let loginUsername, loginPassword, loginError, loginBtn;
+        let registerUsername, registerPassword, registerConfirmPassword, registerError, registerBtn;
+        let showRegisterLink, showLoginLink, userInfoEl, logoutBtn;
+        let quizArea, resultsArea, answerInput, questionMeaningEl, questionIpaEl, questionMeaningEnEl;
+        let questionExampleEnEl, questionExampleCnEl, nextBtn, currentQNumEl, totalQNumEl;
+        let ukBtn, usBtn, toggleDetailsBtn, wordDetailsContainer;
+        let questionDerivativesEl, questionRootEtymologyEl, questionMnemonicEl;
+        let questionComparisonEl, questionCollocationEl, questionExamSentenceEl;
+        let questionExamYearSourceEl, questionExamOptionsEl, questionExamExplanationEl, questionTipsEl;
+        let lumiImg, lumiToggle, autoPlayToggle, audioEl, startBtn;
 
         // --- 功能函数 ---
 
@@ -2248,17 +2207,21 @@
 
         // 检查用户登录状态
         function checkLoginStatus() {
+            console.log('Checking login status...'); // Debug log
             // 从sessionStorage获取用户信息
             const userJson = sessionStorage.getItem('currentUser');
+            console.log('Session storage currentUser:', userJson); // Debug log
             if (userJson) {
                 try {
                     currentUser = JSON.parse(userJson);
+                    console.log('Parsed user:', currentUser); // Debug log
                     showAppInterface();
                 } catch (e) {
                     console.error('解析用户信息失败:', e);
                     showAuthInterface();
                 }
             } else {
+                console.log('No user session found, showing auth interface'); // Debug log
                 showAuthInterface();
             }
         }
@@ -2357,8 +2320,17 @@
 
         // 处理登录
         async function handleLogin() {
+            console.log('handleLogin called'); // Debug log
+
+            if (!loginUsername || !loginPassword) {
+                console.error('Login elements not found');
+                return;
+            }
+
             const username = loginUsername.value.trim();
             const password = loginPassword.value.trim();
+
+            console.log('Login attempt:', { username, password: password ? '***' : 'empty' }); // Debug log
 
             if (!username || !password) {
                 loginError.textContent = '用户名和密码不能为空';
@@ -2367,16 +2339,20 @@
             }
 
             try {
+                console.log('Sending login request...'); // Debug log
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
 
+                console.log('Login response status:', response.status); // Debug log
                 const data = await response.json();
+                console.log('Login response data:', data); // Debug log
 
                 if (response.ok) {
                     // 登录成功
+                    console.log('Login successful'); // Debug log
                     currentUser = data.user;
                     sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
                     showAppInterface();
@@ -2385,6 +2361,7 @@
                     loginError.style.display = 'none';
                 } else {
                     // 登录失败
+                    console.log('Login failed:', data.error); // Debug log
                     loginError.textContent = data.error || '登录失败';
                     loginError.style.display = 'block';
                 }
@@ -3312,11 +3289,64 @@
             // 监听窗口大小变化
             window.addEventListener('resize', applyResponsiveStyles);
 
+            // Cache DOM elements after DOM is loaded
+            authContainer = document.getElementById('auth-container');
+            appContainer = document.getElementById('app-container');
+            loginForm = document.getElementById('login-form');
+            registerForm = document.getElementById('register-form');
+            loginUsername = document.getElementById('login-username');
+            loginPassword = document.getElementById('login-password');
+            loginError = document.getElementById('login-error');
+            loginBtn = document.getElementById('login-btn');
+            registerUsername = document.getElementById('register-username');
+            registerPassword = document.getElementById('register-password');
+            registerConfirmPassword = document.getElementById('register-confirm-password');
+            registerError = document.getElementById('register-error');
+            registerBtn = document.getElementById('register-btn');
+            showRegisterLink = document.getElementById('show-register');
+            showLoginLink = document.getElementById('show-login');
+            userInfoEl = document.getElementById('user-info');
+            logoutBtn = document.getElementById('logout-btn');
+            quizArea = document.getElementById('quiz-area');
+            resultsArea = document.getElementById('results-area');
+            answerInput = document.getElementById('answer-input');
+            questionMeaningEl = document.getElementById('question-meaning');
+            questionIpaEl = document.getElementById('question-ipa');
+            questionMeaningEnEl = document.getElementById('question-meaning-en');
+            questionExampleEnEl = document.getElementById('question-example-en');
+            questionExampleCnEl = document.getElementById('question-example-cn');
+            nextBtn = document.getElementById('next-btn');
+            currentQNumEl = document.getElementById('current-q-num');
+            totalQNumEl = document.getElementById('total-q-num');
+            ukBtn = document.getElementById('play-uk-btn');
+            usBtn = document.getElementById('play-us-btn');
+            toggleDetailsBtn = document.getElementById('toggle-details-btn');
+            wordDetailsContainer = document.getElementById('word-details-container');
+            questionDerivativesEl = document.getElementById('question-derivatives');
+            questionRootEtymologyEl = document.getElementById('question-root-etymology');
+            questionMnemonicEl = document.getElementById('question-mnemonic');
+            questionComparisonEl = document.getElementById('question-comparison');
+            questionCollocationEl = document.getElementById('question-collocation');
+            questionExamSentenceEl = document.getElementById('question-exam-sentence');
+            questionExamYearSourceEl = document.getElementById('question-exam-year-source');
+            questionExamOptionsEl = document.getElementById('question-exam-options');
+            questionExamExplanationEl = document.getElementById('question-exam-explanation');
+            questionTipsEl = document.getElementById('question-tips');
+            lumiImg = document.querySelector('.lumi-reaction');
+            lumiToggle = document.getElementById('lumi-toggle');
+            autoPlayToggle = document.getElementById('auto-play-toggle');
+            audioEl = document.getElementById('word-audio');
+            startBtn = document.getElementById('start-btn');
+
             Object.values(lumiImages).forEach(path => { (new Image()).src = path; }); // 预加载图片
             updateLumiReaction('welcome');
             loadBookLists(); // 加载词书列表，而不是直接加载单词列表
+            // Add a simple test to check session storage
+            console.log('All sessionStorage keys:', Object.keys(sessionStorage));
+            console.log('Current user in sessionStorage:', sessionStorage.getItem('currentUser'));
+
             checkLoginStatus();
-            
+
             // 尝试恢复页面状态和测试进度
             const restored = restoreQuizProgress();
             if (!restored) {
@@ -3369,10 +3399,21 @@
             });
 
             // 添加认证相关事件监听器
-            loginBtn.addEventListener('click', async () => {
-                await handleLogin();
-                loadSRSMastery();
-            });
+            if (loginBtn) {
+                console.log('Login button found, adding event listener'); // Debug log
+                loginBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    console.log('Login button clicked'); // Debug log
+                    try {
+                        await handleLogin();
+                        loadSRSMastery();
+                    } catch (error) {
+                        console.error('Login error:', error);
+                    }
+                });
+            } else {
+                console.error('Login button not found!');
+            }
 
             // 添加回车键登录功能
             loginPassword.addEventListener('keypress', function (event) {
@@ -3428,170 +3469,392 @@
                 loadSRSMastery();
             });
             loadSRSMastery(); // 加载SRS掌握度
-        });
 
-        // Lumi开关事件监听
-        lumiToggle.addEventListener('change', function () {
-            lumiEnabled = this.checked;
-            if (lumiEnabled) {
-                // 根据当前状态更新 Lumi 反应
-                if (appContainer.style.display === 'block') {
-                    // 如果在应用界面
-                    if (quizArea.style.display === 'block' && currentQuestionIndex < questions.length) {
-                        updateLumiReaction('thinking');
-                    } else if (resultsArea.style.display === 'block') {
-                        updateLumiReaction('celebration');
+            // Lumi开关事件监听
+            lumiToggle.addEventListener('change', function () {
+                lumiEnabled = this.checked;
+                if (lumiEnabled) {
+                    // 根据当前状态更新 Lumi 反应
+                    if (appContainer.style.display === 'block') {
+                        // 如果在应用界面
+                        if (quizArea.style.display === 'block' && currentQuestionIndex < questions.length) {
+                            updateLumiReaction('thinking');
+                        } else if (resultsArea.style.display === 'block') {
+                            updateLumiReaction('celebration');
+                        } else {
+                            updateLumiReaction('welcome');
+                        }
                     } else {
                         updateLumiReaction('welcome');
                     }
                 } else {
-                    updateLumiReaction('welcome');
+                    lumiImg.classList.remove('active');
                 }
-            } else {
-                lumiImg.classList.remove('active');
-            }
-        });
+            });
 
-        // 自动播放开关事件监听
-        autoPlayToggle.addEventListener('change', function () {
-            autoPlayEnabled = this.checked;
-            // 保存到localStorage
-            localStorage.setItem('autoPlayEnabled', autoPlayEnabled);
-            // 如果开启自动播放且当前正在显示问题，则立即播放当前问题的音频
-            if (autoPlayEnabled && questions.length > 0 && currentQuestionIndex < questions.length && quizArea.style.display !== 'none') {
-                autoPlayAudios();
-            }
-        });
+            // 自动播放开关事件监听
+            autoPlayToggle.addEventListener('change', function () {
+                autoPlayEnabled = this.checked;
+                // 保存到localStorage
+                localStorage.setItem('autoPlayEnabled', autoPlayEnabled);
+                // 如果开启自动播放且当前正在显示问题，则立即播放当前问题的音频
+                if (autoPlayEnabled && questions.length > 0 && currentQuestionIndex < questions.length && quizArea.style.display !== 'none') {
+                    autoPlayAudios();
+                }
+            });
 
-        // 即时反馈开关事件监听
-        document.getElementById('instant-feedback-toggle').addEventListener('change', function () {
-            instantFeedbackEnabled = this.checked;
-            // 保存到localStorage
-            localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
-        });
+            // 即时反馈开关事件监听
+            document.getElementById('instant-feedback-toggle').addEventListener('change', function () {
+                instantFeedbackEnabled = this.checked;
+                // 保存到localStorage
+                localStorage.setItem('instantFeedbackEnabled', instantFeedbackEnabled);
+            });
 
+            // 学习模式变化事件监听
+            document.getElementById('study-mode').addEventListener('change', function () {
+                const selectedMode = this.value;
+                const errorStatsContainer = document.getElementById('error-stats-container');
+                const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)'); // 数量选择器容器
+                const countSelect = document.getElementById('count-select');
+                const srsReviewArea = document.getElementById('srs-review-area');
+                const srsMasteryContainer = document.getElementById('srs-mastery-container');
+                const quizArea = document.getElementById('quiz-area');
 
+                // 保存页面状态
+                savePageState();
 
-        // 学习模式变化事件监听
-        document.getElementById('study-mode').addEventListener('change', function () {
-            const selectedMode = this.value;
-            const errorStatsContainer = document.getElementById('error-stats-container');
-            const countSelectContainer = document.querySelector('.list-selector div:nth-child(3)'); // 数量选择器容器
-            const countSelect = document.getElementById('count-select');
-            const srsReviewArea = document.getElementById('srs-review-area');
-            const srsMasteryContainer = document.getElementById('srs-mastery-container');
-            const quizArea = document.getElementById('quiz-area');
-<<<<<<< HEAD
+                if (selectedMode === 'error_review') {
+                    // 显示错词统计容器
+                    errorStatsContainer.style.display = 'block';
+                    // 隐藏数量选择器
+                    countSelectContainer.style.display = 'none';
+                    // 默认选择全部
+                    countSelect.value = 'all';
+                    // 加载错词统计信息
+                    loadErrorStats();
+                    // 隐藏其他区域
+                    srsReviewArea.style.display = 'none';
+                    srsMasteryContainer.style.display = 'none';
+                    quizArea.style.display = 'none';
 
-=======
-            
-            // 保存页面状态
-            savePageState();
-            
->>>>>>> gitlab/mods-to-fix
-            if (selectedMode === 'error_review') {
-                // 显示错词统计容器
-                errorStatsContainer.style.display = 'block';
-                // 隐藏数量选择器
-                countSelectContainer.style.display = 'none';
-                // 默认选择全部
-                countSelect.value = 'all';
-                // 加载错词统计信息
-                loadErrorStats();
-                // 隐藏其他区域
-                srsReviewArea.style.display = 'none';
-                srsMasteryContainer.style.display = 'none';
-                quizArea.style.display = 'none';
+                    // 显示start-btn
+                    startBtn.style.display = 'inline-block';
+                } else if (selectedMode === 'error_clear') {
+                    // 错词清零模式：显示错词统计容器并隐藏数量选择器
+                    errorStatsContainer.style.display = 'block';
+                    countSelectContainer.style.display = 'none';
+                    countSelect.value = 'all';
+                    // 加载错词统计信息
+                    loadErrorStats();
+                    // 隐藏其他区域
+                    srsReviewArea.style.display = 'none';
+                    srsMasteryContainer.style.display = 'none';
+                    quizArea.style.display = 'none';
 
-                // 显示start-btn
-                startBtn.style.display = 'inline-block';
-            } else if (selectedMode === 'error_clear') {
-                // 错词清零模式：显示错词统计容器并隐藏数量选择器
-                errorStatsContainer.style.display = 'block';
-                countSelectContainer.style.display = 'none';
-                countSelect.value = 'all';
-                // 加载错词统计信息
-                loadErrorStats();
-                // 隐藏其他区域
-                srsReviewArea.style.display = 'none';
-                srsMasteryContainer.style.display = 'none';
-                quizArea.style.display = 'none';
+                    // 显示start-btn
+                    startBtn.style.display = 'inline-block';
 
-                // 显示start-btn
-                startBtn.style.display = 'inline-block';
+                    // 显示错词清零模式特殊提示
+                    setTimeout(() => {
+                        const errorStatsContent = document.getElementById('error-stats-content');
+                        if (errorStatsContent) {
+                            // 移除之前的特殊提示（如果有）
+                            const existingNote = errorStatsContent.querySelector('.error-clear-note');
+                            if (existingNote) {
+                                existingNote.remove();
+                            }
 
-                // 显示错词清零模式特殊提示
-                setTimeout(() => {
-                    const errorStatsContent = document.getElementById('error-stats-content');
-                    if (errorStatsContent) {
-                        // 移除之前的特殊提示（如果有）
-                        const existingNote = errorStatsContent.querySelector('.error-clear-note');
-                        if (existingNote) {
-                            existingNote.remove();
+                            const clearModeNote = document.createElement('div');
+                            clearModeNote.className = 'error-clear-note';
+                            clearModeNote.style.cssText = `
+                                background: #e3f2fd;
+                                border: 1px solid #2196f3;
+                                border-radius: 5px;
+                                padding: 10px;
+                                margin-top: 10px;
+                                color: #1976d2;
+                                font-weight: bold;
+                            `;
+                            clearModeNote.innerHTML = '🎯 <strong>错词清零模式已开启</strong> - 将对错词进行循环考核直到100%正确！';
+                            errorStatsContent.appendChild(clearModeNote);
                         }
+                    }, 100); // 延迟一点确保错词统计已加载
+                } else if (selectedMode === 'srs_review') {
+                    // SRS复习模式：显示SRS掌握度容器，隐藏其他区域
+                    srsMasteryContainer.style.display = 'block';
+                    errorStatsContainer.style.display = 'none';
+                    quizArea.style.display = 'none';
+                    countSelectContainer.style.display = 'none';
 
-                        const clearModeNote = document.createElement('div');
-                        clearModeNote.className = 'error-clear-note';
-                        clearModeNote.style.cssText = `
-                            background: #e3f2fd;
-                            border: 1px solid #2196f3;
-                            border-radius: 5px;
-                            padding: 10px;
-                            margin-top: 10px;
-                            color: #1976d2;
-                            font-weight: bold;
-                        `;
-                        clearModeNote.innerHTML = '🎯 <strong>错词清零模式已开启</strong> - 将对错词进行循环考核直到100%正确！';
-                        errorStatsContent.appendChild(clearModeNote);
+                    // 显示start-btn，保持与其他模式一致
+                    startBtn.style.display = 'inline-block';
+
+                    // 隐藏SRS复习区域，等待用户点击开始后显示
+                    srsReviewArea.style.display = 'none';
+
+                    // 检查用户是否已登录
+                    if (!currentUser) {
+                        alert('请先登录后使用SRS复习功能');
+                        this.value = 'standard'; // 重置为标准模式
+                        return;
                     }
-                }, 100); // 延迟一点确保错词统计已加载
-            } else if (selectedMode === 'srs_review') {
-                // SRS复习模式：显示SRS掌握度容器，隐藏其他区域
-                srsMasteryContainer.style.display = 'block';
-                errorStatsContainer.style.display = 'none';
-                quizArea.style.display = 'none';
-                countSelectContainer.style.display = 'none';
 
-                // 显示start-btn，保持与其他模式一致
-                startBtn.style.display = 'inline-block';
+                    // 加载SRS掌握度信息
+                    loadSRSMastery();
+                } else {
+                    // 其他模式：隐藏错词统计容器和SRS相关容器，显示数量选择器
+                    errorStatsContainer.style.display = 'none';
+                    srsMasteryContainer.style.display = 'none';
+                    countSelectContainer.style.display = 'block';
+                    srsReviewArea.style.display = 'none';
+                    quizArea.style.display = 'none';
 
-                // 隐藏SRS复习区域，等待用户点击开始后显示
-                srsReviewArea.style.display = 'none';
+                    // 显示start-btn
+                    startBtn.style.display = 'inline-block';
+                }
+            });
 
-                // 检查用户是否已登录
-                if (!currentUser) {
-                    alert('请先登录后使用SRS复习功能');
-                    this.value = 'standard'; // 重置为标准模式
+            // 单元选择变化事件监听（用于错词复习模式和错词清零模式）
+            document.getElementById('list-select').addEventListener('change', function () {
+                const selectedMode = document.getElementById('study-mode').value;
+                if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
+                    // 立即显示加载状态
+                    const errorStatsContent = document.getElementById('error-stats-content');
+                    errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
+
+                    // 立即加载错词统计信息
+                    loadErrorStats();
+                }
+            });
+
+            // 开始按钮
+            startBtn.addEventListener('click', async () => {
+                const selectedListId = document.getElementById('list-select').value;
+                const selectedCount = document.getElementById('count-select').value;
+                const selectedMode = document.getElementById('study-mode').value;
+
+                if (!selectedListId) {
+                    alert('请先选择一个单词列表！');
                     return;
                 }
 
-                // 加载SRS掌握度信息
-                loadSRSMastery();
-            } else {
-                // 其他模式：隐藏错词统计容器和SRS相关容器，显示数量选择器
-                errorStatsContainer.style.display = 'none';
-                srsMasteryContainer.style.display = 'none';
-                countSelectContainer.style.display = 'block';
-                srsReviewArea.style.display = 'none';
-                quizArea.style.display = 'none';
+                // SRS模式下的特殊处理
+                if (selectedMode === 'srs_review') {
+                    await handleSRSStart();
+                    return;
+                }
 
-                // 显示start-btn
-                startBtn.style.display = 'inline-block';
-            }
-        });
+                // 错词复习模式和错词清零模式特殊处理
+                if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
+                    try {
+                        // 先检查错词统计
+                        const statsResponse = await fetch(`/api/error-stats?list_id=${selectedListId}`);
+                        if (!statsResponse.ok) {
+                            if (statsResponse.status === 401) {
+                                alert('请先登录后使用错词复习模式！');
+                                return;
+                            } else {
+                                throw new Error('获取错词统计失败');
+                            }
+                        }
 
-        // 单元选择变化事件监听（用于错词复习模式和错词清零模式）
-        document.getElementById('list-select').addEventListener('change', function () {
-            const selectedMode = document.getElementById('study-mode').value;
-            if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
-                // 立即显示加载状态
-                const errorStatsContent = document.getElementById('error-stats-content');
-                errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
+                        const stats = await statsResponse.json();
+                        if (stats.error_words_count === 0) {
+                            alert('恭喜！在这个列表中你还没有犯过任何错误。请尝试其他模式或选择其他列表。');
+                            return;
+                        }
+                    } catch (error) {
+                        console.error("检查错词统计时出错:", error);
+                        alert('检查错词统计时出错，请稍后再试');
+                        return;
+                    }
+                }
 
-                // 立即加载错词统计信息
-                loadErrorStats();
-            }
-        });
+                try {
+                    // 错词清零模式使用错词复习模式获取数据
+                    const actualStudyMode = selectedMode === 'error_clear' ? 'error_review' : selectedMode;
+                    const response = await fetch(`/api/questions?list_id=${selectedListId}&count=${selectedCount}&study_mode=${actualStudyMode}`);
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            alert('请先登录后使用此功能！');
+                            return;
+                        }
+                        throw new Error('网络请求失败');
+                    }
+                    questions = await response.json();
+
+                    if (questions && questions.length > 0) {
+                        // 错词清零模式特殊处理
+                        if (selectedMode === 'error_clear') {
+                            // 获取当前选择的词书和单元信息
+                            const selectedBookName = document.getElementById('book-select').options[document.getElementById('book-select').selectedIndex]?.text || '未知词书';
+                            const selectedListName = document.getElementById('list-select').options[document.getElementById('list-select').selectedIndex]?.text || '未知单元';
+
+                            // 初始化错词清零模式数据
+                            errorClearModeData = {
+                                isActive: true,
+                                currentRound: 1,
+                                originalQuestions: [...questions],
+                                currentQuestions: [...questions],
+                                incorrectWords: [],
+                                roundResults: [],
+                                bookName: selectedBookName,
+                                listName: selectedListName
+                            };
+
+                            // 隐藏所有控制元素
+                            document.querySelector('.list-selector').style.display = 'none';
+                            startBtn.style.display = 'none';
+                            document.querySelector('a.btn').style.display = 'none';
+                            document.getElementById('error-stats-container').style.display = 'none';
+                            document.querySelector('.lumi-toggle-container').style.display = 'none';
+                            document.querySelector('.auto-play-container').style.display = 'none';
+                            document.querySelector('.feedback-container').style.display = 'none';
+
+                            // 显示错词清零模式界面
+                            showErrorClearModeInterface();
+                            return;
+                        }
+
+                        // 其他模式（标准模式、默写模式、错词复习模式）
+                        document.querySelector('.list-selector').style.display = 'none';
+                        startBtn.style.display = 'none';
+                        document.querySelector('a.btn').style.display = 'none';
+                        document.getElementById('error-stats-container').style.display = 'none';
+                        // SRS掌握度容器现在由学习模式变化事件控制，这里不需要手动隐藏
+                        quizArea.style.display = 'block';
+                        totalQNumEl.textContent = questions.length;
+                        userAnswers = []; // 重置答案
+                        currentQuestionIndex = 0; // 重置索引
+                        inputEnabled = true; // 重置输入状态
+                        displayQuestion();
+                        updateLumiReaction('thinking');
+                    } else {
+                        if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
+                            alert('该列表中没有错词需要复习！');
+                        } else {
+                            alert('无法加载题目或该列表为空！');
+                        }
+                    }
+                } catch (error) {
+                    console.error("加载题目时出错:", error);
+                    alert('加载题目时出错，请检查后端服务。');
+                }
+            });
+
+            // 下一步按钮和回车键
+            nextBtn.addEventListener('click', function () {
+                if (inputEnabled) {
+                    handleNextQuestion();
+                }
+            });
+
+            toggleDetailsBtn.addEventListener('click', () => {
+                if (wordDetailsContainer.style.display === 'none') {
+                    wordDetailsContainer.style.display = 'block';
+                    toggleDetailsBtn.textContent = '隐藏更多详情';
+
+                    // 调试信息：检查详情内容是否为空
+                    const detailsContent = [
+                        document.getElementById('question-derivatives').textContent,
+                        document.getElementById('question-root-etymology').textContent,
+                        document.getElementById('question-mnemonic').textContent,
+                        document.getElementById('question-comparison').textContent,
+                        document.getElementById('question-collocation').textContent,
+                        document.getElementById('question-exam-sentence').textContent,
+                        document.getElementById('question-exam-year-source').textContent,
+                        document.getElementById('question-exam-options').textContent,
+                        document.getElementById('question-exam-explanation').textContent,
+                        document.getElementById('question-tips').textContent
+                    ];
+
+                    const hasContent = detailsContent.some(text => text.trim() !== '');
+                    if (!hasContent) {
+                        // 如果所有详情内容都为空，显示提示信息
+                        const noContentMsg = document.createElement('p');
+                        noContentMsg.id = 'no-details-msg';
+                        noContentMsg.textContent = '当前单词没有更多详细信息';
+                        noContentMsg.style.color = '#888';
+                        noContentMsg.style.fontStyle = 'italic';
+                        noContentMsg.style.textAlign = 'center';
+                        noContentMsg.style.padding = '10px';
+
+                        // 清除之前的提示（如果有）
+                        const oldMsg = document.getElementById('no-details-msg');
+                        if (oldMsg) oldMsg.remove();
+
+                        wordDetailsContainer.appendChild(noContentMsg);
+                    }
+                } else {
+                    wordDetailsContainer.style.display = 'none';
+                    toggleDetailsBtn.textContent = '显示更多详情';
+                }
+            });
+
+            answerInput.addEventListener('keydown', function (event) {
+                if (event.keyCode === 13 && inputEnabled) {
+                    event.preventDefault();
+                    handleNextQuestion();
+                }
+            });
+
+            // SRS复习按钮事件
+            document.getElementById('srs-review-btn').addEventListener('click', async () => {
+                // 直接进入SRS复习流程
+                await handleSRSStart();
+            });
+
+            // SRS复习相关事件监听
+            document.getElementById('srs-start-btn').addEventListener('click', async () => {
+                await handleSRSStart();
+            });
+
+            // SRS复习结果按钮事件
+            document.getElementById('srs-restart-btn').addEventListener('click', async () => {
+                document.getElementById('srs-results-container').style.display = 'none';
+                const hasWords = await loadSRSDueWords();
+                if (hasWords) {
+                    startSRSReview();
+                }
+            });
+
+            document.getElementById('srs-back-home-btn').addEventListener('click', () => {
+                resetSRSReview();
+                resetQuizState();
+                // 确保SRS复习区域被隐藏
+                document.getElementById('srs-review-area').style.display = 'none';
+            });
+
+            // SRS复习控制按钮事件
+            document.getElementById('srs-back-home-from-review-btn').addEventListener('click', () => {
+                if (confirm('确定要返回主页吗？当前复习进度将丢失。')) {
+                    resetSRSReview();
+                    resetQuizState();
+                    // 确保SRS复习区域被隐藏
+                    document.getElementById('srs-review-area').style.display = 'none';
+                }
+            });
+
+            document.getElementById('srs-exit-review-btn').addEventListener('click', () => {
+                if (confirm('确定要退出SRS复习吗？当前复习进度将丢失。')) {
+                    resetSRSReview();
+                    // 确保SRS复习区域被隐藏
+                    document.getElementById('srs-review-area').style.display = 'none';
+                }
+            });
+
+            // 验证测试相关事件监听
+            document.getElementById('submit-verification-btn').addEventListener('click', submitVerification);
+            document.getElementById('skip-verification-btn').addEventListener('click', skipVerification);
+
+            // 验证测试输入框回车事件
+            document.getElementById('verification-answer').addEventListener('keydown', function (event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    submitVerification();
+                }
+            });
+        }); // 关闭 DOMContentLoaded 事件监听器
 
         // 显示错词清零模式界面
         function showErrorClearModeInterface() {
@@ -4146,7 +4409,7 @@
                 console.error('保存进度时出错:', error);
             }
         }
-        
+
         // 保存页面状态
         function savePageState() {
             pageState.lastActivity = Date.now();
@@ -4156,7 +4419,7 @@
             pageState.selectedStudyMode = document.getElementById('study-mode').value;
             localStorage.setItem('pageState', JSON.stringify(pageState));
         }
-        
+
         // 恢复页面状态
         function restorePageState() {
             const savedState = localStorage.getItem('pageState');
@@ -4167,28 +4430,28 @@
                     const hoursSinceLastActivity = (Date.now() - state.lastActivity) / (1000 * 60 * 60);
                     if (hoursSinceLastActivity < 24) {
                         pageState = { ...pageState, ...state };
-                        
+
                         // 恢复选择器状态
                         if (pageState.selectedBookId) {
                             document.getElementById('book-select').value = pageState.selectedBookId;
                             // 触发书籍选择事件以加载列表
                             loadListsForBook(pageState.selectedBookId);
                         }
-                        
+
                         if (pageState.selectedListId) {
                             setTimeout(() => {
                                 document.getElementById('list-select').value = pageState.selectedListId;
                             }, 500);
                         }
-                        
+
                         if (pageState.selectedCount) {
                             document.getElementById('count-select').value = pageState.selectedCount;
                         }
-                        
+
                         if (pageState.selectedStudyMode) {
                             document.getElementById('study-mode').value = pageState.selectedStudyMode;
                         }
-                        
+
                         // 根据模式恢复界面
                         switch (pageState.currentMode) {
                             case 'quiz':
@@ -4217,7 +4480,7 @@
                 }
             }
         }
-        
+
         // 恢复测试进度的函数
         function restoreQuizProgress() {
             const savedProgress = localStorage.getItem('quizProgress');
@@ -4232,15 +4495,15 @@
                         currentQuestionIndex = progress.currentQuestionIndex || 0;
                         userAnswers = progress.userAnswers || [];
                         consecutiveCorrect = progress.consecutiveCorrect || 0;
-                        
+
                         // 恢复页面状态
                         if (progress.pageState) {
                             pageState = { ...pageState, ...progress.pageState };
                         }
-                        
+
                         // 恢复界面状态
                         restorePageState();
-                        
+
                         // 显示恢复提示
                         if (questions.length > 0 && userAnswers.length > 0) {
                             const confirmed = confirm(`检测到未完成的测试进度：\n\n• 已答题：${userAnswers.length}/${questions.length}\n• 正确率：${Math.round((userAnswers.filter(a => a.isCorrect).length / userAnswers.length) * 100)}%\n\n是否恢复继续？`);
