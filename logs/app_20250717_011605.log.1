@@ -1,0 +1,42 @@
+2025-07-17 09:45:45,809 ERROR: TTS生成失败: certain, 错误: Failed to connect. Probable cause: Unknown [in /var/www/vocabulary/app.py:155]
+2025-07-17 09:46:15,813 ERROR: TTS生成失败: penny, 错误: Failed to connect. Probable cause: Unknown [in /var/www/vocabulary/app.py:155]
+2025-07-17 09:46:45,817 ERROR: TTS生成失败: pack, 错误: Failed to connect. Probable cause: Unknown [in /var/www/vocabulary/app.py:155]
+2025-07-17 09:47:01,055 INFO: 记录错误: student_id=3, word_id=18607, student_answer='area', list_id=227 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:47:01,076 INFO: 成功记录错误: student_id=3, word_id=18607, word='belt' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:47:01,078 INFO: 记录错误: student_id=3, word_id=18611, student_answer='nervous', list_id=227 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:47:01,108 INFO: 成功记录错误: student_id=3, word_id=18611, word='anxious' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:47:01,110 INFO: 记录错误: student_id=3, word_id=18567, student_answer='', list_id=227 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:47:01,121 INFO: 成功记录错误: student_id=3, word_id=18567, word='certain' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:47:01,123 INFO: 记录错误: student_id=3, word_id=18587, student_answer='package', list_id=227 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:47:01,132 INFO: 成功记录错误: student_id=3, word_id=18587, word='pack' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:47:01,133 INFO: 记录错误: student_id=3, word_id=18588, student_answer='juice', list_id=227 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:47:01,142 INFO: 成功记录错误: student_id=3, word_id=18588, word='orange' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:47:01,144 INFO: 记录错误: student_id=3, word_id=18589, student_answer='crazy', list_id=227 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:47:01,153 INFO: 成功记录错误: student_id=3, word_id=18589, word='mad' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:57:14,553 INFO: 错词复习模式SQL: 
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
+               wl.list_name, b.book_name
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+         [in /var/www/vocabulary/app.py:230]
+2025-07-17 09:57:14,555 INFO: 错词复习模式参数: (3, 3, 228, 3) [in /var/www/vocabulary/app.py:231]
+2025-07-17 09:57:14,562 INFO: 错词复习模式: 列表ID=228, 学生ID=3, 获取到5个错词 [in /var/www/vocabulary/app.py:238]
+2025-07-17 09:57:14,562 INFO: 错词示例: ['envelope', 'rural', 'shiny'] [in /var/www/vocabulary/app.py:240]
+2025-07-17 09:58:04,321 ERROR: TTS生成失败: rural, 错误: Failed to connect. Probable cause: Unknown [in /var/www/vocabulary/app.py:155]
+2025-07-17 09:58:41,792 INFO: 记录错误: student_id=3, word_id=18625, student_answer='bright', list_id=228 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:58:41,802 INFO: 成功记录错误: student_id=3, word_id=18625, word='shiny' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:58:41,813 INFO: 记录错误: student_id=3, word_id=18632, student_answer='view', list_id=228 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:58:41,820 INFO: 成功记录错误: student_id=3, word_id=18632, word='sight' [in /var/www/vocabulary/app.py:944]
+2025-07-17 09:58:41,822 INFO: 记录错误: student_id=3, word_id=18648, student_answer='cookery', list_id=228 [in /var/www/vocabulary/app.py:923]
+2025-07-17 09:58:41,829 INFO: 成功记录错误: student_id=3, word_id=18648, word='recipe' [in /var/www/vocabulary/app.py:944]
+2025-07-17 12:59:29,675 INFO: 获取错误历史记录: student_id=3, limit=500, book_id=None, list_id=None, date_from=2025-06-17, date_to=2025-07-17, sort_by=error_date, sort_order=desc [in /var/www/vocabulary/app.py:656]

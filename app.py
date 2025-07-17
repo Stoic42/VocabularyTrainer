@@ -133,9 +133,29 @@ def get_tts_audio(word):
         
         # 如果文件不存在，则生成
         if not os.path.exists(filepath):
-            tts = gTTS(text=processed_word, lang='en', slow=False)
-            tts.save(filepath)
-            app.logger.info(f"已生成TTS音频: {word} -> {filepath}")
+            # 添加超时控制，防止Worker崩溃
+            import signal
+            
+            def timeout_handler(signum, frame):
+                raise TimeoutError("TTS生成超时")
+            
+            # 设置30秒超时
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(30)
+            
+            try:
+                tts = gTTS(text=processed_word, lang='en', slow=False)
+                tts.save(filepath)
+                app.logger.info(f"已生成TTS音频: {word} -> {filepath}")
+            except TimeoutError:
+                app.logger.error(f"TTS生成超时: {word}")
+                # 返回一个默认的音频文件或错误响应
+                return {'error': 'TTS生成超时，请稍后重试'}, 408
+            except Exception as e:
+                app.logger.error(f"TTS生成失败: {word}, 错误: {str(e)}")
+                return {'error': 'TTS生成失败'}, 500
+            finally:
+                signal.alarm(0)  # 取消超时
         
         return send_from_directory(TTS_CACHE_DIR, filename)
     except Exception as e:

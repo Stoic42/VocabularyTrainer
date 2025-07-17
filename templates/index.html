@@ -2115,6 +2115,18 @@
 
         let currentUser = null; // 当前登录用户
         let inputEnabled = true; // 输入控制状态
+        
+        // 页面状态管理
+        let pageState = {
+            currentMode: 'home', // home, quiz, results, srs_review
+            selectedBookId: null,
+            selectedListId: null,
+            selectedCount: '10',
+            selectedStudyMode: 'standard',
+            quizProgress: null,
+            lastActivity: Date.now()
+        };
+        
         const lumiImages = {
             'welcome': '/assets/img/Lumi/Lumi_ReadingontheLaptop_SmilingattheScreen.png',
             'thinking': '/assets/img/Lumi/Lumi_HoldingWordCard.png',
@@ -3304,7 +3316,13 @@
             updateLumiReaction('welcome');
             loadBookLists(); // 加载词书列表，而不是直接加载单词列表
             checkLoginStatus();
-
+            
+            // 尝试恢复页面状态和测试进度
+            const restored = restoreQuizProgress();
+            if (!restored) {
+                // 如果没有测试进度，尝试恢复页面状态
+                restorePageState();
+            }
             // 初始化错词复习模式和错词清零模式的设置
             const selectedMode = document.getElementById('study-mode').value;
             if (selectedMode === 'error_review' || selectedMode === 'error_clear') {
@@ -3347,6 +3365,7 @@
                     errorStatsContent.innerHTML = '<p style="color: #856404;">正在加载错词统计...</p>';
                     loadErrorStats();
                 }
+                savePageState(); // 保存页面状态
             });
 
             // 添加认证相关事件监听器
@@ -3462,7 +3481,14 @@
             const srsReviewArea = document.getElementById('srs-review-area');
             const srsMasteryContainer = document.getElementById('srs-mastery-container');
             const quizArea = document.getElementById('quiz-area');
+<<<<<<< HEAD
 
+=======
+            
+            // 保存页面状态
+            savePageState();
+            
+>>>>>>> gitlab/mods-to-fix
             if (selectedMode === 'error_review') {
                 // 显示错词统计容器
                 errorStatsContainer.style.display = 'block';
@@ -4095,7 +4121,13 @@
                     answered_questions: userAnswers.length,
                     correct_answers: userAnswers.filter(answer => answer.isCorrect).length,
                     progress_percentage: Math.round((userAnswers.length / questions.length) * 100),
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    // 添加完整的页面状态
+                    pageState: pageState,
+                    questions: questions,
+                    currentQuestionIndex: currentQuestionIndex,
+                    userAnswers: userAnswers,
+                    consecutiveCorrect: consecutiveCorrect
                 };
 
                 // 保存到localStorage作为备份
@@ -4113,6 +4145,124 @@
             } catch (error) {
                 console.error('保存进度时出错:', error);
             }
+        }
+        
+        // 保存页面状态
+        function savePageState() {
+            pageState.lastActivity = Date.now();
+            pageState.selectedBookId = document.getElementById('book-select').value;
+            pageState.selectedListId = document.getElementById('list-select').value;
+            pageState.selectedCount = document.getElementById('count-select').value;
+            pageState.selectedStudyMode = document.getElementById('study-mode').value;
+            localStorage.setItem('pageState', JSON.stringify(pageState));
+        }
+        
+        // 恢复页面状态
+        function restorePageState() {
+            const savedState = localStorage.getItem('pageState');
+            if (savedState) {
+                try {
+                    const state = JSON.parse(savedState);
+                    // 检查状态是否在24小时内
+                    const hoursSinceLastActivity = (Date.now() - state.lastActivity) / (1000 * 60 * 60);
+                    if (hoursSinceLastActivity < 24) {
+                        pageState = { ...pageState, ...state };
+                        
+                        // 恢复选择器状态
+                        if (pageState.selectedBookId) {
+                            document.getElementById('book-select').value = pageState.selectedBookId;
+                            // 触发书籍选择事件以加载列表
+                            loadListsForBook(pageState.selectedBookId);
+                        }
+                        
+                        if (pageState.selectedListId) {
+                            setTimeout(() => {
+                                document.getElementById('list-select').value = pageState.selectedListId;
+                            }, 500);
+                        }
+                        
+                        if (pageState.selectedCount) {
+                            document.getElementById('count-select').value = pageState.selectedCount;
+                        }
+                        
+                        if (pageState.selectedStudyMode) {
+                            document.getElementById('study-mode').value = pageState.selectedStudyMode;
+                        }
+                        
+                        // 根据模式恢复界面
+                        switch (pageState.currentMode) {
+                            case 'quiz':
+                                if (questions.length > 0) {
+                                    showQuestion();
+                                    quizArea.style.display = 'block';
+                                }
+                                break;
+                            case 'results':
+                                if (userAnswers.length > 0) {
+                                    showResults();
+                                    resultsArea.style.display = 'block';
+                                }
+                                break;
+                            case 'srs_review':
+                                // SRS复习状态恢复
+                                break;
+                        }
+                    } else {
+                        // 超过24小时，清除旧状态
+                        localStorage.removeItem('pageState');
+                    }
+                } catch (error) {
+                    console.error('解析保存的状态时出错:', error);
+                    localStorage.removeItem('pageState');
+                }
+            }
+        }
+        
+        // 恢复测试进度的函数
+        function restoreQuizProgress() {
+            const savedProgress = localStorage.getItem('quizProgress');
+            if (savedProgress) {
+                try {
+                    const progress = JSON.parse(savedProgress);
+                    // 检查进度是否在24小时内
+                    const hoursSinceLastActivity = (Date.now() - new Date(progress.timestamp).getTime()) / (1000 * 60 * 60);
+                    if (hoursSinceLastActivity < 24) {
+                        // 恢复测试数据
+                        questions = progress.questions || [];
+                        currentQuestionIndex = progress.currentQuestionIndex || 0;
+                        userAnswers = progress.userAnswers || [];
+                        consecutiveCorrect = progress.consecutiveCorrect || 0;
+                        
+                        // 恢复页面状态
+                        if (progress.pageState) {
+                            pageState = { ...pageState, ...progress.pageState };
+                        }
+                        
+                        // 恢复界面状态
+                        restorePageState();
+                        
+                        // 显示恢复提示
+                        if (questions.length > 0 && userAnswers.length > 0) {
+                            const confirmed = confirm(`检测到未完成的测试进度：\n\n• 已答题：${userAnswers.length}/${questions.length}\n• 正确率：${Math.round((userAnswers.filter(a => a.isCorrect).length / userAnswers.length) * 100)}%\n\n是否恢复继续？`);
+                            if (confirmed) {
+                                showQuestion();
+                                quizArea.style.display = 'block';
+                                return true;
+                            } else {
+                                // 用户选择不恢复，清除进度
+                                localStorage.removeItem('quizProgress');
+                            }
+                        }
+                    } else {
+                        // 超过24小时，清除旧进度
+                        localStorage.removeItem('quizProgress');
+                    }
+                } catch (error) {
+                    console.error('解析保存的进度时出错:', error);
+                    localStorage.removeItem('quizProgress');
+                }
+            }
+            return false;
         }
 
         // 加载错词统计信息的函数

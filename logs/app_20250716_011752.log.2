@@ -1,0 +1,19 @@
+2025-07-16 21:47:36,185 INFO: 错词复习模式SQL: 
+        SELECT w.word_id, w.spelling, w.meaning_cn, w.pos, w.audio_path_uk, w.audio_path_us,
+               w.derivatives, w.root_etymology, w.mnemonic, w.comparison, w.collocation,
+               w.exam_sentence, w.exam_year_source, w.exam_options, w.exam_explanation, w.tips,
+               w.list_id,
+               (SELECT COUNT(*) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as error_count,
+               (SELECT MAX(error_date) FROM ErrorLogs WHERE word_id = w.word_id AND student_id = ?) as last_error_date,
+               wl.list_name, b.book_name
+        FROM Words w
+        INNER JOIN ErrorLogs e ON w.word_id = e.word_id
+        LEFT JOIN WordLists wl ON w.list_id = wl.list_id
+        LEFT JOIN Books b ON wl.book_id = b.book_id
+        WHERE w.list_id = ? AND e.student_id = ?
+        GROUP BY w.word_id
+        ORDER BY error_count DESC, last_error_date DESC
+         [in /var/www/vocabulary/app.py:210]
+2025-07-16 21:47:36,186 INFO: 错词复习模式参数: (3, 3, 223, 3) [in /var/www/vocabulary/app.py:211]
+2025-07-16 21:47:36,191 INFO: 错词复习模式: 列表ID=223, 学生ID=3, 获取到13个错词 [in /var/www/vocabulary/app.py:218]
+2025-07-16 21:47:36,191 INFO: 错词示例: ['Australia', 'retire', 'wheat'] [in /var/www/vocabulary/app.py:220]

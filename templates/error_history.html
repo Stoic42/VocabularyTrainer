@@ -2652,4 +2652,2659 @@
     <script src="/fix_mess_display_new.js"></script>
 </body>
 
+=======
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>词汇训练 - 错误历史记录</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-bg: #f5f7fa;
+            --dark-text: #2c3e50;
+            --light-text: #ecf0f1;
+            --border-color: #dce0e3;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #c0392b;
+            --hover-color: #e6eef7;
+            --pos-tag-bg: #e9ecef;
+            --pos-tag-color: #495057;
+            --badge-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            --badge-primary: #3498db;
+            --badge-secondary: #2980b9;
+            --badge-hover: #2574a9;
+            --border-radius: 8px;
+        }
+
+        /* 打印样式 */
+        @media print {
+            body {
+                background-color: white;
+                font-size: 12pt;
+            }
+
+            header,
+            .filter-container,
+            .tabs,
+            .back-btn,
+            .action-btn,
+            #loading,
+            #error-message,
+            #login-message {
+                display: none !important;
+            }
+
+            #content {
+                display: block !important;
+                margin: 0;
+                padding: 0;
+            }
+
+            .stats-container {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: center;
+                width: 30%;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                table-layout: fixed;
+                /* 使用固定表格布局以便更好地控制列宽 */
+            }
+
+            th,
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+                word-wrap: break-word;
+                /* 允许长单词换行 */
+            }
+
+            /* 设置特定列的宽度 */
+            table th:nth-child(1),
+            table td:nth-child(1) {
+                /* 序号列 */
+                width: 6%;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            /* 单词列（第2列，但会被隐藏） */
+            table th:nth-child(2),
+            table td:nth-child(2) {
+                width: 12%;
+            }
+
+            /* 词性列（第3列） */
+            table th:nth-child(3),
+            table td:nth-child(3) {
+                width: 8%;
+            }
+
+            /* 中文意思列（第4列） */
+            table th:nth-child(4),
+            table td:nth-child(4) {
+                width: 20%;
+            }
+
+            /* 列表列（第5列） */
+            table th:nth-child(5),
+            table td:nth-child(5) {
+                width: 18%;
+            }
+
+            /* 你的答案列（第6列） */
+            table th:nth-child(6),
+            table td:nth-child(6) {
+                width: 20%;
+                /* 为答案列分配更多空间 */
+            }
+
+            /* 日期列（第7列） */
+            table th:nth-child(7),
+            table td:nth-child(7) {
+                width: 10%;
+            }
+
+            /* 错误次数列（第8列） */
+            table th:nth-child(8),
+            table td:nth-child(8) {
+                width: 6%;
+            }
+
+            .word-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .print-header {
+                display: block;
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 18pt;
+                font-weight: bold;
+            }
+
+            .print-date {
+                display: block;
+                text-align: right;
+                margin-bottom: 20px;
+                font-size: 10pt;
+                color: #666;
+            }
+
+            /* 隐藏单词列 */
+            .hide-for-print {
+                display: none !important;
+            }
+
+            /* 空白答案列样式 */
+            .empty-for-print {
+                height: 40px;
+                /* 增加高度以便学生书写 */
+                min-width: 150px;
+                /* 确保有足够的宽度写完整单词 */
+                border: 1px solid #666 !important;
+                /* 加深边框颜色使其更明显 */
+                background-color: #f9f9f9 !important;
+                padding: 8px 15px !important;
+                /* 增加内边距提供更多书写空间 */
+                position: relative;
+            }
+
+            /* 添加底部虚线作为书写参考线 */
+            .empty-for-print::after {
+                content: '';
+                position: absolute;
+                bottom: 10px;
+                left: 15px;
+                right: 15px;
+                border-bottom: 1px dashed #aaa;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--light-bg);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 头部样式 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .back-btn,
+        .action-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .back-btn:hover,
+        .action-btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* 筛选容器样式 */
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .date-filter,
+        .sort-filter {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            height: 36px;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        #reset-filter {
+            background-color: #888;
+        }
+
+        #reset-filter:hover {
+            background-color: #666;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--dark-text);
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            table-layout: fixed;
+            /* 使用固定表格布局以便更好地控制列宽 */
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            word-wrap: break-word;
+            /* 允许长文本换行 */
+            overflow-wrap: break-word;
+        }
+
+        /* 列宽控制 */
+        /* 第1列：序号 */
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            width: 6%;
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* 第2列：单词 */
+        table th:nth-child(2),
+        table td:nth-child(2) {
+            width: 12%;
+        }
+
+        /* 第3列：词性 */
+        table th:nth-child(3),
+        table td:nth-child(3) {
+            width: 8%;
+        }
+
+        /* 第4列：中文意思 - 变窄 */
+        table th:nth-child(4),
+        table td:nth-child(4) {
+            width: 20%;
+        }
+
+        /* 第5列：列表 - 拓宽 */
+        table th:nth-child(5),
+        table td:nth-child(5) {
+            width: 18%;
+        }
+
+        /* 第6列：你的答案 */
+        table th:nth-child(6),
+        table td:nth-child(6) {
+            width: 15%;
+        }
+
+        /* 第7列：日期 */
+        table th:nth-child(7),
+        table td:nth-child(7) {
+            width: 12%;
+        }
+
+        /* 第8列：错误次数 */
+        table th:nth-child(8),
+        table td:nth-child(8) {
+            width: 9%;
+        }
+
+        th {
+            background-color: var(--light-bg);
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .error-count {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .word-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .word-card h3 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .word-card .meaning {
+            color: var(--dark-text);
+            margin-bottom: 10px;
+        }
+
+        .pos-tag {
+            display: inline-block;
+            background-color: var(--pos-tag-bg);
+            color: var(--pos-tag-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+
+        .meaning div {
+            margin-bottom: 6px;
+        }
+
+        .word-card .wrong-answers {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .word-card .wrong-answer {
+            display: inline-block;
+            background-color: var(--light-bg);
+            padding: 5px 10px;
+            margin: 0 5px 5px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--error-color);
+        }
+
+        .list-badge {
+            display: inline-flex;
+            align-items: center;
+            flex-direction: column;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            background-color: var(--badge-primary);
+            color: var(--light-text);
+            box-shadow: var(--badge-shadow);
+            transition: all 0.2s ease;
+            margin: 2px;
+            text-align: left;
+        }
+
+        .badge-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+
+        .list-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--hover-shadow);
+            background-color: var(--badge-hover);
+        }
+
+        .list-badge .icon {
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        .list-badge:hover .icon {
+            transform: scale(1.1);
+        }
+
+        .book-icon {
+            fill: var(--light-text);
+        }
+
+        .list-icon {
+            fill: var(--light-text);
+        }
+
+        /* 为单词卡片中的徽章设置不同的样式 */
+        .word-card .list-badge {
+            background-color: var(--badge-secondary);
+            margin-left: 8px;
+            font-size: 11px;
+            min-width: 80px;
+            padding: 6px 10px;
+        }
+
+        .word-card .list-badge:hover {
+            background-color: var(--badge-hover);
+        }
+
+        /* 为列表统计表格中的徽章设置样式 */
+        #list-stats-table .list-badge {
+            background-color: var(--badge-primary);
+            font-size: 11px;
+            padding: 6px 10px;
+            min-width: 80px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: var(--dark-text);
+        }
+
+        .error-message {
+            background-color: #fdecea;
+            color: var(--error-color);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--error-color);
+        }
+
+        /* 登录提示样式 */
+        .login-required {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .login-required p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .login-required button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .login-required button:hover {
+            background-color: #0056b3;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--dark-text);
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* 导出对话框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .export-options {
+            margin-bottom: 20px;
+        }
+
+        .export-options h3 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        .preset-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .modal-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        .cancel-btn {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .export-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .back-btn,
+            .action-btn {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+                white-space: nowrap;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .back-btn {
+                margin-top: 0;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            /* 移动端表格列宽调整 */
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px 6px;
+            }
+
+            /* 移动端列宽控制 */
+            table th:nth-child(1),
+            table td:nth-child(1) {
+                width: 8%;
+                text-align: center;
+                font-weight: bold;
+                color: var(--primary-color);
+            }
+
+            table th:nth-child(2),
+            table td:nth-child(2) {
+                width: 12%;
+            }
+
+            table th:nth-child(3),
+            table td:nth-child(3) {
+                width: 8%;
+            }
+
+            table th:nth-child(4),
+            table td:nth-child(4) {
+                width: 18%;
+            }
+
+            table th:nth-child(5),
+            table td:nth-child(5) {
+                width: 20%;
+            }
+
+            table th:nth-child(6),
+            table td:nth-child(6) {
+                width: 15%;
+            }
+
+            table th:nth-child(7),
+            table td:nth-child(7) {
+                width: 10%;
+            }
+
+            table th:nth-child(8),
+            table td:nth-child(8) {
+                width: 9%;
+            }
+        }
+
+        /* Remove extra closing brace */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>词汇训练 - 错误历史记录</h1>
+            <div class="header-actions">
+                <button id="export-btn" class="action-btn" title="导出错误历史"><i class="fas fa-file-export"></i> 导出</button>
+                <button id="print-btn" class="action-btn" title="打印错误历史"><i class="fas fa-print"></i> 打印</button>
+                <button id="print-hide-btn" class="action-btn" title="打印默写纸"><i class="fas fa-print"></i> 打印默写纸</button>
+                <button class="back-btn" onclick="window.location.href='/'">返回主页</button>
+            </div>
+        </header>
+
+        <div id="loading" class="loading">加载中...</div>
+
+        <div id="error-message" class="error-message" style="display: none;"></div>
+
+        <div id="content" style="display: none;">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="date-from">开始日期:</label>
+                    <input type="date" id="date-from" class="date-filter">
+                </div>
+                <div class="filter-group">
+                    <label for="date-to">结束日期:</label>
+                    <input type="date" id="date-to" class="date-filter">
+                </div>
+                <div class="filter-group">
+                    <label for="book-filter">词书筛选:</label>
+                    <select id="book-filter" class="sort-filter">
+                        <option value="all">所有词书</option>
+                        <!-- 这里将通过JavaScript动态填充 -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="list-filter">列表筛选:</label>
+                    <select id="list-filter" class="sort-filter">
+                        <option value="all">所有列表</option>
+                        <!-- 这里将通过JavaScript动态填充 -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sort-by">排序方式:</label>
+                    <select id="sort-by" class="sort-filter">
+                        <option value="date-desc">日期 (最新优先)</option>
+                        <option value="date-asc">日期 (最早优先)</option>
+                        <option value="error-desc">错误次数 (多到少)</option>
+                        <option value="error-asc">错误次数 (少到多)</option>
+                    </select>
+                </div>
+                <button id="today-only-btn" class="filter-btn">只显示今日错词</button>
+                <button id="apply-filter" class="filter-btn">应用筛选</button>
+                <button id="reset-filter" class="filter-btn">重置筛选</button>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>总错误单词数</h3>
+                    <div id="total-errors" class="value">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>总体正确率</h3>
+                    <div id="accuracy-rate" class="value">0%</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>最近错误</h3>
+                    <div id="recent-errors" class="value">0</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="recent-errors">最近错误</div>
+                <div class="tab" data-tab="word-history">单词错误历史</div>
+                <div class="tab" data-tab="list-stats">列表统计</div>
+            </div>
+
+            <div id="recent-errors-content" class="tab-content active">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>单词</th>
+                            <th>词性</th>
+                            <th>中文意思</th>
+                            <th>列表</th>
+                            <th>你的答案</th>
+                            <th>日期</th>
+                            <th>错误次数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-errors-table">
+                        <!-- 这里将通过JavaScript动态填充 -->
+                    </tbody>
+                </table>
+                <div id="load-more-container" style="text-align: center; margin: 20px 0; display: none;">
+                    <button id="load-more-btn" class="filter-btn"
+                        style="background-color: var(--primary-color); color: white;">
+                        加载更多记录
+                    </button>
+                </div>
+            </div>
+
+            <div id="word-history-content" class="tab-content">
+                <div id="word-history-container">
+                    <!-- 这里将通过JavaScript动态填充 -->
+                </div>
+            </div>
+
+            <div id="list-stats-content" class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>列表ID</th>
+                            <th>错误次数</th>
+                            <th>错误单词数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-stats-table">
+                        <!-- 这里将通过JavaScript动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const loadingEl = document.getElementById('loading');
+        const contentEl = document.getElementById('content');
+        const errorMessageEl = document.getElementById('error-message');
+        const totalErrorsEl = document.getElementById('total-errors');
+        const accuracyRateEl = document.getElementById('accuracy-rate');
+        const recentErrorsEl = document.getElementById('recent-errors');
+        const recentErrorsTableEl = document.getElementById('recent-errors-table');
+        const wordHistoryContainerEl = document.getElementById('word-history-container');
+        const listStatsTableEl = document.getElementById('list-stats-table');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const printBtn = document.getElementById('print-btn');
+        const dateFromInput = document.getElementById('date-from');
+        const dateToInput = document.getElementById('date-to');
+        const bookFilterSelect = document.getElementById('book-filter');
+        const listFilterSelect = document.getElementById('list-filter');
+        const sortBySelect = document.getElementById('sort-by');
+        const applyFilterBtn = document.getElementById('apply-filter');
+        const resetFilterBtn = document.getElementById('reset-filter');
+
+        // 全局变量存储原始数据
+        let originalData = null;
+        let filteredData = null;
+        let currentLimit = 500; // 当前加载的记录数
+        let hasMoreData = false; // 是否还有更多数据
+
+        // 切换标签页
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签页的active类
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // 添加当前标签页的active类
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-content`).classList.add('active');
+            });
+        });
+
+        // 格式化日期
+        function formatDate(dateStr, includeTime = false) {
+            const date = new Date(dateStr);
+            // 默认只返回年月日，不包含时分
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        }
+
+        // 格式化词性
+        function formatPOS(pos) {
+            if (!pos) return '-';
+
+            // 将词性按照分号或空格分割，并用<br>连接
+            return pos.replace(/([a-z]+\.)(\s|;)/gi, '$1<br>');
+        }
+
+        // 格式化多义词的显示
+        function formatMultiMeanings(meaning, pos) {
+            if (!pos || !meaning) return meaning || '-';
+
+            // 分割词性和意思
+            const posItems = pos.split(/\s*[;\s]\s*/).filter(p => p.trim());
+
+            // 如果只有一个词性或没有词性，直接返回原意思
+            if (posItems.length <= 1) return meaning;
+
+            // 尝试将意思按照词性分割
+            const meaningParts = meaning.split(/\s*[;\s]\s*/).filter(m => m.trim());
+
+            // 如果意思部分少于词性部分，可能格式不匹配，返回原意思
+            if (meaningParts.length < posItems.length) return meaning;
+
+            // 构建格式化后的意思
+            let formattedMeaning = '';
+            let meaningIndex = 0;
+
+            for (let i = 0; i < posItems.length; i++) {
+                const posItem = posItems[i].trim();
+                // 为每个词性找到对应的意思
+                if (meaningIndex < meaningParts.length) {
+                    formattedMeaning += `<div><span class="pos-tag">${posItem}</span> ${meaningParts[meaningIndex]}</div>`;
+                    meaningIndex++;
+                }
+            }
+
+            // 如果还有剩余的意思，添加到最后
+            while (meaningIndex < meaningParts.length) {
+                formattedMeaning += `<div>${meaningParts[meaningIndex]}</div>`;
+                meaningIndex++;
+            }
+
+            return formattedMeaning || meaning;
+        }
+
+        // 获取错误历史数据
+        async function fetchErrorHistory(bookId = null, listId = null, dateFrom = null, dateTo = null, sortBy = null, sortOrder = null, limit = 500) {
+            try {
+                // 构建URL和查询参数
+                let url = '/api/error-history';
+                const params = new URLSearchParams();
+
+                if (bookId !== null && bookId !== 'all') {
+                    params.append('book_id', bookId);
+                }
+
+                if (listId !== null && listId !== 'all') {
+                    params.append('list_id', listId);
+                }
+
+                // 添加日期范围参数
+                if (dateFrom !== null) {
+                    params.append('date_from', dateFrom);
+                }
+
+                if (dateTo !== null) {
+                    params.append('date_to', dateTo);
+                }
+
+                // 添加排序参数
+                if (sortBy !== null) {
+                    // 将前端排序值转换为后端API参数
+                    let apiSortBy = 'error_date';
+                    if (sortBy.startsWith('error-')) {
+                        apiSortBy = 'error_count';
+                    }
+                    params.append('sort_by', apiSortBy);
+
+                    // 设置排序顺序
+                    let apiSortOrder = 'desc';
+                    if (sortBy.endsWith('-asc')) {
+                        apiSortOrder = 'asc';
+                    }
+                    params.append('sort_order', apiSortOrder);
+                }
+
+                // 添加limit参数
+                params.append('limit', limit);
+
+                // 如果有参数，添加到URL
+                if (params.toString()) {
+                    url += `?${params.toString()}`;
+                }
+
+                console.log('Fetching error history with URL:', url);
+                const response = await fetch(url);
+
+                // 解析响应数据
+                const data = await response.json();
+
+                // 检查响应状态
+                if (!response.ok) {
+                    // 如果是401未授权错误，显示登录提示
+                    if (response.status === 401) {
+                        throw new Error(data.error || '请先登录后查看错误历史记录');
+                    } else {
+                        throw new Error(data.error || '获取错误历史记录失败');
+                    }
+                }
+
+                console.log('Received data:', data);
+                originalData = JSON.parse(JSON.stringify(data)); // 深拷贝保存原始数据
+                filteredData = data;
+                return data;
+            } catch (error) {
+                console.error('获取错误历史记录时出错:', error);
+                throw error;
+            }
+        }
+
+        // 筛选和排序数据
+        function filterAndSortData() {
+            if (!originalData) return null;
+
+            // 创建深拷贝以避免修改原始数据
+            let data = JSON.parse(JSON.stringify(originalData));
+
+            // 日期筛选
+            const dateFrom = dateFromInput.value ? new Date(dateFromInput.value) : null;
+            const dateTo = dateToInput.value ? new Date(dateToInput.value + 'T23:59:59') : null;
+
+            // 词书和列表筛选
+            const selectedBookId = bookFilterSelect.value;
+            const selectedListId = listFilterSelect.value;
+
+            if (dateFrom || dateTo || selectedBookId !== 'all' || selectedListId !== 'all') {
+                // 筛选错误记录
+                if (data.errors && data.errors.length > 0) {
+                    data.errors = data.errors.filter(error => {
+                        // 日期筛选
+                        const errorDate = new Date(error.error_date);
+                        const dateMatch = (!dateFrom || errorDate >= dateFrom) && (!dateTo || errorDate <= dateTo);
+
+                        // 列表筛选
+                        const listMatch = selectedListId === 'all' || error.list_id == selectedListId;
+
+                        // 词书筛选（需要在后端API中添加book_id字段）
+                        // 如果错误记录中没有book_id字段，则忽略词书筛选
+                        const bookMatch = selectedBookId === 'all' || !error.book_id || error.book_id == selectedBookId;
+
+                        return dateMatch && listMatch && bookMatch;
+                    });
+                }
+
+                // 筛选单词错误历史
+                if (data.word_history && data.word_history.length > 0) {
+                    data.word_history = data.word_history.filter(word => {
+                        // 列表筛选
+                        const listMatch = selectedListId === 'all' || word.list_id == selectedListId;
+
+                        // 词书筛选（需要在后端API中添加book_id字段）
+                        // 如果单词记录中没有book_id字段，则忽略词书筛选
+                        const bookMatch = selectedBookId === 'all' || !word.book_id || word.book_id == selectedBookId;
+
+                        // 如果不匹配列表或词书，直接返回false
+                        if (!listMatch || !bookMatch) {
+                            return false;
+                        }
+
+                        // 日期筛选
+                        if (dateFrom || dateTo) {
+                            const errorDates = word.error_dates ? word.error_dates.split(', ').map(date => new Date(date)) : [];
+                            const filteredDates = errorDates.filter(date =>
+                                (!dateFrom || date >= dateFrom) && (!dateTo || date <= dateTo)
+                            );
+
+                            if (filteredDates.length > 0) {
+                                // 更新错误日期和错误次数
+                                word.error_dates = filteredDates.map(date => formatDate(date)).join(', ');
+                                word.total_errors = filteredDates.length;
+                                return true;
+                            }
+                            return false;
+                        }
+
+                        return true;
+                    });
+                }
+
+                // 筛选列表统计
+                if (data.stats && data.stats.length > 0 && (selectedBookId !== 'all' || selectedListId !== 'all')) {
+                    data.stats = data.stats.filter(stat => {
+                        // 列表筛选
+                        const listMatch = selectedListId === 'all' || stat.list_id == selectedListId;
+
+                        // 词书筛选（需要在后端API中添加book_id字段）
+                        // 如果统计记录中没有book_id字段，则忽略词书筛选
+                        const bookMatch = selectedBookId === 'all' || !stat.book_id || stat.book_id == selectedBookId;
+
+                        return listMatch && bookMatch;
+                    });
+                }
+            }
+
+            // 排序
+            const sortBy = sortBySelect.value;
+
+            // 排序最近错误
+            if (data.errors && data.errors.length > 0) {
+                data.errors.sort((a, b) => {
+                    if (sortBy === 'date-desc') {
+                        return new Date(b.error_date) - new Date(a.error_date);
+                    } else if (sortBy === 'date-asc') {
+                        return new Date(a.error_date) - new Date(b.error_date);
+                    } else if (sortBy === 'error-desc') {
+                        return b.error_count - a.error_count;
+                    } else if (sortBy === 'error-asc') {
+                        return a.error_count - b.error_count;
+                    }
+                    return 0;
+                });
+            }
+
+            // 排序单词错误历史
+            if (data.word_history && data.word_history.length > 0) {
+                data.word_history.sort((a, b) => {
+                    if (sortBy === 'error-desc') {
+                        return b.total_errors - a.total_errors;
+                    } else if (sortBy === 'error-asc') {
+                        return a.total_errors - b.total_errors;
+                    } else if (sortBy === 'date-desc') {
+                        const lastDateA = a.error_dates ? a.error_dates.split(', ').pop() : '';
+                        const lastDateB = b.error_dates ? b.error_dates.split(', ').pop() : '';
+                        return new Date(lastDateB) - new Date(lastDateA);
+                    } else if (sortBy === 'date-asc') {
+                        const firstDateA = a.error_dates ? a.error_dates.split(', ')[0] : '';
+                        const firstDateB = b.error_dates ? b.error_dates.split(', ')[0] : '';
+                        return new Date(firstDateA) - new Date(firstDateB);
+                    }
+                    return 0;
+                });
+            }
+
+            filteredData = data;
+            return data;
+        }
+
+        // 渲染错误历史数据
+        function renderErrorHistory(data) {
+            // 更新统计信息
+            totalErrorsEl.textContent = data.total_tested || 0;
+            accuracyRateEl.textContent = `${data.accuracy_rate || 0}%`;
+            recentErrorsEl.textContent = data.errors ? data.errors.length : 0;
+
+            // 检查是否还有更多数据
+            hasMoreData = data.errors && data.errors.length >= currentLimit;
+
+            // 渲染最近错误表格
+            if (data.errors && data.errors.length > 0) {
+                recentErrorsTableEl.innerHTML = '';
+                data.errors.forEach((error, index) => {
+                    const row = document.createElement('tr');
+                    // 获取词书和单元名称
+                    const bookName = getBookName(error.book_id);
+                    const listName = getListName(error.list_id);
+
+                    // 提取词性
+                    const posResult = formatPOSAndMeaning(error.pos, error.meaning_cn);
+                    const extractedPos = posResult.extractedPos || error.pos || '-';
+                    const formattedMeaning = posResult.formattedMeaning || error.meaning_cn || '-';
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${error.spelling}</td>
+                        <td>${extractedPos}</td>
+                        <td>${formattedMeaning}</td>
+                        <td><span class="list-badge">
+                            <div class="badge-row">
+                                <svg class="icon book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 427 511.85">
+                                    <path fill="white" fill-rule="nonzero" d="M57.35 493.94l349.22 0c1.41,0 2.52,-1.1 2.52,-2.52l0 -66.84 -351.74 0c-16.85,0 -27.56,8.86 -32.18,20.19 -1.86,4.54 -2.79,9.51 -2.79,14.5 0,19.75 14.34,34.67 34.97,34.67zm-15.76 -20.96l353.91 0 0 7.85 -350.17 0c-1.51,-2.46 -2.77,-5.09 -3.74,-7.85zm3.74 -35.3c-1.5,2.46 -2.76,5.09 -3.74,7.85l353.91 0 0 -7.85 -350.17 0zm-5.92 17.65c-0.25,2.62 -0.25,5.23 0,7.85l356.09 0 0 -7.85 -356.09 0zm381.57 50.51c-3.72,3.71 -8.83,6.01 -14.41,6.01l-349.22 0c-40.09,0 -57.35,-35.04 -57.35,-70.32l0 -362.31c0,-21.59 8.69,-40.71 22.76,-54.78 14.27,-14.27 34.12,-23.31 56.04,-24.4l11.99 0c0.26,-0.02 0.52,-0.04 0.78,-0.04 0.26,0 0.53,0.02 0.78,0.04l324.32 -0.04c4.95,0 8.96,4.01 8.96,8.96l0 406.95c0.88,1.94 1.37,4.09 1.37,6.34l0 69.17c0,5.58 -2.29,10.67 -5.98,14.38l-0.04 0.04zm-13.26 -99.18l0 -388.75 -307.19 0 0 388.75 307.19 0zm-325.11 0l0 -388.75 -3.39 0c-17.15,0.95 -32.65,8.05 -43.8,19.19 -10.82,10.82 -17.51,25.53 -17.51,42.12l0 343.82c8.84,-9.83 22,-16.38 39.44,-16.38l25.26 0z"/>
+                                </svg>
+                                ${bookName}
+                            </div>
+                            <div class="badge-row">
+                                <svg class="icon list-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 112.5">
+                                    <path fill="white" fill-rule="evenodd" clip-rule="evenodd" d="M12.56,87.39c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,112.5,0,106.88,0,99.95 C0,93.01,5.62,87.39,12.56,87.39L12.56,87.39z M35.07,88.24h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V89.67C33.64,88.88,34.29,88.24,35.07,88.24L35.07,88.24z M35.07,44.7h86.38 c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43H35.07c-0.79,0-1.43-0.64-1.43-1.43V46.13 C33.64,45.34,34.29,44.7,35.07,44.7L35.07,44.7z M35.07,1.16h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V2.59C33.64,1.8,34.29,1.16,35.07,1.16L35.07,1.16z M12.56,43.69c6.93,0,12.56,5.62,12.56,12.56 c0,6.93-5.62,12.56-12.56,12.56C5.62,68.81,0,63.19,0,56.25C0,49.32,5.62,43.69,12.56,43.69L12.56,43.69z M12.56,0 c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,25.11,0,19.49,0,12.56C0,5.62,5.62,0,12.56,0L12.56,0z"/>
+                                </svg>
+                                ${listName}
+                            </div>
+                        </span></td>
+                        <td style="color: var(--error-color);">${error.student_answer}</td>
+                        <td>${formatDate(error.error_date, true)}</td>
+                        <td><span class="error-count">${error.error_count}</span></td>
+                    `;
+                    recentErrorsTableEl.appendChild(row);
+                });
+            } else {
+                recentErrorsTableEl.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="no-data">暂无错误记录</td>
+                    </tr>
+                `;
+            }
+
+            // 显示或隐藏加载更多按钮
+            const loadMoreContainer = document.getElementById('load-more-container');
+            if (loadMoreContainer) {
+                if (hasMoreData && data.errors && data.errors.length > 0) {
+                    loadMoreContainer.style.display = 'block';
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            }
+
+            // 渲染单词错误历史
+            if (data.word_history && data.word_history.length > 0) {
+                wordHistoryContainerEl.innerHTML = '';
+                data.word_history.forEach(word => {
+                    const wrongAnswers = word.wrong_answers ? word.wrong_answers.split(', ') : [];
+                    const errorDates = word.error_dates ? word.error_dates.split(', ') : [];
+
+                    const wordCard = document.createElement('div');
+                    wordCard.className = 'word-card';
+
+                    // 如果fix_mess_display.js已经处理过，使用其生成的HTML
+                    let wrongAnswersHtml = '';
+                    if (word.wrongAnswersHtml) {
+                        wrongAnswersHtml = word.wrongAnswersHtml;
+                    } else {
+                        // 兼容原始逻辑
+                        wrongAnswers.forEach((answer, index) => {
+                            const date = errorDates[index] || '';
+                            const highlightClass = (word.spelling && word.spelling.toLowerCase() === 'mess' && answer.toLowerCase() === 'mass') ? 'mess-mass-highlight' : '';
+                            wrongAnswersHtml += `<span class="wrong-answer ${highlightClass}" title="${date}">${answer}</span> `;
+                        });
+                    }
+
+                    // 获取词书和单元名称
+                    const bookName = getBookName(word.book_id);
+                    const listName = getListName(word.list_id);
+
+                    // 提取词性
+                    const posResult = formatPOSAndMeaning(word.pos, word.meaning_cn);
+                    const extractedPos = posResult.extractedPos || word.pos || '-';
+                    const formattedMeaning = posResult.formattedMeaning || word.meaning_cn || '-';
+
+                    wordCard.innerHTML = `
+                        <h3>
+                            ${word.spelling}
+                            <span class="list-badge">
+                                <div class="badge-row">
+                                    <svg class="icon book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 427 511.85">
+                                        <path fill="white" fill-rule="nonzero" d="M57.35 493.94l349.22 0c1.41,0 2.52,-1.1 2.52,-2.52l0 -66.84 -351.74 0c-16.85,0 -27.56,8.86 -32.18,20.19 -1.86,4.54 -2.79,9.51 -2.79,14.5 0,19.75 14.34,34.67 34.97,34.67zm-15.76 -20.96l353.91 0 0 7.85 -350.17 0c-1.51,-2.46 -2.77,-5.09 -3.74,-7.85zm3.74 -35.3c-1.5,2.46 -2.76,5.09 -3.74,7.85l353.91 0 0 -7.85 -350.17 0zm-5.92 17.65c-0.25,2.62 -0.25,5.23 0,7.85l356.09 0 0 -7.85 -356.09 0zm381.57 50.51c-3.72,3.71 -8.83,6.01 -14.41,6.01l-349.22 0c-40.09,0 -57.35,-35.04 -57.35,-70.32l0 -362.31c0,-21.59 8.69,-40.71 22.76,-54.78 14.27,-14.27 34.12,-23.31 56.04,-24.4l11.99 0c0.26,-0.02 0.52,-0.04 0.78,-0.04 0.26,0 0.53,0.02 0.78,0.04l324.32 -0.04c4.95,0 8.96,4.01 8.96,8.96l0 406.95c0.88,1.94 1.37,4.09 1.37,6.34l0 69.17c0,5.58 -2.29,10.67 -5.98,14.38l-0.04 0.04zm-13.26 -99.18l0 -388.75 -307.19 0 0 388.75 307.19 0zm-325.11 0l0 -388.75 -3.39 0c-17.15,0.95 -32.65,8.05 -43.8,19.19 -10.82,10.82 -17.51,25.53 -17.51,42.12l0 343.82c8.84,-9.83 22,-16.38 39.44,-16.38l25.26 0z"/>
+                                    </svg>
+                                    ${bookName}
+                                </div>
+                                <div class="badge-row">
+                                    <svg class="icon list-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 112.5">
+                                        <path fill="white" fill-rule="evenodd" clip-rule="evenodd" d="M12.56,87.39c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,112.5,0,106.88,0,99.95 C0,93.01,5.62,87.39,12.56,87.39L12.56,87.39z M35.07,88.24h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V89.67C33.64,88.88,34.29,88.24,35.07,88.24L35.07,88.24z M35.07,44.7h86.38 c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43H35.07c-0.79,0-1.43-0.64-1.43-1.43V46.13 C33.64,45.34,34.29,44.7,35.07,44.7L35.07,44.7z M35.07,1.16h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V2.59C33.64,1.8,34.29,1.16,35.07,1.16L35.07,1.16z M12.56,43.69c6.93,0,12.56,5.62,12.56,12.56 c0,6.93-5.62,12.56-12.56,12.56C5.62,68.81,0,63.19,0,56.25C0,49.32,5.62,43.69,12.56,43.69L12.56,43.69z M12.56,0 c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,25.11,0,19.49,0,12.56C0,5.62,5.62,0,12.56,0L12.56,0z"/>
+                                    </svg>
+                                    ${listName}
+                                </div>
+                            </span>
+                        </h3>
+                        <div class="pos">
+                            <strong>词性:</strong> ${extractedPos}
+                        </div>
+                        <div class="meaning">
+                            <strong>中文意思:</strong> ${formattedMeaning}
+                        </div>
+                        <div class="wrong-answers">
+                            <strong>错误次数:</strong> ${word.total_errors}<br>
+                            <strong>错误答案:</strong><br>
+                            ${wrongAnswersHtml}
+                        </div>
+                    `;
+
+                    wordHistoryContainerEl.appendChild(wordCard);
+                });
+            } else {
+                wordHistoryContainerEl.innerHTML = `<div class="no-data">暂无单词错误历史</div>`;
+            }
+
+            // 渲染列表统计
+            if (data.stats && data.stats.length > 0) {
+                listStatsTableEl.innerHTML = '';
+                data.stats.forEach(stat => {
+                    const row = document.createElement('tr');
+                    // 获取词书和单元名称
+                    const bookName = getBookName(stat.book_id);
+                    const listName = getListName(stat.list_id);
+
+                    row.innerHTML = `
+                        <td><span class="list-badge">
+                            <div class="badge-row">
+                                <svg class="icon book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 427 511.85">
+                                    <path fill="white" fill-rule="nonzero" d="M57.35 493.94l349.22 0c1.41,0 2.52,-1.1 2.52,-2.52l0 -66.84 -351.74 0c-16.85,0 -27.56,8.86 -32.18,20.19 -1.86,4.54 -2.79,9.51 -2.79,14.5 0,19.75 14.34,34.67 34.97,34.67zm-15.76 -20.96l353.91 0 0 7.85 -350.17 0c-1.51,-2.46 -2.77,-5.09 -3.74,-7.85zm3.74 -35.3c-1.5,2.46 -2.76,5.09 -3.74,7.85l353.91 0 0 -7.85 -350.17 0zm-5.92 17.65c-0.25,2.62 -0.25,5.23 0,7.85l356.09 0 0 -7.85 -356.09 0zm381.57 50.51c-3.72,3.71 -8.83,6.01 -14.41,6.01l-349.22 0c-40.09,0 -57.35,-35.04 -57.35,-70.32l0 -362.31c0,-21.59 8.69,-40.71 22.76,-54.78 14.27,-14.27 34.12,-23.31 56.04,-24.4l11.99 0c0.26,-0.02 0.52,-0.04 0.78,-0.04 0.26,0 0.53,0.02 0.78,0.04l324.32 -0.04c4.95,0 8.96,4.01 8.96,8.96l0 406.95c0.88,1.94 1.37,4.09 1.37,6.34l0 69.17c0,5.58 -2.29,10.67 -5.98,14.38l-0.04 0.04zm-13.26 -99.18l0 -388.75 -307.19 0 0 388.75 307.19 0zm-325.11 0l0 -388.75 -3.39 0c-17.15,0.95 -32.65,8.05 -43.8,19.19 -10.82,10.82 -17.51,25.53 -17.51,42.12l0 343.82c8.84,-9.83 22,-16.38 39.44,-16.38l25.26 0z"/>
+                                </svg>
+                                ${bookName}
+                            </div>
+                            <div class="badge-row">
+                                <svg class="icon list-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 112.5">
+                                    <path fill="white" fill-rule="evenodd" clip-rule="evenodd" d="M12.56,87.39c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,112.5,0,106.88,0,99.95 C0,93.01,5.62,87.39,12.56,87.39L12.56,87.39z M35.07,88.24h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V89.67C33.64,88.88,34.29,88.24,35.07,88.24L35.07,88.24z M35.07,44.7h86.38 c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43H35.07c-0.79,0-1.43-0.64-1.43-1.43V46.13 C33.64,45.34,34.29,44.7,35.07,44.7L35.07,44.7z M35.07,1.16h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V2.59C33.64,1.8,34.29,1.16,35.07,1.16L35.07,1.16z M12.56,43.69c6.93,0,12.56,5.62,12.56,12.56 c0,6.93-5.62,12.56-12.56,12.56C5.62,68.81,0,63.19,0,56.25C0,49.32,5.62,43.69,12.56,43.69L12.56,43.69z M12.56,0 c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,25.11,0,19.49,0,12.56C0,5.62,5.62,0,12.56,0L12.56,0z"/>
+                                    </svg>
+                                    ${listName}
+                                </div>
+                            </span></td>
+                        <td>${stat.error_count}</td>
+                        <td>${stat.unique_words_count}</td>
+                    `;
+                    listStatsTableEl.appendChild(row);
+                });
+            } else {
+                listStatsTableEl.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="no-data">暂无列表统计数据</td>
+                    </tr>
+                `;
+            }
+
+            // 添加打印页面的标题和日期
+            const printHeader = document.createElement('div');
+            printHeader.className = 'print-header';
+            printHeader.style.display = 'none';
+            printHeader.textContent = '词汇训练 - 错误历史记录';
+
+            const printDate = document.createElement('div');
+            printDate.className = 'print-date';
+            printDate.style.display = 'none';
+            printDate.textContent = `打印日期: ${formatDate(new Date(), true)}`;
+
+            // 添加到页面，但默认隐藏，只在打印时显示
+            document.body.insertBefore(printHeader, document.body.firstChild);
+            document.body.insertBefore(printDate, document.body.firstChild.nextSibling);
+        }
+
+        // 获取词书列表
+        async function fetchBooks() {
+            try {
+                const response = await fetch('/api/books');
+
+                if (!response.ok) {
+                    throw new Error('获取词书列表失败');
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('获取词书列表时出错:', error);
+                return [];
+            }
+        }
+
+        // 获取单词列表
+        async function fetchLists(bookId = null) {
+            try {
+                let url = '/api/lists';
+                if (bookId !== null) {
+                    url += `?book_id=${bookId}`;
+                }
+
+                console.log('Fetching lists with URL:', url);
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error('获取单词列表失败');
+                }
+
+                const data = await response.json();
+                console.log('Received lists:', data);
+                return data;
+            } catch (error) {
+                console.error('获取单词列表时出错:', error);
+                return [];
+            }
+        }
+
+        // 填充词书筛选下拉框
+        async function populateBookFilter() {
+            const books = await fetchBooks();
+
+            // 清空现有选项，保留"所有词书"选项
+            bookFilterSelect.innerHTML = '<option value="all">所有词书</option>';
+
+            // 添加词书选项
+            books.forEach(book => {
+                const option = document.createElement('option');
+                option.value = book.id;
+                option.textContent = book.name;
+                bookFilterSelect.appendChild(option);
+            });
+        }
+
+        // 填充列表筛选下拉框
+        async function populateListFilter(bookId = null) {
+            try {
+                console.log('Populating list filter with bookId:', bookId);
+                const lists = await fetchLists(bookId !== 'all' ? bookId : null);
+                console.log('Fetched lists:', lists);
+
+                // 清空现有选项，保留"所有列表"选项
+                listFilterSelect.innerHTML = '<option value="all">所有列表</option>';
+
+                // 添加列表选项
+                lists.forEach(list => {
+                    const option = document.createElement('option');
+                    option.value = list.id;
+                    option.textContent = list.name;
+                    listFilterSelect.appendChild(option);
+                });
+
+                // 重置为"所有列表"
+                listFilterSelect.value = 'all';
+            } catch (error) {
+                console.error('填充列表筛选下拉框时出错:', error);
+            }
+        }
+
+        // 缓存词书和单元数据
+        let booksCache = [];
+        let listsCache = [];
+
+        // 获取词书名称
+        function getBookName(bookId) {
+            if (!bookId) return '未知词书';
+
+            const book = booksCache.find(b => b.id === bookId);
+            return book ? book.name : `词书 ${bookId}`;
+        }
+
+        // 获取单元名称
+        function getListName(listId) {
+            if (!listId) return '未知单元';
+
+            const list = listsCache.find(l => l.id === listId);
+            return list ? list.name : `List ${listId}`;
+        }
+
+        // 初始化页面
+        async function initPage() {
+            try {
+                console.log('Initializing page...');
+                // 获取并缓存词书和单元列表
+                booksCache = await fetchBooks();
+                console.log('Books cache initialized:', booksCache);
+
+                listsCache = await fetchLists();
+                console.log('Lists cache initialized:', listsCache);
+
+                // 填充词书和列表筛选下拉框
+                await populateBookFilter();
+                await populateListFilter();
+
+                // 设置日期筛选器的默认值（过去30天）
+                const today = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+
+                dateToInput.valueAsDate = today;
+                dateFromInput.valueAsDate = thirtyDaysAgo;
+
+                // 设置默认排序方式
+                sortBySelect.value = 'date-desc';
+
+                // 获取错误历史数据，传递日期范围和排序参数
+                const todayStr = today.toISOString().split('T')[0];
+                const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+                const data = await fetchErrorHistory(
+                    'all',  // 默认所有词书
+                    'all',  // 默认所有列表
+                    thirtyDaysAgoStr,
+                    todayStr,
+                    'date-desc'  // 默认按日期降序排序
+                );
+                console.log('Initial error history data:', data);
+
+                if (data) {
+                    // 隐藏加载提示，显示内容
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+
+                    // 渲染数据
+                    renderErrorHistory(data);
+                } else {
+                    // 如果没有数据，可能是未登录
+                    loadingEl.style.display = 'none';
+                }
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+
+                // 检查是否是未登录错误
+                if (error.message.includes('请先登录')) {
+                    // 创建登录提示和按钮
+                    errorMessageEl.innerHTML = `
+                        <div class="login-required">
+                            <p>${error.message}</p>
+                            <button id="goToLoginBtn" class="btn btn-primary">返回主页登录</button>
+                        </div>
+                    `;
+
+                    // 添加按钮点击事件
+                    setTimeout(() => {
+                        const goToLoginBtn = document.getElementById('goToLoginBtn');
+                        if (goToLoginBtn) {
+                            goToLoginBtn.addEventListener('click', () => {
+                                window.location.href = '/';
+                            });
+                        }
+                    }, 0);
+                } else {
+                    // 其他错误
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                }
+
+                errorMessageEl.style.display = 'block';
+            }
+        }
+
+        // 应用筛选
+        async function applyFilters() {
+            // 重置limit
+            currentLimit = 500;
+
+            // 获取筛选条件
+            const selectedBookId = bookFilterSelect.value;
+            const selectedListId = listFilterSelect.value;
+            const dateFrom = dateFromInput.value || null;
+            const dateTo = dateToInput.value || null;
+            const sortBy = sortBySelect.value || null;
+
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
+
+                // 如果选择了特定词书，更新单元列表缓存
+                if (selectedBookId !== 'all') {
+                    listsCache = await fetchLists(selectedBookId);
+                } else {
+                    // 如果选择了所有词书，获取所有单元
+                    listsCache = await fetchLists();
+                }
+
+                // 始终从服务器获取筛选后的数据，传递所有筛选参数
+                const data = await fetchErrorHistory(
+                    selectedBookId,
+                    selectedListId,
+                    dateFrom,
+                    dateTo,
+                    sortBy
+                );
+
+                // 隐藏加载提示，显示内容
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+
+                // 渲染数据
+                renderErrorHistory(data);
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
+            }
+        }
+
+        // 重置筛选
+        function resetFilters() {
+            // 重置limit
+            currentLimit = 500;
+
+            // 重置日期筛选器
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+
+            dateToInput.valueAsDate = today;
+            dateFromInput.valueAsDate = thirtyDaysAgo;
+
+            // 重置词书和列表筛选
+            bookFilterSelect.value = 'all';
+            listFilterSelect.value = 'all';
+
+            // 重置排序
+            sortBySelect.value = 'date-desc';
+
+            // 获取格式化的日期字符串
+            const todayStr = today.toISOString().split('T')[0];
+            const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
+
+                // 直接从服务器获取重置后的数据
+                fetchErrorHistory(
+                    'all',  // 所有词书
+                    'all',  // 所有列表
+                    thirtyDaysAgoStr,
+                    todayStr,
+                    'date-desc'  // 按日期降序排序
+                ).then(data => {
+                    // 隐藏加载提示，显示内容
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+
+                    // 渲染数据
+                    renderErrorHistory(data);
+                }).catch(error => {
+                    // 显示错误信息
+                    loadingEl.style.display = 'none';
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                    errorMessageEl.style.display = 'block';
+                });
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
+            }
+        }
+
+        // 当词书选择变化时，更新列表筛选下拉框
+        bookFilterSelect.addEventListener('change', async () => {
+            const selectedBookId = bookFilterSelect.value;
+            console.log('Book selection changed to:', selectedBookId);
+            await populateListFilter(selectedBookId);
+            // 重置列表选择为"所有列表"
+            listFilterSelect.value = 'all';
+        });
+
+        // 当排序方式变化时，自动应用筛选
+        sortBySelect.addEventListener('change', () => {
+            console.log('Sort selection changed to:', sortBySelect.value);
+            applyFilters();
+        });
+
+        // 当日期筛选器变化时，自动应用筛选
+        dateFromInput.addEventListener('change', () => {
+            console.log('Date from changed to:', dateFromInput.value);
+            applyFilters();
+        });
+
+        dateToInput.addEventListener('change', () => {
+            console.log('Date to changed to:', dateToInput.value);
+            applyFilters();
+        });
+
+        // 打印功能
+        function printErrorHistory(hideWordAndAnswer = false) {
+            // 在打印前显示打印标题和日期
+            const printHeader = document.querySelector('.print-header') || document.createElement('div');
+            const printDate = document.querySelector('.print-date') || document.createElement('div');
+
+            if (!document.querySelector('.print-header')) {
+                printHeader.className = 'print-header';
+                printHeader.textContent = '词汇训练 - 错误历史记录';
+                document.body.insertBefore(printHeader, document.body.firstChild);
+            }
+
+            if (!document.querySelector('.print-date')) {
+                printDate.className = 'print-date';
+                printDate.textContent = `打印日期: ${new Date().toLocaleDateString()}`;
+                document.body.insertBefore(printDate, document.body.firstChild.nextSibling);
+            }
+
+            printHeader.style.display = 'block';
+            printDate.style.display = 'block';
+
+            // 如果需要隐藏单词列并清空答案列
+            if (hideWordAndAnswer) {
+                // 获取所有表格
+                const tables = document.querySelectorAll('table');
+                tables.forEach(table => {
+                    // 获取表头行
+                    const headerRow = table.querySelector('thead tr');
+                    if (headerRow) {
+                        // 获取所有表头单元格
+                        const headerCells = headerRow.querySelectorAll('th');
+                        // 找到单词和答案列的索引
+                        let wordColIndex = -1;
+                        let answerColIndex = -1;
+
+                        headerCells.forEach((cell, index) => {
+                            if (cell.textContent.trim() === '单词') {
+                                wordColIndex = index;
+                                cell.classList.add('hide-for-print');
+                            } else if (cell.textContent.trim() === '你的答案') {
+                                answerColIndex = index;
+                                // 不隐藏答案列的表头
+                            }
+                        });
+
+                        // 如果没找到，使用默认索引（现在单词是第2列，答案是第6列）
+                        if (wordColIndex === -1) wordColIndex = 1;
+                        if (answerColIndex === -1) answerColIndex = 5;
+
+                        // 处理数据行
+                        if (wordColIndex !== -1 || answerColIndex !== -1) {
+                            const rows = table.querySelectorAll('tbody tr');
+                            rows.forEach(row => {
+                                const cells = row.querySelectorAll('td');
+                                // 隐藏单词列
+                                if (wordColIndex !== -1 && cells[wordColIndex]) {
+                                    cells[wordColIndex].classList.add('hide-for-print');
+                                }
+                                // 清空答案列内容但保留单元格
+                                if (answerColIndex !== -1 && cells[answerColIndex]) {
+                                    // 保存原始内容作为数据属性，以便恢复
+                                    if (!cells[answerColIndex].hasAttribute('data-original-content')) {
+                                        cells[answerColIndex].setAttribute('data-original-content', cells[answerColIndex].innerHTML);
+                                    }
+                                    // 清空内容，保留空白单元格用于书写
+                                    cells[answerColIndex].innerHTML = '&nbsp;';
+                                    cells[answerColIndex].classList.add('empty-for-print');
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            // 调用打印
+            window.print();
+
+            // 打印后恢复显示
+            setTimeout(() => {
+                printHeader.style.display = 'none';
+                printDate.style.display = 'none';
+
+                // 如果隐藏了单词列并清空了答案列，恢复显示
+                if (hideWordAndAnswer) {
+                    // 恢复隐藏的元素
+                    document.querySelectorAll('.hide-for-print').forEach(el => {
+                        el.classList.remove('hide-for-print');
+                    });
+
+                    // 恢复答案列的原始内容
+                    document.querySelectorAll('.empty-for-print').forEach(el => {
+                        if (el.hasAttribute('data-original-content')) {
+                            el.innerHTML = el.getAttribute('data-original-content');
+                            el.removeAttribute('data-original-content');
+                        }
+                        el.classList.remove('empty-for-print');
+                    });
+                }
+            }, 1000);
+        }
+
+        // 导出错误历史
+        function exportErrorHistory() {
+            // 显示导出对话框
+            document.getElementById('export-modal').style.display = 'flex';
+        }
+
+        // 关闭导出对话框
+        function closeExportModal() {
+            document.getElementById('export-modal').style.display = 'none';
+        }
+
+        // 应用预设模式
+        function applyPreset(presetName) {
+            // 移除所有预设按钮的active类
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 为当前选中的预设按钮添加active类
+            document.querySelector(`.preset-btn[data-preset="${presetName}"]`).classList.add('active');
+
+            // 获取所有导出字段复选框
+            const checkboxes = document.querySelectorAll('input[name="export-fields"]');
+            const hideWordCheckbox = document.getElementById('hide-word');
+
+            // 根据预设设置复选框状态
+            switch (presetName) {
+                case 'daily-detail':
+                    // 当日错题详解模式：包含所有信息
+                    checkboxes.forEach(cb => { cb.checked = true; });
+                    hideWordCheckbox.checked = false;
+                    break;
+
+                case 'daily-exam':
+                    // 生成当日错题试卷：隐藏单词，显示音标、词性和中文意思
+                    checkboxes.forEach(cb => { cb.checked = false; });
+                    document.getElementById('export-meaning-cn').checked = true;
+                    document.getElementById('export-pos').checked = true;
+                    document.getElementById('export-ipa').checked = true;
+                    hideWordCheckbox.checked = true;
+                    break;
+
+                case 'full-history':
+                    // 完整错误历史：基本信息加错误记录
+                    checkboxes.forEach(cb => { cb.checked = false; });
+                    document.getElementById('export-word').checked = true;
+                    document.getElementById('export-meaning-cn').checked = true;
+                    document.getElementById('export-pos').checked = true;
+                    document.getElementById('export-list').checked = true;
+                    document.getElementById('export-error-date').checked = true;
+                    document.getElementById('export-error-count').checked = true;
+                    hideWordCheckbox.checked = false;
+                    break;
+
+                case 'custom':
+                    // 自定义：不改变当前选择
+                    break;
+            }
+        }
+
+        // 执行导出
+        function performExport() {
+            // 获取选中的导出字段
+            const selectedFields = [];
+            document.querySelectorAll('input[name="export-fields"]:checked').forEach(cb => {
+                selectedFields.push(cb.value);
+            });
+
+            // 获取导出格式
+            const exportFormat = document.querySelector('input[name="export-format"]:checked').value;
+
+            // 获取是否隐藏单词
+            const hideWord = document.getElementById('hide-word').checked;
+
+            // 获取当前筛选后的数据
+            const filteredData = filterAndSortData();
+
+            if (!filteredData || !filteredData.errors || filteredData.errors.length === 0) {
+                alert('没有可导出的数据');
+                return;
+            }
+
+            // 根据导出格式执行不同的导出逻辑
+            switch (exportFormat) {
+                case 'csv':
+                    exportAsCSV(filteredData.errors, selectedFields, hideWord);
+                    break;
+                case 'txt':
+                    exportAsTXT(filteredData.errors, selectedFields, hideWord);
+                    break;
+                case 'pdf':
+                    exportAsPDF(filteredData.errors, selectedFields, hideWord);
+                    break;
+            }
+
+            // 关闭导出对话框
+            closeExportModal();
+        }
+
+        // 导出为CSV
+        function exportAsCSV(errors, fields, hideWord) {
+            // 创建CSV内容
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            // 添加标题行
+            const headers = [];
+            fields.forEach(field => {
+                switch (field) {
+                    case 'word': headers.push(hideWord ? '单词(隐藏)' : '单词'); break;
+                    case 'meaning_cn': headers.push('中文意思'); break;
+                    case 'pos': headers.push('词性'); break;
+                    case 'ipa': headers.push('音标'); break;
+                    case 'meaning_en': headers.push('英文释义'); break;
+                    case 'example_en': headers.push('英文例句'); break;
+                    case 'example_cn': headers.push('中文例句'); break;
+                    case 'list': headers.push('所属列表'); break;
+                    case 'wrong_answers': headers.push('错误答案'); break;
+                    case 'error_date': headers.push('错误日期'); break;
+                    case 'error_count': headers.push('错误次数'); break;
+                }
+            });
+            csvContent += headers.join(',') + "\r\n";
+
+            // 添加数据行
+            errors.forEach(error => {
+                const row = [];
+                fields.forEach(field => {
+                    let value = '';
+                    switch (field) {
+                        case 'word':
+                            value = hideWord ? '______' : error.spelling;
+                            break;
+                        case 'meaning_cn': value = error.meaning_cn || '-'; break;
+                        case 'pos': value = error.pos || '-'; break;
+                        case 'ipa': value = error.ipa || '-'; break;
+                        case 'meaning_en': value = error.meaning_en || '-'; break;
+                        case 'example_en': value = error.example_en || '-'; break;
+                        case 'example_cn': value = error.example_cn || '-'; break;
+                        case 'list': value = error.list_name || '-'; break;
+                        case 'wrong_answers':
+                            if (error.wrong_answers && error.wrong_answers.length > 0) {
+                                value = error.wrong_answers.join('; ');
+                            } else {
+                                value = '-';
+                            }
+                            break;
+                        case 'error_date': value = error.error_date || '-'; break;
+                        case 'error_count': value = error.error_count || '0'; break;
+                    }
+                    // 处理CSV中的特殊字符
+                    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                        value = '"' + value.replace(/"/g, '""') + '"';
+                    }
+                    row.push(value);
+                });
+                csvContent += row.join(',') + "\r\n";
+            });
+
+            // 创建下载链接
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `错误历史_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+
+            // 触发下载
+            link.click();
+
+            // 清理
+            document.body.removeChild(link);
+        }
+
+        // 导出为TXT
+        function exportAsTXT(errors, fields, hideWord) {
+            // 创建TXT内容
+            let txtContent = "";
+
+            // 添加标题
+            txtContent += `词汇训练 - 错误历史记录 (${new Date().toLocaleDateString()})\r\n\r\n`;
+
+            // 添加每个错误的详细信息
+            errors.forEach((error, index) => {
+                txtContent += `${index + 1}. `;
+                if (hideWord) {
+                    txtContent += `______`;
+                } else {
+                    txtContent += `${error.spelling}`;
+                }
+                txtContent += `\r\n`;
+
+                fields.forEach(field => {
+                    if (field !== 'word') { // 单词已经作为标题显示了
+                        let label = '';
+                        let value = '';
+
+                        switch (field) {
+                            case 'meaning_cn':
+                                label = '中文意思';
+                                value = error.meaning_cn || '-';
+                                break;
+                            case 'pos':
+                                label = '词性';
+                                value = error.pos || '-';
+                                break;
+                            case 'ipa':
+                                label = '音标';
+                                value = error.ipa || '-';
+                                break;
+                            case 'meaning_en':
+                                label = '英文释义';
+                                value = error.meaning_en || '-';
+                                break;
+                            case 'example_en':
+                                label = '英文例句';
+                                value = error.example_en || '-';
+                                break;
+                            case 'example_cn':
+                                label = '中文例句';
+                                value = error.example_cn || '-';
+                                break;
+                            case 'list':
+                                label = '所属列表';
+                                value = error.list_name || '-';
+                                break;
+                            case 'wrong_answers':
+                                label = '错误答案';
+                                if (error.wrong_answers && error.wrong_answers.length > 0) {
+                                    value = error.wrong_answers.join('; ');
+                                } else {
+                                    value = '-';
+                                }
+                                break;
+                            case 'error_date':
+                                label = '错误日期';
+                                value = error.error_date || '-';
+                                break;
+                            case 'error_count':
+                                label = '错误次数';
+                                value = error.error_count || '0';
+                                break;
+                        }
+
+                        txtContent += `   ${label}: ${value}\r\n`;
+                    }
+                });
+
+                txtContent += `\r\n`; // 每个单词之间添加空行
+            });
+
+            // 创建Blob对象
+            const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+
+            // 创建下载链接
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `错误历史_${new Date().toLocaleDateString()}.txt`);
+            document.body.appendChild(link);
+
+            // 触发下载
+            link.click();
+
+            // 清理
+            URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+        }
+
+        // 导出为PDF
+        function exportAsPDF(errors, fields, hideWord) {
+            // 创建一个变量来跟踪是否取消了请求
+            let isCancelled = false;
+
+            // 显示加载提示，并添加取消按钮
+            const recordCount = errors.length;
+            const estimatedTime = Math.max(5, Math.ceil(recordCount / 50)) + '秒';
+
+            showLoading(
+                `正在生成PDF，请稍候...<br>
+                <div style="margin: 10px 0; text-align: left;">
+                    <small>✓ 正在处理 ${recordCount} 条记录</small><br>
+                    <small>✓ 预计需要 ${estimatedTime}</small><br>
+                    <small>✓ 系统正在生成文档，请耐心等待</small>
+                </div>`,
+                true,
+                () => {
+                    isCancelled = true;
+                    alert('已取消PDF生成');
+                }
+            );
+
+            // 获取当前筛选的词书和列表名称
+            const bookSelect = document.getElementById('bookFilter');
+            const listSelect = document.getElementById('listFilter');
+            const bookName = bookSelect.options[bookSelect.selectedIndex].text !== '全部词书' ? bookSelect.options[bookSelect.selectedIndex].text : '';
+            const listName = listSelect.options[listSelect.selectedIndex].text !== '全部列表' ? listSelect.options[listSelect.selectedIndex].text : '';
+
+            // 获取当前用户名
+            const username = document.querySelector('.user-info span')?.textContent || '用户';
+
+            // 设置超时时间（毫秒）
+            const timeoutDuration = 120000; // 2分钟
+
+            // 创建AbortController用于取消请求
+            const controller = new AbortController();
+            const signal = controller.signal;
+
+            // 设置超时处理
+            const timeoutId = setTimeout(() => {
+                if (!isCancelled) {
+                    controller.abort();
+                    isCancelled = true;
+                    hideLoading();
+                    alert('PDF生成超时，请尝试减少数据量或稍后再试');
+                }
+            }, timeoutDuration);
+
+            // 发送请求到后端生成PDF
+            fetch('/api/export-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    errors: errors,
+                    fields: fields,
+                    hideWord: hideWord,
+                    bookName: bookName,
+                    listName: listName
+                }),
+                signal: signal
+            })
+                .then(response => {
+                    // 清除超时计时器
+                    clearTimeout(timeoutId);
+
+                    // 如果用户取消了请求，不继续处理
+                    if (isCancelled) {
+                        throw new Error('用户取消了请求');
+                    }
+
+                    hideLoading();
+                    if (!response.ok) {
+                        // 如果响应不成功，尝试解析错误信息
+                        return response.json().then(data => {
+                            throw new Error(data.error || '导出PDF失败');
+                        });
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // 如果用户取消了请求，不继续处理
+                    if (isCancelled) return;
+
+                    // 创建下载链接
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+
+                    // 生成文件名
+                    const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                    let filename = `${username}-${currentDate}当日错词考核纸.pdf`;
+                    if (bookName && listName) {
+                        filename = `${username}-${currentDate}当日错词考核纸-${bookName}${listName}.pdf`;
+                    } else if (bookName) {
+                        filename = `${username}-${currentDate}当日错词考核纸-${bookName}.pdf`;
+                    } else if (listName) {
+                        filename = `${username}-${currentDate}当日错词考核纸-${listName}.pdf`;
+                    }
+
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    document.body.appendChild(link);
+
+                    // 触发下载
+                    link.click();
+
+                    // 清理
+                    URL.revokeObjectURL(url);
+                    document.body.removeChild(link);
+                })
+                .catch(error => {
+                    // 清除超时计时器
+                    clearTimeout(timeoutId);
+
+                    // 如果是用户取消的请求，不显示错误
+                    if (isCancelled) return;
+
+                    hideLoading();
+
+                    // 根据错误类型提供更具体的错误信息
+                    if (error.name === 'AbortError') {
+                        alert('请求已中止，可能是由于网络问题或请求超时');
+                    } else if (error.message.includes('NetworkError')) {
+                        alert('网络错误，请检查您的网络连接后重试');
+                    } else if (error.message.includes('SyntaxError')) {
+                        alert('服务器返回了无效的数据，请联系管理员');
+                    } else {
+                        alert(error.message || '导出PDF失败，请稍后重试');
+                    }
+
+                    console.error('PDF导出错误:', error);
+                });
+        }
+
+        // 显示加载提示
+        function showLoading(message = '加载中...', showCancelButton = false, cancelCallback = null) {
+            // 创建加载提示元素
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loading-overlay';
+            loadingOverlay.style.position = 'fixed';
+            loadingOverlay.style.top = '0';
+            loadingOverlay.style.left = '0';
+            loadingOverlay.style.width = '100%';
+            loadingOverlay.style.height = '100%';
+            loadingOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.justifyContent = 'center';
+            loadingOverlay.style.alignItems = 'center';
+            loadingOverlay.style.zIndex = '9999';
+
+            const loadingContent = document.createElement('div');
+            loadingContent.style.backgroundColor = 'white';
+            loadingContent.style.padding = '20px';
+            loadingContent.style.borderRadius = '5px';
+            loadingContent.style.textAlign = 'center';
+
+            const loadingText = document.createElement('div');
+            loadingText.innerHTML = message;
+            loadingText.style.marginBottom = '10px';
+
+            loadingContent.appendChild(loadingText);
+
+            // 添加旋转加载图标
+            const spinner = document.createElement('div');
+            spinner.style.border = '4px solid #f3f3f3';
+            spinner.style.borderTop = '4px solid #3498db';
+            spinner.style.borderRadius = '50%';
+            spinner.style.width = '30px';
+            spinner.style.height = '30px';
+            spinner.style.animation = 'spin 2s linear infinite';
+            spinner.style.margin = '10px auto';
+
+            // 添加旋转动画
+            const style = document.createElement('style');
+            style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+            document.head.appendChild(style);
+
+            loadingContent.appendChild(spinner);
+
+            // 如果需要显示取消按钮
+            if (showCancelButton && typeof cancelCallback === 'function') {
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = '取消';
+                cancelButton.style.marginTop = '10px';
+                cancelButton.style.padding = '5px 15px';
+                cancelButton.style.backgroundColor = '#f44336';
+                cancelButton.style.color = 'white';
+                cancelButton.style.border = 'none';
+                cancelButton.style.borderRadius = '3px';
+                cancelButton.style.cursor = 'pointer';
+
+                cancelButton.addEventListener('click', () => {
+                    hideLoading();
+                    cancelCallback();
+                });
+
+                loadingContent.appendChild(cancelButton);
+            }
+
+            loadingOverlay.appendChild(loadingContent);
+            document.body.appendChild(loadingOverlay);
+        }
+
+        // 隐藏加载提示
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                document.body.removeChild(loadingOverlay);
+            }
+        }
+
+        // 只显示今日错词
+        function showTodayErrorsOnly() {
+            // 设置日期筛选器为今天
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
+            dateFromInput.valueAsDate = today;
+            dateToInput.valueAsDate = today;
+
+            // 获取其他筛选条件
+            const selectedBookId = bookFilterSelect.value;
+            const selectedListId = listFilterSelect.value;
+            const sortBy = sortBySelect.value || null;
+
+            try {
+                // 显示加载提示
+                loadingEl.style.display = 'block';
+                contentEl.style.display = 'none';
+
+                // 直接从服务器获取今日数据
+                fetchErrorHistory(
+                    selectedBookId,
+                    selectedListId,
+                    todayStr,
+                    todayStr,
+                    sortBy
+                ).then(data => {
+                    // 隐藏加载提示，显示内容
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+
+                    // 渲染数据
+                    renderErrorHistory(data);
+                }).catch(error => {
+                    // 显示错误信息
+                    loadingEl.style.display = 'none';
+                    errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                    errorMessageEl.style.display = 'block';
+                });
+            } catch (error) {
+                // 显示错误信息
+                loadingEl.style.display = 'none';
+                errorMessageEl.textContent = `获取错误历史记录失败: ${error.message}`;
+                errorMessageEl.style.display = 'block';
+            }
+        }
+
+        // 加载更多数据
+        async function loadMoreData() {
+            try {
+                // 增加limit
+                currentLimit += 500;
+
+                // 获取当前筛选条件
+                const selectedBookId = bookFilterSelect.value;
+                const selectedListId = listFilterSelect.value;
+                const dateFrom = dateFromInput.value || null;
+                const dateTo = dateToInput.value || null;
+                const sortBy = sortBySelect.value || null;
+
+                // 显示加载提示
+                const loadMoreBtn = document.getElementById('load-more-btn');
+                if (loadMoreBtn) {
+                    loadMoreBtn.textContent = '加载中...';
+                    loadMoreBtn.disabled = true;
+                }
+
+                // 获取更多数据
+                const data = await fetchErrorHistory(
+                    selectedBookId,
+                    selectedListId,
+                    dateFrom,
+                    dateTo,
+                    sortBy,
+                    null,
+                    currentLimit
+                );
+
+                // 恢复按钮状态
+                if (loadMoreBtn) {
+                    loadMoreBtn.textContent = '加载更多记录';
+                    loadMoreBtn.disabled = false;
+                }
+
+                // 重新渲染数据
+                renderErrorHistory(data);
+            } catch (error) {
+                console.error('加载更多数据时出错:', error);
+                // 恢复按钮状态
+                const loadMoreBtn = document.getElementById('load-more-btn');
+                if (loadMoreBtn) {
+                    loadMoreBtn.textContent = '加载更多记录';
+                    loadMoreBtn.disabled = false;
+                }
+                alert('加载更多数据失败: ' + error.message);
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+
+            // 添加事件监听器
+            if (applyFilterBtn) {
+                applyFilterBtn.addEventListener('click', () => {
+                    console.log('Apply filter button clicked');
+                    applyFilters();
+                });
+            }
+
+            if (resetFilterBtn) {
+                resetFilterBtn.addEventListener('click', resetFilters);
+            }
+
+            const todayOnlyBtn = document.getElementById('today-only-btn');
+            if (todayOnlyBtn) {
+                todayOnlyBtn.addEventListener('click', showTodayErrorsOnly);
+            }
+
+            if (printBtn) {
+                printBtn.addEventListener('click', () => printErrorHistory(false));
+            }
+
+            const printHideBtn = document.getElementById('print-hide-btn');
+            if (printHideBtn) {
+                printHideBtn.addEventListener('click', () => printErrorHistory(true));
+            }
+
+            // 导出按钮事件监听
+            const exportBtn = document.getElementById('export-btn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportErrorHistory);
+            }
+
+            // 加载更多按钮事件监听
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', loadMoreData);
+            }
+
+            // 导出对话框关闭按钮
+            const closeModalBtn = document.querySelector('.close-modal');
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeExportModal);
+            }
+
+            // 导出对话框取消按钮
+            const cancelBtn = document.querySelector('.cancel-btn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeExportModal);
+            }
+
+            // 导出对话框导出按钮
+            const performExportBtn = document.querySelector('.export-btn');
+            if (performExportBtn) {
+                performExportBtn.addEventListener('click', performExport);
+            }
+
+            // 预设按钮事件监听
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            if (presetBtns) {
+                presetBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const preset = btn.getAttribute('data-preset');
+                        applyPreset(preset);
+                    });
+                });
+            }
+
+            // 默认选中"当日错题详解模式"预设
+            applyPreset('daily-detail');
+        });
+
+        // 格式化词性和意思的函数
+        function formatPOSAndMeaning(pos, meaning) {
+            if (!pos || !meaning) {
+                return { extractedPos: pos || '', formattedMeaning: meaning || '' };
+            }
+
+            // 提取词性信息
+            const posMatch = pos.match(/^([^，。；]*?)(?=[，。；]|$)/);
+            const extractedPos = posMatch ? posMatch[1].trim() : pos;
+
+            // 格式化意思，将词性信息用斜体显示
+            let formattedMeaning = meaning;
+            if (extractedPos && extractedPos !== pos) {
+                // 如果提取的词性与原始词性不同，说明有多个词性
+                const posParts = pos.split(/[，。；]/);
+                formattedMeaning = posParts.map((part, index) => {
+                    if (index === 0) {
+                        return `<em style="color: #007bff; font-weight: bold;">${part.trim()}</em>`;
+                    } else {
+                        return part.trim();
+                    }
+                }).join(' / '); // 使用斜杠分隔，避免换行
+            } else {
+                // 单个词性
+                formattedMeaning = `<em style="color: #007bff; font-weight: bold;">${extractedPos}</em> ${meaning}`;
+            }
+
+            return { extractedPos, formattedMeaning };
+        }
+    </script>
+    <!-- 导出对话框 -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>导出错误历史</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="export-options">
+                <h3>预设模式</h3>
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-preset="daily-detail">当日错题详解模式</button>
+                    <button class="preset-btn" data-preset="daily-exam">生成当日错题试卷</button>
+                    <button class="preset-btn" data-preset="full-history">完整错误历史</button>
+                    <button class="preset-btn" data-preset="custom">自定义</button>
+                </div>
+
+                <h3>选择要导出的信息</h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-word" name="export-fields" value="word" checked>
+                        <label for="export-word">单词拼写</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-meaning-cn" name="export-fields" value="meaning_cn" checked>
+                        <label for="export-meaning-cn">中文意思</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-pos" name="export-fields" value="pos" checked>
+                        <label for="export-pos">词性</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-ipa" name="export-fields" value="ipa">
+                        <label for="export-ipa">音标</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-meaning-en" name="export-fields" value="meaning_en">
+                        <label for="export-meaning-en">英文释义</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-example-en" name="export-fields" value="example_en">
+                        <label for="export-example-en">英文例句</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-example-cn" name="export-fields" value="example_cn">
+                        <label for="export-example-cn">中文例句</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-list" name="export-fields" value="list">
+                        <label for="export-list">所属列表</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-wrong-answers" name="export-fields" value="wrong_answers">
+                        <label for="export-wrong-answers">错误答案</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-error-date" name="export-fields" value="error_date">
+                        <label for="export-error-date">错误日期</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="export-error-count" name="export-fields" value="error_count">
+                        <label for="export-error-count">错误次数</label>
+                    </div>
+                </div>
+
+                <h3>导出格式</h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="radio" id="export-format-csv" name="export-format" value="csv" checked>
+                        <label for="export-format-csv">CSV (Excel)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" id="export-format-txt" name="export-format" value="txt">
+                        <label for="export-format-txt">文本文件</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="radio" id="export-format-pdf" name="export-format" value="pdf">
+                        <label for="export-format-pdf">PDF</label>
+                        <small style="display: block; color: #888; margin-left: 25px;">生成PDF可能需要较长时间，特别是数据量大时</small>
+                        <small style="display: block; color: #888; margin-left: 25px;">注意：为保证性能，每次最多导出500条记录</small>
+                    </div>
+                </div>
+
+                <div class="checkbox-item" style="margin-top: 10px;">
+                    <input type="checkbox" id="hide-word" name="hide-word">
+                    <label for="hide-word">隐藏单词（用于生成试卷）</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel-btn">取消</button>
+                <button class="modal-btn export-btn">导出</button>
+            </div>
+        </div>
+    </div>
+    <script src="/fix_mess_display_new.js"></script>
+</body>
+
 </html>
