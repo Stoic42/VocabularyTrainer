@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-基于error_id增量同步Alan的错词记录从vocabulary_classroom.db到vocabulary.db
+基于error_id增量同步Alan的错词记录从vocabulary_server.db到vocabulary.db
 """
+
+import sys
+import os
+# 添加scripts目录到Python路径
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from utils import get_database_connection, get_database_path
 import sqlite3
@@ -13,8 +18,8 @@ def sync_alan_errorlogs_by_id():
     """基于error_id增量同步Alan的错词记录"""
     
     # 数据库文件路径
-    source_db = "Alan/vocabulary_classroom.db"
-    target_db = get_database_path()
+    source_db = "././vocabulary_server.db"  # 服务器数据库（源）
+    target_db = "././vocabulary.db"  # 本地数据库（目标）
     
     # 检查源数据库是否存在
     if not os.path.exists(source_db):
