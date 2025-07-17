@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 忽略数据库文件
 # 数据库包含学生信息，且会频繁变动，不适合放入版本控制
 *.db
@@ -68,73 +67,4 @@ Alan/*.*
 
 # 忽略部署包
 deployment_packages/
-=======
-# 忽略数据库文件
-# 数据库包含学生信息，且会频繁变动，不适合放入版本控制
-*.db
-
-# 忽略Python虚拟环境文件夹
-# 这个文件夹体积庞大，且每个人的电脑上都不同，没有必要上传
-venv/
-/venv/
-
-# 忽略Python的缓存文件
-# 这些是程序运行时自动生成的文件
-__pycache__/
-*.pyc
-
-# 忽略存放API密钥等敏感信息的配置文件
-# 这是在公开仓库中最重要的规则！
-config.py
-.env
-
-# 忽略IDE/编辑器的配置文件
-# 这些文件只跟您自己的编辑习惯有关
-.idea/
-.vscode/
-
-# 忽略词库CSV文件
-# 词库文件可能很大，且包含特定内容，不适合放入版本控制
-*.csv
-wordlists/*.csv
-wordlists/*.txt
-wordlists/*.mp3
-# 但保留README.md文件
-!wordlists/README.md
-
-# 忽略assets目录下的特定文件
-# 忽略所有图片文件，除了SVG
-assets/img/*.png
-assets/img/*.jpg
-assets/img/*.jpeg
-assets/img/*.gif
-assets/img/*.bmp
-# 保留SVG文件，因为它们是矢量图，体积小且易于版本控制
-!assets/img/*.svg
-# 忽略生成的HTML文件
-assets/img/*.html
-# 忽略其他可能的二进制资源文件
-assets/audio/*
-assets/video/*
-assets/fonts/*
-
-# 忽略Obsidian配置文件
-.obsidian/
-
-# LumiCamp_for_Alan定制版本处理
-# 默认不忽略LumiCamp_for_Alan目录，但忽略其中的特定文件
-LumiCamp_for_Alan/*.db
-LumiCamp_for_Alan/__pycache__/
-LumiCamp_for_Alan/*.pyc
-LumiCamp_for_Alan/logs/
-# 不忽略标记文件和说明文件
-!LumiCamp_for_Alan/CUSTOM_VERSION.md
-!LumiCamp_for_Alan/README.md
-product_manager/.obsidian/
-
-Alan/*.*
-
-# 忽略部署包
-deployment_packages/
->>>>>>> gitlab/mods-to-fix
 *.zip
